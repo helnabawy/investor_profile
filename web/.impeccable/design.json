@@ -1,0 +1,660 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-08T00:13:46.893094+00:00",
+  "title": "Design System: EstateSite tenant sites",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Tenant Background",
+        "canonical": "oklch(15.9% 0.004 84.6)",
+        "tonalRamp": [
+          "#0c0b09",
+          "#262523",
+          "#43423f",
+          "#62615e",
+          "#83827f",
+          "#a6a5a2",
+          "#cac9c6",
+          "#f0eeeb"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Tenant Foreground",
+        "canonical": "oklch(95.1% 0.013 82.4)",
+        "tonalRamp": [
+          "#0e0b06",
+          "#28251e",
+          "#45413a",
+          "#656159",
+          "#86827a",
+          "#a9a49c",
+          "#cdc8c0",
+          "#f3eee5"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Tenant Card",
+        "canonical": "oklch(19.6% 0.012 91.8)",
+        "tonalRamp": [
+          "#0d0b06",
+          "#27251f",
+          "#44423b",
+          "#64615a",
+          "#85827a",
+          "#a8a59d",
+          "#ccc9c1",
+          "#f1eee6"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Tenant Muted",
+        "canonical": "oklch(22.8% 0.012 84.6)",
+        "tonalRamp": [
+          "#0e0b06",
+          "#28251e",
+          "#45423b",
+          "#64615a",
+          "#86827a",
+          "#a8a59d",
+          "#cdc9c0",
+          "#f2eee6"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Tenant Muted Foreground",
+        "canonical": "oklch(73.7% 0.035 88.1)",
+        "tonalRamp": [
+          "#0f0b03",
+          "#2a2417",
+          "#484131",
+          "#69604d",
+          "#8b826b",
+          "#ada48f",
+          "#d1c9b5",
+          "#f5eedd"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Tenant Border",
+        "canonical": "oklch(28.7% 0.019 84.5)",
+        "tonalRamp": [
+          "#0f0a03",
+          "#29241b",
+          "#474137",
+          "#666155",
+          "#888276",
+          "#aba498",
+          "#cfc8bc",
+          "#f4eee1"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Tenant Primary",
+        "canonical": "oklch(73.7% 0.115 87.2)",
+        "tonalRamp": [
+          "#170700",
+          "#362100",
+          "#573d00",
+          "#7a5c00",
+          "#a07d1d",
+          "#c1a155",
+          "#e3c683",
+          "#ffecb2"
+        ],
+        "presets": {
+          "luxury-gold": "#c9a54c",
+          "modern": "#0f766e",
+          "minimal": "#1c1917",
+          "desert-sand": "#a0522d"
+        }
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Primary Foreground",
+        "canonical": "oklch(17.9% 0.014 87.5)",
+        "tonalRamp": [
+          "#0e0b05",
+          "#28251d",
+          "#454239",
+          "#656158",
+          "#868279",
+          "#a9a59b",
+          "#cdc9bf",
+          "#f2eee4"
+        ]
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "Tenant Accent",
+        "canonical": "oklch(88.7% 0.056 90.3)",
+        "tonalRamp": [
+          "#110a00",
+          "#2c240d",
+          "#4b4125",
+          "#6c603f",
+          "#8f815b",
+          "#b1a481",
+          "#d4c9a9",
+          "#f8eed2"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "oklch(14.5% 0.005 85.9)",
+        "tonalRamp": [
+          "#0c0b09",
+          "#262522",
+          "#43423f",
+          "#62615e",
+          "#83827f",
+          "#a6a5a2",
+          "#cac9c6",
+          "#f0eeeb"
+        ]
+      },
+      "lounge-text": {
+        "role": "neutral",
+        "displayName": "Lounge Text",
+        "canonical": "oklch(96.4% 0.007 88.6)",
+        "tonalRamp": [
+          "#0c0b08",
+          "#262521",
+          "#43423e",
+          "#63615d",
+          "#84827e",
+          "#a7a5a0",
+          "#cbc9c4",
+          "#f0eee9"
+        ]
+      },
+      "admin-teal": {
+        "role": "primary",
+        "displayName": "Admin Teal",
+        "canonical": "oklch(51.1% 0.086 186.4)",
+        "tonalRamp": [
+          "#00110f",
+          "#002e2a",
+          "#004d48",
+          "#1b6f68",
+          "#3a938a",
+          "#69b5ac",
+          "#96d8d0",
+          "#c2fcf5"
+        ]
+      },
+      "admin-teal-deep": {
+        "role": "primary",
+        "displayName": "Admin Teal Deep",
+        "canonical": "oklch(43.7% 0.071 188.2)",
+        "tonalRamp": [
+          "#00100e",
+          "#002c2a",
+          "#154c48",
+          "#306d68",
+          "#4c908a",
+          "#76b2ac",
+          "#a0d5d0",
+          "#cbfaf5"
+        ]
+      },
+      "admin-focus": {
+        "role": "primary",
+        "displayName": "Admin Focus Teal",
+        "canonical": "oklch(70.4% 0.123 182.5)",
+        "tonalRamp": [
+          "#00130e",
+          "#003129",
+          "#005246",
+          "#007567",
+          "#009988",
+          "#41bbab",
+          "#7bdece",
+          "#adfff3"
+        ]
+      },
+      "admin-ink": {
+        "role": "neutral",
+        "displayName": "Admin Slate Ink",
+        "canonical": "oklch(20.8% 0.040 265.8)",
+        "tonalRamp": [
+          "#070b15",
+          "#1f2533",
+          "#3a4253",
+          "#576176",
+          "#77829b",
+          "#9aa5bc",
+          "#bfc9de",
+          "#e6efff"
+        ]
+      },
+      "admin-label": {
+        "role": "neutral",
+        "displayName": "Admin Label Slate",
+        "canonical": "oklch(37.2% 0.039 257.3)",
+        "tonalRamp": [
+          "#050b15",
+          "#1d2632",
+          "#384353",
+          "#556276",
+          "#74849a",
+          "#98a6bb",
+          "#bdcade",
+          "#e3f0ff"
+        ]
+      },
+      "admin-muted": {
+        "role": "neutral",
+        "displayName": "Admin Muted Slate",
+        "canonical": "oklch(55.4% 0.041 257.4)",
+        "tonalRamp": [
+          "#050b15",
+          "#1c2633",
+          "#374353",
+          "#546276",
+          "#73849b",
+          "#97a6bc",
+          "#bccade",
+          "#e3f0ff"
+        ]
+      },
+      "admin-line": {
+        "role": "neutral",
+        "displayName": "Admin Hairline",
+        "canonical": "oklch(92.9% 0.013 255.5)",
+        "tonalRamp": [
+          "#080b10",
+          "#21252b",
+          "#3e4249",
+          "#5d6268",
+          "#7d838a",
+          "#a0a6ad",
+          "#c4cad1",
+          "#e9eff7"
+        ]
+      },
+      "admin-field-line": {
+        "role": "neutral",
+        "displayName": "Admin Field Line",
+        "canonical": "oklch(86.9% 0.020 252.9)",
+        "tonalRamp": [
+          "#060c13",
+          "#1e262f",
+          "#3b434d",
+          "#59626d",
+          "#7a838e",
+          "#9da6b2",
+          "#c0cad6",
+          "#e5f0fc"
+        ]
+      },
+      "lounge-ink": {
+        "role": "neutral",
+        "displayName": "Lounge Ink (night ink + 7% primary)",
+        "derived": true
+      },
+      "lounge-muted": {
+        "role": "neutral",
+        "displayName": "Lounge Muted (72% lounge text)",
+        "derived": true
+      },
+      "lounge-glass": {
+        "role": "neutral",
+        "displayName": "Lounge Glass (58% night ink)",
+        "derived": true
+      },
+      "lounge-glass-line": {
+        "role": "neutral",
+        "displayName": "Glass Line (16% lounge text)",
+        "derived": true
+      },
+      "sidebar": {
+        "role": "secondary",
+        "displayName": "Inverted Sidebar (foreground warmed 14% by accent)",
+        "derived": true
+      },
+      "sidebar-fg": {
+        "role": "secondary",
+        "displayName": "Sidebar Text (= tenant background)",
+        "derived": true
+      },
+      "sidebar-mark": {
+        "role": "secondary",
+        "displayName": "Sidebar Mark (primary 80% toward sidebar text)",
+        "derived": true
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page-header and contact titles on photo; last word in accent."
+      },
+      "display-lobby": {
+        "displayName": "Display Lobby",
+        "purpose": "Advisor name on the chat home; condenses into the talking header."
+      },
+      "numeral": {
+        "displayName": "Chapter Numeral",
+        "purpose": "Story chapter numbers, lining figures, translucent."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Story chapter titles and Lounge CTA titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, form heading, channel labels."
+      },
+      "body-ui": {
+        "displayName": "Body UI",
+        "purpose": "Lounge subtitles, story text, controls (Hanken Grotesk)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Classic section copy in the tenant body face."
+      },
+      "label-ui": {
+        "displayName": "Label UI",
+        "purpose": "Field labels, chips, hints."
+      },
+      "admin": {
+        "displayName": "Admin",
+        "purpose": "System sans for the /admin dashboard only."
+      }
+    },
+    "tenantPresets": {
+      "luxury-gold": {
+        "background": "#0e0d0b",
+        "foreground": "#f3eee5",
+        "card": "#17150f",
+        "muted": "#1f1c16",
+        "mutedForeground": "#b3a991",
+        "border": "#2f2a20",
+        "primary": "#c9a54c",
+        "primaryForeground": "#14110a",
+        "accent": "#e8d9b0",
+        "headingFont": "Playfair Display",
+        "bodyFont": "Cormorant Garamond",
+        "radius": "0.125rem"
+      },
+      "modern": {
+        "background": "#ffffff",
+        "foreground": "#0f172a",
+        "card": "#f8fafc",
+        "muted": "#f1f5f9",
+        "mutedForeground": "#64748b",
+        "border": "#e2e8f0",
+        "primary": "#0f766e",
+        "primaryForeground": "#ffffff",
+        "accent": "#14b8a6",
+        "headingFont": "Plus Jakarta Sans",
+        "bodyFont": "Inter",
+        "radius": "0.75rem"
+      },
+      "minimal": {
+        "background": "#fafaf9",
+        "foreground": "#1c1917",
+        "card": "#ffffff",
+        "muted": "#f5f5f4",
+        "mutedForeground": "#78716c",
+        "border": "#e7e5e4",
+        "primary": "#1c1917",
+        "primaryForeground": "#fafaf9",
+        "accent": "#a8a29e",
+        "headingFont": "DM Serif Display",
+        "bodyFont": "Manrope",
+        "radius": "0rem"
+      },
+      "desert-sand": {
+        "background": "#f7f1e8",
+        "foreground": "#2b2118",
+        "card": "#fffaf3",
+        "muted": "#efe5d6",
+        "mutedForeground": "#7a6a58",
+        "border": "#e2d4bf",
+        "primary": "#a0522d",
+        "primaryForeground": "#fffaf3",
+        "accent": "#d4a373",
+        "headingFont": "Libre Baskerville",
+        "bodyFont": "Outfit",
+        "radius": "0.5rem"
+      }
+    },
+    "tenantTokenRoles": [
+      "background",
+      "foreground",
+      "card",
+      "muted",
+      "mutedForeground",
+      "border",
+      "primary",
+      "primaryForeground",
+      "accent",
+      "headingFont",
+      "bodyFont",
+      "radius"
+    ],
+    "shadows": [
+      {
+        "name": "shell-float",
+        "value": "0 24px 60px -18px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.18)",
+        "purpose": "Lounge sidebar card."
+      },
+      {
+        "name": "composer-float",
+        "value": "0 18px 50px -20px rgb(0 0 0 / 0.7)",
+        "purpose": "Concierge composer; adds 0 0 0 4px accent 14% on focus."
+      },
+      {
+        "name": "avatar-lift",
+        "value": "0 18px 40px -12px rgb(0 0 0 / 0.8)",
+        "purpose": "96px lobby avatar."
+      },
+      {
+        "name": "cta-lift",
+        "value": "0 6px 18px -8px rgb(0 0 0 / 0.5)",
+        "purpose": "Sidebar CTA; hover 0 10px 24px -10px rgb(0 0 0 / 0.6)."
+      },
+      {
+        "name": "accent-glow",
+        "value": "0 10px 28px -12px color-mix(in srgb, var(--accent) 70%, transparent)",
+        "purpose": "Solid submit button."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-lounge",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "All reveals, lobby-to-conversation layout transitions, drift."
+      },
+      {
+        "name": "reveal",
+        "value": "0.7s, y 24px to 0, once",
+        "purpose": "Section entrance on scroll."
+      },
+      {
+        "name": "layout-shift",
+        "value": "0.6s",
+        "purpose": "Shared avatar/title layoutId between lobby and talking header."
+      },
+      {
+        "name": "nav-marker-spring",
+        "value": "spring stiffness 500 damping 40",
+        "purpose": "Active nav marker slide."
+      },
+      {
+        "name": "drawer-spring",
+        "value": "spring stiffness 420 damping 42",
+        "purpose": "Mobile sidebar drawer."
+      },
+      {
+        "name": "chip-stagger",
+        "value": "40ms stagger, 250ms delay",
+        "purpose": "Suggestion chips entrance."
+      },
+      {
+        "name": "state",
+        "value": "0.2s",
+        "purpose": "Hover and focus colour transitions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "surfaces": {
+      "lounge": "Sidebar shell, chat-first home, story About, contact lounge (default for new sites).",
+      "classic": "Top nav, long scrolling sections (incumbent).",
+      "admin": "/admin, fixed teal-on-slate system sans; independent of tenant tokens."
+    }
+  },
+  "components": [
+    {
+      "name": "Suggestion Chip",
+      "kind": "chip",
+      "refersTo": "lounge-chip",
+      "description": "Glass pill with a suggested question, over the chat-home backdrop only.",
+      "html": "<div class=\"ds-photo\"><button class=\"ds-chip\">Best areas to invest</button></div>",
+      "css": ".ds-photo{background:linear-gradient(160deg,#4a4334,#0b0a08);padding:24px} .ds-chip{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:.82rem;color:color-mix(in srgb,#f5f3ee 86%,transparent);background:color-mix(in srgb,#0b0a08 58%,transparent);border:1px solid color-mix(in srgb,#f5f3ee 16%,transparent);border-radius:999px;padding:.45rem .95rem;backdrop-filter:blur(8px);cursor:pointer;transition:border-color .2s,color .2s,background-color .2s} .ds-chip:hover{border-color:color-mix(in srgb,var(--accent,#e8d9b0) 70%,transparent);color:#f5f3ee;background:color-mix(in srgb,#0b0a08 45%,transparent)} .ds-chip:focus-visible{outline:2px solid var(--accent,#e8d9b0);outline-offset:2px}"
+    },
+    {
+      "name": "Concierge Composer",
+      "kind": "input",
+      "refersTo": "lounge-composer",
+      "description": "Glass composer with textarea and send button; the chat home's anchor.",
+      "html": "<div class=\"ds-photo\"><form class=\"ds-composer\" onsubmit=\"return false\"><textarea rows=\"2\" placeholder=\"Ask about projects, prices…\"></textarea><button class=\"ds-send\" aria-label=\"Send\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m5 12 7-7 7 7\"/><path d=\"M12 19V5\"/></svg></button></form></div>",
+      "css": ".ds-photo{background:linear-gradient(160deg,#4a4334,#0b0a08);padding:24px} .ds-composer{display:flex;align-items:flex-end;gap:8px;padding:10px;max-width:640px;background:color-mix(in srgb,#0b0a08 62%,transparent);border:1px solid color-mix(in srgb,#f5f3ee 16%,transparent);border-radius:calc(var(--radius,0.125rem) + 10px);backdrop-filter:blur(14px);box-shadow:0 18px 50px -20px rgb(0 0 0/.7);transition:border-color .2s,box-shadow .2s} .ds-composer:focus-within{border-color:color-mix(in srgb,var(--accent,#e8d9b0) 60%,transparent);box-shadow:0 18px 50px -20px rgb(0 0 0/.7),0 0 0 4px color-mix(in srgb,var(--accent,#e8d9b0) 14%,transparent)} .ds-composer textarea{flex:1;resize:none;background:transparent;border:0;outline:none;color:#f5f3ee;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:.98rem;line-height:1.6;padding:8px 10px;caret-color:var(--accent,#e8d9b0)} .ds-composer textarea::placeholder{color:color-mix(in srgb,#f5f3ee 55%,transparent)} .ds-send{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer;color:#f5f3ee;background:color-mix(in srgb,var(--accent,#e8d9b0) 22%,transparent);border-radius:calc(var(--radius,0.125rem) + 4px);transition:background-color .2s} .ds-send:hover{background:var(--accent,#e8d9b0);color:#0b0a08}"
+    },
+    {
+      "name": "Solid Submit",
+      "kind": "button",
+      "refersTo": "lounge-submit",
+      "description": "The Lounge's one solid action: accent ground with accent glow.",
+      "html": "<button class=\"ds-submit\">Send message</button>",
+      "css": ".ds-submit{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:.95rem;letter-spacing:.01em;color:#120f09;background:var(--accent,#e8d9b0);border:0;border-radius:var(--radius,0.125rem);padding:.9rem 1.2rem;cursor:pointer;box-shadow:0 10px 28px -12px color-mix(in srgb,var(--accent,#e8d9b0) 70%,transparent);transition:transform .2s,background-color .2s} .ds-submit:hover{transform:translateY(-1px);background:color-mix(in srgb,var(--accent,#e8d9b0) 88%,#fff)} .ds-submit:focus-visible{outline:2px solid var(--accent,#e8d9b0);outline-offset:3px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "lounge-ghost",
+      "description": "Secondary Lounge action on the theme ground, paired with the solid submit.",
+      "html": "<button class=\"ds-ghost\">Ask the concierge</button>",
+      "css": ".ds-ghost{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:500;font-size:.95rem;color:var(--foreground,#f3eee5);background:transparent;border:1px solid color-mix(in srgb,var(--foreground,#f3eee5) 28%,transparent);border-radius:var(--radius,0.125rem);padding:.85rem 1.4rem;cursor:pointer;transition:border-color .2s,background-color .2s} .ds-ghost:hover{border-color:var(--accent,#e8d9b0);background:color-mix(in srgb,var(--accent,#e8d9b0) 8%,transparent)} .ds-ghost:focus-visible{outline:2px solid var(--accent,#e8d9b0);outline-offset:3px}"
+    },
+    {
+      "name": "Lounge Field",
+      "kind": "input",
+      "refersTo": "lounge-input",
+      "description": "Labelled input on the photographic contact ground.",
+      "html": "<div class=\"ds-photo\"><label class=\"ds-field\"><span>Full name</span><input placeholder=\"Your name\"></label></div>",
+      "css": ".ds-photo{background:linear-gradient(160deg,#4a4334,#0b0a08);padding:24px} .ds-field{display:grid;gap:8px} .ds-field span{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:.82rem;color:color-mix(in srgb,#f5f3ee 72%,transparent)} .ds-field input{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:.95rem;color:#f5f3ee;background:color-mix(in srgb,#0b0a08 55%,transparent);border:1px solid color-mix(in srgb,#f5f3ee 16%,transparent);border-radius:var(--radius,0.125rem);padding:.75rem .95rem;transition:border-color .2s,box-shadow .2s} .ds-field input::placeholder{color:color-mix(in srgb,#f5f3ee 45%,transparent)} .ds-field input:focus{outline:none;border-color:color-mix(in srgb,var(--accent,#e8d9b0) 70%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent,#e8d9b0) 16%,transparent)}"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "lounge-sidebar",
+      "description": "Inverted floating sidebar with icon nav, active marker and CTA.",
+      "html": "<nav class=\"ds-side\"><a class=\"ds-nav on\" href=\"#\"><i class=\"ds-mark\"></i><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z\"/></svg>Home</a><a class=\"ds-nav\" href=\"#\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M7 20.7a6 6 0 0 1 10 0\"/></svg>About</a><a class=\"ds-cta\" href=\"#\">Book a consultation</a></nav>",
+      "css": ".ds-side{--sb:color-mix(in srgb,var(--foreground,#f3eee5) 86%,var(--accent,#e8d9b0));--sf:var(--background,#0e0d0b);width:240px;padding:12px;display:grid;gap:4px;background:var(--sb);color:var(--sf);border-radius:calc(var(--radius,0.125rem) + 6px);box-shadow:0 24px 60px -18px rgb(0 0 0/.55),0 2px 6px rgb(0 0 0/.18);font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif} .ds-nav{position:relative;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--radius,0.125rem);font-size:.95rem;text-decoration:none;color:color-mix(in srgb,var(--sf) 82%,transparent);transition:background-color .2s,color .2s} .ds-nav:hover{background:color-mix(in srgb,var(--sf) 6%,transparent);color:var(--sf)} .ds-nav.on{background:color-mix(in srgb,var(--sf) 9%,transparent);color:var(--sf);font-weight:500} .ds-nav.on svg{color:color-mix(in srgb,var(--primary,#c9a54c) 80%,var(--sf))} .ds-mark{position:absolute;left:-4px;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--primary,#c9a54c)} .ds-nav:focus-visible,.ds-cta:focus-visible{outline:2px solid var(--primary,#c9a54c);outline-offset:2px} .ds-cta{margin-top:16px;display:flex;justify-content:center;padding:12px 16px;border-radius:var(--radius,0.125rem);background:var(--sf);color:var(--sb);font-weight:500;font-size:.95rem;text-decoration:none;box-shadow:0 6px 18px -8px rgb(0 0 0/.5);transition:transform .2s,box-shadow .2s} .ds-cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px -10px rgb(0 0 0/.6)}"
+    },
+    {
+      "name": "Story Chapter",
+      "kind": "card",
+      "refersTo": "story-panel",
+      "description": "Numbered About chapter on night ink with masked photo.",
+      "html": "<article class=\"ds-story\"><p class=\"n\">01</p><h2>A private advisory for Dubai property</h2><p class=\"b\">How the advisor works, told as one chapter.</p><span class=\"r\"></span></article>",
+      "css": ".ds-story{background:color-mix(in srgb,#0b0a08 93%,var(--primary,#c9a54c));color:#f5f3ee;border-radius:calc(var(--radius,0.125rem) + 6px);padding:48px} .ds-story .n{font-family:var(--font-heading,'Playfair Display',Georgia,serif);font-size:4rem;line-height:1;font-variant-numeric:lining-nums;color:color-mix(in srgb,#f5f3ee 38%,transparent);margin:0} .ds-story h2{font-family:var(--font-heading,'Playfair Display',Georgia,serif);font-weight:400;font-size:2.2rem;line-height:1.1;max-width:16ch;margin:20px 0 0;letter-spacing:-.01em} .ds-story .b{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:.98rem;line-height:1.7;max-width:46ch;color:color-mix(in srgb,#f5f3ee 72%,transparent);margin-top:20px} .ds-story .r{display:block;margin-top:32px;height:1px;width:56px;background:color-mix(in srgb,var(--accent,#e8d9b0) 70%,transparent)}"
+    },
+    {
+      "name": "Project Card",
+      "kind": "card",
+      "refersTo": "project-card",
+      "description": "Inventory card shared by both layouts.",
+      "html": "<a class=\"ds-pcard\" href=\"#\"><div class=\"img\"><span>Off-plan</span></div><div class=\"body\"><h3>Marina Residences</h3><p class=\"meta\">Emaar · Dubai Marina · 2 BR</p><p class=\"price\">From AED 2,400,000</p></div></a>",
+      "css": ".ds-pcard{display:block;overflow:hidden;width:320px;text-decoration:none;color:var(--foreground,#f3eee5);background:var(--card,#17150f);border:1px solid var(--border,#2f2a20);border-radius:var(--radius,0.125rem);transition:border-color .2s} .ds-pcard:hover{border-color:var(--primary,#c9a54c)} .ds-pcard:focus-visible{outline:2px solid var(--primary,#c9a54c);outline-offset:2px} .ds-pcard .img{position:relative;aspect-ratio:4/3;background:var(--muted,#1f1c16)} .ds-pcard .img span{position:absolute;left:12px;top:12px;padding:4px 10px;font:500 .7rem 'Hanken Grotesk',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.12em;background:color-mix(in srgb,var(--background,#0e0d0b) 90%,transparent);border-radius:var(--radius,0.125rem)} .ds-pcard .body{padding:20px} .ds-pcard h3{font-family:var(--font-heading,'Playfair Display',Georgia,serif);font-weight:400;font-size:1.25rem;margin:0} .ds-pcard .meta{font:.875rem 'Hanken Grotesk',system-ui,sans-serif;color:var(--muted-foreground,#b3a991);margin-top:8px} .ds-pcard .price{font:1.125rem 'Hanken Grotesk',system-ui,sans-serif;font-variant-numeric:lining-nums tabular-nums;color:var(--primary,#c9a54c);margin-top:16px}"
+    },
+    {
+      "name": "Admin Primary Button",
+      "kind": "button",
+      "refersTo": "admin-button-primary",
+      "description": "Fixed teal action in /admin; never on tenant sites.",
+      "html": "<button class=\"ds-abtn\">Save changes</button>",
+      "css": ".ds-abtn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:8px;padding:.55rem 1rem;font:500 .875rem ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;background:#0f766e;color:#fff;cursor:pointer;transition:background .15s} .ds-abtn:hover{background:#115e59} .ds-abtn:focus-visible{outline:2px solid #14b8a6;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Advisor's Private Lounge",
+    "overview": "Every tenant site is one advisor's private room, not a listings portal. In the Lounge layout the conversation is the homepage: a floating sidebar holds the room together, a blurred and theme-tinted photograph sets the light, and the advisor's face, name and composer sit in the middle of it. The visual system has no fixed palette. It is a set of **token roles** (background, foreground, card, muted, muted-foreground, border, primary, primary-foreground, accent, heading font, body font, radius) that each tenant fills, either from a named preset or by overriding single roles. Everything else is derived from those roles with `color-mix()`, so any preset lands coherently.\n\nTwo layouts share the tokens. **Lounge** (default for new sites per PRODUCT.md) is the sidebar shell with a chat-first home, a numbered story About and a contact lounge. **Classic** is the incumbent top nav with long scrolling sections. The **Admin** dashboard is a third, separate surface with its own fixed teal-on-slate design that never reads tenant tokens.\n\nThe frontmatter values for the tenant roles are the **Luxury Gold** preset, which is also the fallback preset when a tenant has none. Rounded values are resolved against Luxury Gold's base radius (2px); in code they are offsets from the tenant's `--radius`.",
+    "keyCharacteristics": [
+      "Tenant tokens in, derived roles out: no tenant-facing colour is hard-coded except the night ink of photographic regions.",
+      "Two grounds in Lounge: the theme ground (page) and the photographic night ground (backdrop, page headers, story panels, contact).",
+      "An inverted sidebar: the theme's foreground, warmed by its accent, becomes the sidebar's ground.",
+      "The tenant's heading face for names, titles and numerals; Hanken Grotesk as the workhorse UI face for every control in Lounge.",
+      "One easing curve, cubic-bezier(0.22, 1, 0.36, 1), behind every reveal and layout transition."
+    ],
+    "rules": [
+      {
+        "name": "The Tokens-In Rule",
+        "body": "Tenant-facing colour comes from the nine role tokens or a `color-mix()` of them. A new surface that needs a colour derives it; it never introduces a literal hex, except night ink on photographic ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The Inverted Sidebar Rule",
+        "body": "The Lounge sidebar is foreground mixed 14% toward accent, with background as its text. On a dark preset it is a pale panel; on a light preset it is a dark one. Its CTA inverts again (sidebar-fg ground, sidebar text).",
+        "section": "colors"
+      },
+      {
+        "name": "The Night Ground Rule",
+        "body": "Anything sitting on a photograph is on night ink with lounge-text type, whatever the preset. Never set theme foreground on a photo.",
+        "section": "colors"
+      },
+      {
+        "name": "The Accent Word Rule",
+        "body": "A Lounge display title colours its final word (or an explicit tenant-chosen tail) in accent. One accent span per title, never mid-sentence.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two Faces Rule",
+        "body": "In Lounge, controls and metadata use Hanken Grotesk with tabular lining numerals on cards; the tenant faces never set a button, input or nav label.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glass-On-Photo Rule",
+        "body": "Glass (blurred translucent night ink) exists only over a photograph: chips, composer, menu button, contact channel list and form. On the theme ground, panels are opaque card fills with a border.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** express every tenant-facing colour as a role token or a `color-mix()` of role tokens, so all four presets and any override render coherently.",
+      "**Do** put light lounge-text type and glass controls on any photographic region, over night ink.",
+      "**Do** set Lounge controls, labels and card metadata in Hanken Grotesk and keep the tenant heading face for names, titles and numerals.",
+      "**Do** derive corner radii as offsets from the tenant radius (+4px bubbles, +6px panels, +10px composer); keep chips and avatars fully round.",
+      "**Do** use cubic-bezier(0.22, 1, 0.36, 1) for reveals and layout transitions (0.35 to 0.7s) and honour prefers-reduced-motion.",
+      "**Do** dissolve photo regions into the page ground (bottom 28% gradient to background)."
+    ],
+    "donts": [
+      "**Don't** place glass chips or the glass composer on the theme ground; they belong to the backdrop.",
+      "**Don't** set theme foreground text directly on a photograph.",
+      "**Don't** let admin teal or slate leak into tenant sites, or tenant tokens into `/admin`.",
+      "**Don't** hard-code a brand colour, font or copy for a tenant surface; everything is per-tenant.",
+      "**Don't** carry the classic `.eyebrow` uppercase kicker into Lounge or new surfaces; Lounge titles stand without kickers."
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "name": "estatesite",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:start": "supabase start -x vector,logflare,imgproxy,edge-runtime,supavisor,realtime,studio,mailpit",
+    "db:reset": "supabase db reset",
+    "create-admin": "node --env-file=.env.local scripts/create-admin.mjs",
+    "test:chat": "tsx --conditions=react-server --env-file=.env.local scripts/test-chat-tools.mts",
+    "test:rls": "tsx --env-file=.env.local scripts/test-rls.mts",
+    "test:e2e": "node scripts/e2e-admin.mjs /tmp"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.99",
+    "@ai-sdk/google": "^4.0.114",
+    "@ai-sdk/groq": "^4.0.78",
+    "@ai-sdk/openai-compatible": "^3.0.87",
+    "@ai-sdk/provider": "4.0.37",
+    "@ai-sdk/react": "^4.0.169",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.119.0",
+    "ai": "^7.0.165",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.70.0",
+    "motion": "^14.10.1",
+    "next": "16.4.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "resend": "^6.37.0",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.5",
+    "playwright-core": "^1.65.0",
+    "supabase": "^3.0.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.28.0"
+}

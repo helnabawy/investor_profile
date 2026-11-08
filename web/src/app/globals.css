@@ -1,0 +1,248 @@
+@import "tailwindcss";
+
+/* Defaults; each tenant site overrides these via an injected :root block (src/lib/theme.ts). */
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #f8fafc;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --primary: #0f766e;
+  --primary-foreground: #ffffff;
+  --accent: #14b8a6;
+  --radius: 0.5rem;
+  --font-heading: ui-serif, Georgia, serif;
+  --font-body: ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --radius-theme: var(--radius);
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+* {
+  border-color: var(--border);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.site-header { background: color-mix(in srgb, var(--background) 95%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+body:has(main [data-hero]) .site-header:not(.is-solid) {
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.5), transparent);
+  backdrop-filter: none;
+  border-color: transparent;
+  color: #fff;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.72rem;
+  color: var(--primary);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
+  cursor: pointer;
+}
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-primary:hover { background: color-mix(in srgb, var(--primary) 85%, var(--foreground)); }
+.btn-outline { border: 1px solid color-mix(in srgb, currentColor 40%, transparent); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+.input {
+  width: 100%;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+  color: var(--foreground);
+  font-size: 0.95rem;
+}
+.input:focus { outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent); outline-offset: 1px; }
+
+.prose-chat a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+.prose-chat p + p { margin-top: 0.5rem; }
+.prose-chat ul { list-style: disc; padding-left: 1.1rem; margin: 0.35rem 0; }
+.prose-chat strong { font-weight: 600; }
+
+/* ───────── Admin dashboard (fixed design, independent of tenant themes) ───────── */
+.admin { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.admin h1, .admin h2, .admin h3 { font-family: inherit; letter-spacing: -0.015em; }
+.admin * { border-color: #e2e8f0; }
+.field { display: grid; gap: 0.35rem; font-size: 0.875rem; }
+.field > span { font-weight: 500; color: #334155; }
+.field small { color: #64748b; font-size: 0.78rem; }
+.field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), .field textarea, .field select, .a-input {
+  width: 100%; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.55rem 0.75rem; background: #fff; color: #0f172a; font-size: 0.9rem;
+}
+.field input:focus, .field textarea:focus, .field select:focus, .a-input:focus { outline: 2px solid #14b8a6; outline-offset: 0; border-color: #14b8a6; }
+.a-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; border-radius: 0.5rem; padding: 0.55rem 1rem; font-size: 0.875rem; font-weight: 500; transition: background 0.15s; cursor: pointer; }
+.a-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.a-btn-primary { background: #0f766e; color: #fff; }
+.a-btn-primary:hover { background: #115e59; }
+.a-btn-ghost { border: 1px solid #cbd5e1; background: #fff; color: #0f172a; }
+.a-btn-ghost:hover { background: #f1f5f9; }
+.a-btn-danger { color: #b91c1c; border: 1px solid #fecaca; background: #fff; }
+.a-btn-danger:hover { background: #fef2f2; }
+.a-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 0.875rem; padding: 1.5rem; }
+
+/* ───────── Lounge layout (sidebar shell + chat-first home). All colours derive from tenant tokens. ───────── */
+.lounge {
+  --font-ui: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  /* Sidebar sits on the inverted ground: the theme's text colour, warmed by its accent. */
+  --sidebar: color-mix(in srgb, var(--foreground) 86%, var(--accent));
+  --sidebar-fg: var(--background);
+  --sidebar-line: color-mix(in srgb, var(--sidebar-fg) 14%, transparent);
+  --sidebar-mark: color-mix(in srgb, var(--primary) 80%, var(--sidebar-fg));
+  /* Photographic surfaces are always night-toned so white type reads on any preset. */
+  --lounge-ink: color-mix(in srgb, #0b0a08 93%, var(--primary));
+  --lounge-text: #f5f3ee;
+  --lounge-muted: color-mix(in srgb, #f5f3ee 72%, transparent);
+  --lounge-glass: color-mix(in srgb, #0b0a08 58%, transparent);
+  --lounge-glass-line: color-mix(in srgb, #f5f3ee 16%, transparent);
+}
+.font-ui { font-family: var(--font-ui); }
+
+.lounge-sidebar {
+  background:
+    linear-gradient(to bottom, color-mix(in srgb, var(--sidebar) 92%, var(--primary)) 0%, var(--sidebar) 45%, color-mix(in srgb, var(--sidebar) 94%, var(--sidebar-fg)) 100%);
+  color: var(--sidebar-fg);
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: 0 24px 60px -18px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.18);
+}
+.lounge-nav-item { color: color-mix(in srgb, var(--sidebar-fg) 82%, transparent); transition: background-color 0.2s, color 0.2s; }
+.lounge-nav-item:hover { background: color-mix(in srgb, var(--sidebar-fg) 6%, transparent); color: var(--sidebar-fg); }
+.lounge-nav-item.is-active { background: color-mix(in srgb, var(--sidebar-fg) 9%, transparent); color: var(--sidebar-fg); font-weight: 500; }
+.lounge-nav-item.is-active svg { color: var(--sidebar-mark); }
+.lounge-nav-marker { position: absolute; left: -0.25rem; top: 0.6rem; bottom: 0.6rem; width: 3px; border-radius: 3px; background: var(--primary); }
+.lounge-nav-item:focus-visible, .lounge-cta:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.lounge-cta { background: var(--sidebar-fg); color: var(--sidebar); box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.5); transition: transform 0.2s, box-shadow 0.2s; }
+.lounge-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.6); }
+.lounge-menu-btn { background: var(--lounge-glass); color: var(--lounge-text); border: 1px solid var(--lounge-glass-line); backdrop-filter: blur(10px); }
+
+.lounge-backdrop-img { filter: grayscale(0.85) sepia(0.35) contrast(1.05) brightness(0.62) blur(5px); transform: scale(1.06); }
+.lounge-backdrop-tint {
+  background:
+    radial-gradient(120% 80% at 50% 38%, transparent 0%, color-mix(in srgb, var(--lounge-ink) 55%, transparent) 70%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--lounge-ink) 35%, transparent), color-mix(in srgb, var(--lounge-ink) 20%, transparent) 40%, var(--lounge-ink) 100%),
+    color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* Photographic regions (home, page headers, story panels) speak in light type. */
+.on-photo { color: var(--lounge-text); }
+.on-photo .muted { color: var(--lounge-muted); }
+
+.lounge-chip {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--lounge-text) 86%, transparent);
+  background: var(--lounge-glass);
+  border: 1px solid var(--lounge-glass-line);
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+.lounge-chip:hover { border-color: color-mix(in srgb, var(--accent) 70%, transparent); color: var(--lounge-text); background: color-mix(in srgb, #0b0a08 45%, transparent); }
+.lounge-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.lounge-composer {
+  background: color-mix(in srgb, #0b0a08 62%, transparent);
+  border: 1px solid var(--lounge-glass-line);
+  border-radius: calc(var(--radius) + 10px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 50px -20px rgb(0 0 0 / 0.7);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lounge-composer:focus-within { border-color: color-mix(in srgb, var(--accent) 60%, transparent); box-shadow: 0 18px 50px -20px rgb(0 0 0 / 0.7), 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent); }
+.lounge-composer textarea { background: transparent; color: var(--lounge-text); font-family: var(--font-ui); caret-color: var(--accent); }
+.lounge-composer textarea::placeholder { color: color-mix(in srgb, var(--lounge-text) 55%, transparent); }
+.lounge-send { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--lounge-text); border-radius: calc(var(--radius) + 4px); transition: background-color 0.2s; }
+.lounge-send:not(:disabled):hover { background: var(--accent); color: #0b0a08; }
+.lounge-send:disabled { opacity: 0.45; }
+
+/* Conversation bubbles on the photographic ground. */
+.lounge-thread .prose-chat { font-family: var(--font-ui); font-size: 0.95rem; }
+.lounge-thread .bubble-assistant { background: color-mix(in srgb, #0b0a08 66%, transparent); color: var(--lounge-text); border: 1px solid var(--lounge-glass-line); backdrop-filter: blur(10px); }
+.lounge-thread .bubble-user { background: var(--accent); color: #0b0a08; }
+.lounge-thread .prose-chat a { color: var(--accent); }
+.lounge-thread .bubble-user a { color: #0b0a08; }
+
+.lounge-thread::-webkit-scrollbar { width: 6px; }
+.lounge-thread::-webkit-scrollbar-thumb { background: var(--lounge-glass-line); border-radius: 6px; }
+
+/* Lounge surfaces below the photo: panels on the theme ground. */
+.lounge-panel-card { background: color-mix(in srgb, var(--card) 88%, transparent); border: 1px solid var(--border); border-radius: calc(var(--radius) + 6px); }
+.lounge .field-label { font-family: var(--font-ui); font-size: 0.82rem; color: var(--muted-foreground); }
+.lounge .input { font-family: var(--font-ui); }
+.lounge-input {
+  width: 100%; font-family: var(--font-ui); font-size: 0.95rem; color: var(--lounge-text);
+  background: color-mix(in srgb, #0b0a08 55%, transparent); border: 1px solid var(--lounge-glass-line);
+  border-radius: var(--radius); padding: 0.75rem 0.95rem; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lounge-input::placeholder { color: color-mix(in srgb, var(--lounge-text) 45%, transparent); }
+.lounge-input:focus { outline: none; border-color: color-mix(in srgb, var(--accent) 70%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+.lounge-submit {
+  font-family: var(--font-ui); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em;
+  color: #120f09; background: var(--accent); border-radius: var(--radius); padding: 0.9rem 1.2rem;
+  box-shadow: 0 10px 28px -12px color-mix(in srgb, var(--accent) 70%, transparent); transition: transform 0.2s, background-color 0.2s;
+}
+.lounge-submit:hover:not(:disabled) { transform: translateY(-1px); background: color-mix(in srgb, var(--accent) 88%, #fff); }
+.lounge-submit:disabled { opacity: 0.6; }
+.lounge-submit:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@keyframes lounge-drift { 0%, 100% { transform: translateY(0); opacity: 0.55; } 50% { transform: translateY(5px); opacity: 1; } }
+.lounge-drift { animation: lounge-drift 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+@media (prefers-reduced-motion: reduce) { .lounge-drift { animation: none; } }
+
+/* Review fixes: photo regions dissolve into the page ground; cards speak in the UI face. */
+.lounge-backdrop-tint::after { content: ""; position: absolute; inset: auto 0 0 0; height: 28%; background: linear-gradient(to bottom, transparent, var(--background)); }
+.lounge-story-img { mask-image: linear-gradient(90deg, transparent 0%, transparent 18%, #000 62%); -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 18%, #000 62%); }
+@media (max-width: 767px) { .lounge-story-img { mask-image: none; -webkit-mask-image: none; } }
+.lounge .card-ui { font-family: var(--font-ui); font-variant-numeric: lining-nums tabular-nums; }
+.lounge-ghost {
+  font-family: var(--font-ui); font-weight: 500; font-size: 0.95rem; color: var(--foreground);
+  border: 1px solid color-mix(in srgb, var(--foreground) 28%, transparent); border-radius: var(--radius);
+  padding: 0.85rem 1.4rem; transition: border-color 0.2s, background-color 0.2s;
+}
+.lounge-ghost:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.lounge-ghost:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
