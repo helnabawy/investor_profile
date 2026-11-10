@@ -29,7 +29,7 @@ Set at least one key. The provider is chosen per tenant in Admin → AI concierg
 | `OPENROUTER_API_KEY` | `meta-llama/llama-3.3-70b-instruct` | many cheap/free models |
 | `ANTHROPIC_API_KEY` | `claude-haiku-5-5` | low cost, best quality |
 
-Retrieval uses Postgres full-text search instead of embeddings, so it works with every provider and adds no cost per query. API keys live only in server env, never in the database. Daily message caps per plan are set in `src/app/api/chat/route.ts`.
+Retrieval uses Postgres full-text search instead of embeddings, so it works with every provider and adds no cost per query. API keys live only in server env, never in the database. Daily message caps per plan are set in `src/lib/plans.ts`.
 
 ## Local development
 ```bash
@@ -81,7 +81,8 @@ supabase/migrations/         schema + RLS
 ```
 
 ## Not built yet
-- Stripe billing. `tenants.plan` exists and only the service role can change it, so a billing webhook just updates that column.
+- Stripe billing. `tenants.plan` (`free`, `solo`, `team`) can only be changed with the service role, so a billing webhook just updates that column. Until then, change a plan with `node --env-file=.env.local scripts/set-plan.mjs <slug> <free|solo|team>`.
+- Team accounts (invites and roles); the Team plan currently differs from Solo only in its chat cap.
 - The investor portal (holdings, payments, documents).
 - An embeddable `<script>` chat widget for agents' existing websites.
 - Per-tenant caching (`use cache` + `cacheTag`).

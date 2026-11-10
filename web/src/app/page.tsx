@@ -4,6 +4,7 @@ import { env } from "@/lib/env";
 import { ProductFlow } from "@/components/marketing/flow";
 import { TemplateThumb } from "@/components/template-thumb";
 import { TEMPLATES } from "@/lib/templates";
+import { PLANS as LIMITS } from "@/lib/plans";
 
 // Platform marketing page (root domain in multi-tenant mode). Tenant sites never reach this route.
 const STEPS = [
@@ -12,11 +13,16 @@ const STEPS = [
   ["Share your link", "Buyers browse and ask questions. Leads arrive ready for a WhatsApp follow-up."],
 ];
 
-// Prices are placeholders until the plans are decided (see PRODUCT.md, "Evidence on Hand").
+// Plan names and limits come from src/lib/plans.ts, so this page cannot promise what the app does
+// not enforce. The Solo price is a placeholder until it is decided (see PRODUCT.md, "Evidence on Hand").
+const perDay = (n: number) => `${n.toLocaleString("en")} concierge messages a day`;
 const PLANS = [
-  { name: "Starter", price: "Free", desc: "Try it with your listings", items: ["Subdomain", "Up to 10 projects", "Free templates", "EstateSite badge"] },
-  { name: "Pro", price: "$29/mo", desc: "For independent agents", items: ["Custom domain", "Unlimited projects", "Free templates, premium as add-ons", "No badge", "Email lead alerts"], highlight: true },
-  { name: "Self-hosted", price: "One-time", desc: "For brokerages", items: ["Your own servers", "Your own AI keys", "Full source access", "Priority setup support"] },
+  { name: LIMITS.free.name, price: "Free", desc: "Try it with your listings", cta: "Start free", href: "/signup",
+    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "Both templates", "EstateSite badge in the footer"] },
+  { name: LIMITS.solo.name, price: "AED 199/mo", desc: "For independent agents", cta: "Start free, upgrade later", href: "/signup", highlight: true,
+    items: ["Your own domain", "Unlimited projects", perDay(LIMITS.solo.dailyChat), "Both templates", "No badge"] },
+  { name: LIMITS.team.name, price: "Contact us", desc: "For brokerages", cta: "Start free, upgrade later", href: "/signup",
+    items: ["Everything in Solo", perDay(LIMITS.team.dailyChat), "Managed setup on your domain", "Accounts for several agents (coming soon)"] },
 ];
 
 export default function Landing() {
@@ -118,7 +124,7 @@ export default function Landing() {
         <div className="mx-auto flex max-w-6xl flex-col gap-10 px-5 py-20">
           <div>
             <h2 className="text-[2.1rem] font-bold leading-tight">Simple pricing</h2>
-            <p className="mt-2 text-lg text-slate-600">Hosted for you, or installed on your own server.</p>
+            <p className="mt-2 text-lg text-slate-600">Start free on our address. Move to your own domain when you are ready.</p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {PLANS.map((p) => (
@@ -131,7 +137,7 @@ export default function Landing() {
                 <ul className="flex flex-col gap-2.5">
                   {p.items.map((i) => <li key={i} className="flex gap-2.5"><Check size={20} className="mt-0.5 shrink-0 text-[#1e46b8]" aria-hidden />{i}</li>)}
                 </ul>
-                <Link href="/signup" className={`a-btn mt-auto !min-h-[3.25rem] ${p.highlight ? "a-btn-primary" : "a-btn-ghost"}`}>Start free</Link>
+                <Link href={p.href} className={`a-btn mt-auto !min-h-[3.25rem] ${p.highlight ? "a-btn-primary" : "a-btn-ghost"}`}>{p.cta}</Link>
               </div>
             ))}
           </div>

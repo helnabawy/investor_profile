@@ -15,6 +15,8 @@ let { data: tenant } = await db.from("tenants").select("id,slug").eq("slug", slu
 if (!tenant && flag === "--create") {
   const res = await db.from("tenants").insert({
     slug, name: name || slug,
+    // A self-hosted install is one client's own site, so it gets the unlimited plan.
+    plan: process.env.DEPLOY_MODE === "single" ? "team" : "free",
     theme: { preset: "luxury-gold" },
     ai_config: { provider: "auto" },
     nav: [{ label: "Projects", href: "/projects" }, { label: "About", href: "/about" }, { label: "Concierge", href: "/concierge" }, { label: "Contact", href: "/contact" }],

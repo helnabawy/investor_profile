@@ -28,7 +28,7 @@ A personal-brand "lounge" for one advisor rather than a listings portal. The con
 
 ## Evidence on Hand
 - No real customers, testimonials or metrics exist yet. Seed tenants ("Aurelia Estates", "Skyline Homes") and their projects and testimonials are fictional placeholders and must stay clearly fictional.
-- Landing-page pricing is a placeholder awaiting the user's decision.
+- Plans are Free, Solo and Team (decided 2026-11-11); their limits live in `src/lib/plans.ts` and are enforced. The Solo price on the landing page (AED 199/mo) is a placeholder awaiting the user's decision.
 
 ## Product Principles
 1. The concierge is the front door: the fastest path from a visitor's question to a grounded answer and a human handoff.

@@ -1,6 +1,17 @@
 "use client";
 import { useFormStatus } from "react-dom";
 import type { ActionResult } from "@/app/admin/actions";
+import { upgradeUrl } from "@/lib/plans";
+
+/** One line telling an agent that something needs a higher plan, with the way to get it. */
+export function UpgradeNote({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      {children}{" "}
+      {upgradeUrl ? <a href={upgradeUrl} className="font-semibold underline">See plans</a> : "Contact us to upgrade."}
+    </p>
+  );
+}
 
 export function PageTitle({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }) {
   return (

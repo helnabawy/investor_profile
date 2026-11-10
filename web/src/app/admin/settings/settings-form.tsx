@@ -1,11 +1,11 @@
 "use client";
 import { useActionState, useState } from "react";
 import { saveSite } from "../actions";
-import { FormMessage, PageTitle, SubmitButton } from "@/components/admin/ui";
+import { FormMessage, PageTitle, SubmitButton, UpgradeNote } from "@/components/admin/ui";
 import type { NavItem, Tenant } from "@/lib/types";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 
-export function SettingsForm({ tenant, multi, rootDomain }: { tenant: Tenant; multi: boolean; rootDomain: string }) {
+export function SettingsForm({ tenant, multi, rootDomain, planName, customDomains }: { tenant: Tenant; multi: boolean; rootDomain: string; planName: string; customDomains: boolean }) {
   const [state, action] = useActionState(saveSite, null);
   const [nav, setNav] = useState<NavItem[]>(tenant.nav ?? []);
   const c = tenant.contact ?? {};
@@ -52,10 +52,11 @@ export function SettingsForm({ tenant, multi, rootDomain }: { tenant: Tenant; mu
         <section className="a-card space-y-3">
           <h2 className="font-semibold">Domains</h2>
           <p className="text-sm text-slate-600">Your free address: <code className="rounded bg-slate-100 px-1.5 py-0.5">{tenant.slug}.{rootDomain}</code></p>
-          <label className="field"><span>Custom domains</span>
+          {!customDomains && <UpgradeNote>You are on the {planName} plan. Using your own domain is part of the Solo and Team plans.</UpgradeNote>}
+          {customDomains && <label className="field"><span>Custom domains</span>
             <input name="domains" defaultValue={tenant.domains.join(", ")} placeholder="www.youragency.com" />
             <small>Point a CNAME record for each domain to <code>cname.vercel-dns.com</code> (or your host), then save. Separate several with commas.</small>
-          </label>
+          </label>}
         </section>
       )}
       {!multi && <input type="hidden" name="domains" value={tenant.domains.join(",")} />}

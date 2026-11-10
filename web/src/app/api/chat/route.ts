@@ -8,7 +8,7 @@ import {
   type UIMessage,
 } from "ai";
 import type { LanguageModelV4 } from "@ai-sdk/provider";
-import { getTenantBySite } from "@/lib/tenant";
+import { getTenantBySite, tenantPlan } from "@/lib/tenant";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { resolveModels } from "@/lib/ai/config";
 import { fallbackModel } from "@/lib/ai/fallback";
@@ -18,8 +18,6 @@ import { clientHash, LIMITS, minutesAgo } from "@/lib/rate-limit";
 
 export const maxDuration = 30;
 
-// Daily visitor-message caps per plan (protects the operator's AI bill).
-const DAILY_LIMIT: Record<string, number> = { free: 100, pro: 2000, business: 10000 };
 const MAX_HISTORY = 20;
 const MAX_INPUT_CHARS = 2000;
 
@@ -55,7 +53,7 @@ export async function POST(req: Request) {
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const { count: daily } = await db.from("chat_messages").select("id", { count: "exact", head: true })
     .eq("tenant_id", tenant.id).eq("role", "user").gte("created_at", since);
-  if ((daily ?? 0) >= (DAILY_LIMIT[tenant.plan] ?? DAILY_LIMIT.free)) {
+  if ((daily ?? 0) >= tenantPlan(tenant).dailyChat) {
     return json(429, "The concierge is busy right now. Please use the contact form and we'll reply shortly.");
   }
 

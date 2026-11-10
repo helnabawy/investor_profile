@@ -8,6 +8,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import type { Section } from "@/lib/sections/registry";
 import type { ThemeConfig } from "@/lib/theme";
 import { addDomainToHosting, removeDomainFromHosting } from "@/lib/domains";
+import { tenantPlan } from "@/lib/tenant";
 
 export type ActionResult = { ok: boolean; error?: string; id?: string };
 
@@ -45,7 +46,10 @@ export async function saveSite(_: ActionResult | null, f: FormData): Promise<Act
   const nav = navSchema.safeParse(JSON.parse(fd(f, "nav") || "[]"));
   if (!nav.success) return { ok: false, error: "Navigation links need a label and a link." };
 
-  const domains = fd(f, "domains").toLowerCase().split(/[\s,]+/).filter(Boolean);
+  // Custom domains need a plan that includes them; otherwise the saved list is left as it is.
+  const domains = tenantPlan(tenant).customDomain
+    ? fd(f, "domains").toLowerCase().split(/[\s,]+/).filter(Boolean)
+    : tenant.domains;
   const bad = domains.find((d) => !domainRe.test(d));
   if (bad) return { ok: false, error: `"${bad}" is not a valid domain (use e.g. www.example.com).` };
   if (domains.length) {
@@ -200,6 +204,11 @@ export async function saveProject(_: ActionResult | null, f: FormData): Promise<
     published: f.get("published") === "on",
     sort: Number(fd(f, "sort")) || 0,
   };
+  const max = tenantPlan(tenant).maxProjects;
+  if (!id && max !== null) {
+    const { count } = await db.from("projects").select("id", { count: "exact", head: true }).eq("tenant_id", tenant.id);
+    if ((count ?? 0) >= max) return { ok: false, error: `Your plan includes up to ${max} projects. Upgrade to add more.` };
+  }
   const q = id ? db.from("projects").update(row).eq("id", id).eq("tenant_id", tenant.id) : db.from("projects").insert(row);
   const { error } = await q;
   if (error) return { ok: false, error: error.message };

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireTenant } from "@/lib/tenant";
+import { requireTenant, tenantPlan } from "@/lib/tenant";
 import { googleFontsHref, resolveTheme, siteLayout, themeCss } from "@/lib/theme";
 import { LoungeSidebar } from "@/components/lounge/sidebar";
 import { LoungeFooter } from "@/components/lounge/footer";
@@ -58,7 +58,7 @@ export default async function TenantLayout({ children, params }: Props) {
         />
         <div className="lg:pl-[16rem]">
           <main>{children}</main>
-          <NotOnHome><LoungeFooter tenant={tenant} /></NotOnHome>
+          <NotOnHome><LoungeFooter tenant={tenant} poweredBy={tenantPlan(tenant).badge} /></NotOnHome>
         </div>
         {chat}
       </div>
@@ -76,7 +76,7 @@ export default async function TenantLayout({ children, params }: Props) {
         cta={{ label: tenant.theme?.ctaLabel || "Book a consultation", href: tenant.theme?.ctaHref || "/contact" }}
       />
       <main>{children}</main>
-      <SiteFooter name={tenant.name} tagline={tenant.tagline} contact={tenant.contact ?? {}} nav={tenant.nav ?? []} poweredBy={tenant.plan === "free"} />
+      <SiteFooter name={tenant.name} tagline={tenant.tagline} contact={tenant.contact ?? {}} nav={tenant.nav ?? []} poweredBy={tenantPlan(tenant).badge} />
       {chat}
     </>
   );

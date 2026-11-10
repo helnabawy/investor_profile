@@ -7,8 +7,15 @@ import type { Faq, Page, Project, Tenant } from "./types";
 import { PROJECT_COLUMNS } from "./types";
 import type { ThemeConfig } from "./theme";
 import { PREVIEW_COOKIE, verifyPreviewToken } from "./preview";
+import { isMulti } from "./env";
+import { PLANS, planOf, type Plan } from "./plans";
 
 const TENANT_COLUMNS = "id,slug,name,tagline,domains,plan,theme,ai_config,contact,nav,published";
+
+/** The limits that apply to a site. A self-hosted or managed install (single mode) is never limited. */
+export function tenantPlan(tenant: Pick<Tenant, "plan">): Plan {
+  return isMulti ? planOf(tenant.plan) : PLANS.team;
+}
 
 /**
  * `site` is what proxy.ts put in the URL: a tenant slug (subdomain / single mode)
@@ -21,6 +28,8 @@ export const getTenantBySite = cache(async (site: string): Promise<Tenant | null
   const { data } = key.includes(".") ? await q.contains("domains", [key]).maybeSingle() : await q.eq("slug", key).maybeSingle();
   const tenant = (data as Tenant | null) ?? null;
   if (!tenant) return null;
+  // A downgraded site keeps its saved domains but they stop resolving; its subdomain still works.
+  if (key.includes(".") && !tenantPlan(tenant).customDomain) return null;
   const draft = await previewTheme(tenant);
   return draft ? { ...tenant, theme: draft } : tenant;
 });
