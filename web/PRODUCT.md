@@ -24,7 +24,8 @@ A personal-brand "lounge" for one advisor rather than a listings portal. The con
 - Imagery: agents upload their own portrait and story photos. Demo content uses stock architecture and interior photos, never invented people.
 - AI runs on free or low-cost models (Gemini, Groq, OpenRouter, Claude Haiku) with automatic fallback.
 - Stack: Next.js 16 App Router, Tailwind v4, Supabase, Vercel AI SDK v7.
-- Not yet built: investor portal (holdings, payments, documents), Stripe billing, embeddable chat widget.
+- Client sites can be exported as static files by the operator (`scripts/export-site.mjs`); chat and the form call back to the platform for allowed origins.
+- Not yet built: investor portal (holdings, payments, documents), Stripe billing, embeddable chat widget, an export button in the admin.
 
 ## Evidence on Hand
 - No real customers, testimonials or metrics exist yet. Seed tenants ("Aurelia Estates", "Skyline Homes") and their projects and testimonials are fictional placeholders and must stay clearly fictional.

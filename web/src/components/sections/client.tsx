@@ -4,6 +4,7 @@ import { ChevronDown, MessageCircle } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/types";
 import { ProjectCard } from "../site/project-card";
+import { apiUrl } from "@/lib/api-base";
 
 export function Reveal({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   // Server HTML can't know the visitor's setting, so the first paint is hidden either way; with
@@ -165,7 +166,7 @@ export function ContactForm({ interest, variant = "classic" }: { interest?: stri
     e.preventDefault();
     setState("sending");
     const data = Object.fromEntries(new FormData(e.currentTarget));
-    const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }).catch(() => null);
+    const res = await fetch(apiUrl("/api/contact"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }).catch(() => null);
     if (res?.ok) return setState("done");
     setErr((await res?.json().catch(() => null))?.error ?? "Something went wrong. Please try again.");
     setState("error");

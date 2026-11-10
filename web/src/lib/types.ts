@@ -25,6 +25,8 @@ export type Tenant = {
   contact: Contact;
   nav: NavItem[];
   published: boolean;
+  /** Origins of exported copies of the site that may call the chat and contact endpoints. */
+  allowed_origins: string[];
 };
 
 export type Page = {

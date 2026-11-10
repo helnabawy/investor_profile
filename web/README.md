@@ -80,7 +80,27 @@ src/lib/theme.ts             presets & CSS variables
 supabase/migrations/         schema + RLS
 ```
 
+## Exporting a client's site
+`scripts/export-site.mjs` saves one client's public site as plain static files (HTML, scripts, styles, images) that can be hosted anywhere. The folder contains no platform code, server code or secrets, so it is the way to hand a client their website without handing over the product.
+
+```bash
+# 1. Run a production build of the platform (the exporter reads the live site from it).
+# 2. Export, naming the domain the client will host it on:
+node --env-file=.env.local scripts/export-site.mjs <slug> <new-empty-folder> \
+  --site-url https://<slug>.<your-root-domain> \
+  --origin https://www.clientdomain.com --origin https://clientdomain.com
+# 3. Upload the folder's contents to the root of the client's hosting.
+```
+
+How it works:
+- It follows links from the home page to find every page, loads each in a browser to collect the scripts and styles they use, and downloads the images and PDFs (rewriting the links to `/media/...`). It then serves the folder on its own and fails if any page errors, a file is missing, or platform-only text (such as a service key) is found.
+- Chat and the contact form still call the platform (`--site-url`). `--origin` adds the client's domain to `tenants.allowed_origins`, which `src/lib/cors.ts` checks; members cannot edit that column. Remove an origin there and the chat and form stop working on that copy while the pages keep working. The chat still counts against the client's plan limit.
+- The export is a snapshot: re-run it after the client edits their site. Fonts still load from Google Fonts, and the "Powered by" footer line follows the plan like on the live site.
+- Hosting must serve `path/index.html` for `/path/` at the domain root (all common static hosts do). Link prefetches 404 harmlessly and the browser falls back to normal page loads.
+- Not included: a `--no-concierge` mode for clients who leave the platform entirely.
+
 ## Not built yet
+- A "Download my site" button in the admin (the export is an operator command for now).
 - Stripe billing. `tenants.plan` (`free`, `solo`, `team`) can only be changed with the service role, so a billing webhook just updates that column. Until then, change a plan with `node --env-file=.env.local scripts/set-plan.mjs <slug> <free|solo|team>`.
 - Team accounts (invites and roles); the Team plan currently differs from Solo only in its chat cap.
 - The investor portal (holdings, payments, documents).

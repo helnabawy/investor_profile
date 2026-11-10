@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MessageCircle, Send, X, Sparkles, Loader2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/format";
+import { apiUrl } from "@/lib/api-base";
 import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";
 
 type ChatProps = { assistantName: string; greeting: string; storageKey: string; suggestions?: string[] };
@@ -64,7 +65,7 @@ export function useConciergeChat(storageKey: string) {
   const msgsKey = `chat:${storageKey}:messages`;
   // Start empty on the server and first client render (hydration-safe), then restore from localStorage.
   const [sessionId, setSessionId] = useState("");
-  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat", body: () => ({ sessionId }) }), [sessionId]);
+  const transport = useMemo(() => new DefaultChatTransport({ api: apiUrl("/api/chat"), body: () => ({ sessionId }) }), [sessionId]);
   const { messages, sendMessage, status, error, setMessages, clearError } = useChat({ transport });
   const busy = status === "submitted" || status === "streaming";
 

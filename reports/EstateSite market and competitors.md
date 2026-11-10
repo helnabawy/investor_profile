@@ -143,8 +143,8 @@ Recommendation: sell **A** as "Managed". It is what the code does today, the cli
 
 Offer **C** as the answer to "what if I leave?" or as a one-time purchase. It is the only option that hands over real code with none of yours in it. It needs two pieces that do not exist yet:
 
-- An export command that saves a tenant's rendered pages as static files.
-- The embeddable chat widget (already on the "not built" list), with `/api/chat` and `/api/contact` allowed to accept calls from the client's domain. Without it, an exported site has no concierge and no lead form.
+- An export command that saves a tenant's rendered pages as static files. Built on 11 Nov 2026 as `web/scripts/export-site.mjs`.
+- Cross-site chat and contact form: `/api/chat` and `/api/contact` now accept calls from domains the operator registers per client (`tenants.allowed_origins`). The separate embeddable widget for agents' existing sites is still not built.
 
 A client on option C who keeps the widget is still a paying subscriber for the concierge, which is the part of the product with the clearest value.
 

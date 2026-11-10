@@ -10,7 +10,7 @@ import { PREVIEW_COOKIE, verifyPreviewToken } from "./preview";
 import { isMulti } from "./env";
 import { PLANS, planOf, type Plan } from "./plans";
 
-const TENANT_COLUMNS = "id,slug,name,tagline,domains,plan,theme,ai_config,contact,nav,published";
+const TENANT_COLUMNS = "id,slug,name,tagline,domains,plan,theme,ai_config,contact,nav,published,allowed_origins";
 
 /** The limits that apply to a site. A self-hosted or managed install (single mode) is never limited. */
 export function tenantPlan(tenant: Pick<Tenant, "plan">): Plan {
