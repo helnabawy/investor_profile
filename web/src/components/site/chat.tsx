@@ -3,7 +3,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MessageCircle, Send, X, Sparkles, Loader2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/format";
 import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";
@@ -19,6 +19,7 @@ function safeStorage<T>(fn: () => T, fallback: T): T {
 export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: boolean }) {
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
+  const clearQuestion = useCallback(() => setQuestion(""), []);
   const pathname = usePathname();
   useEffect(() => {
     // An "open-chat" CustomEvent may carry { question } to send straight away (e.g. the hero ask box).
@@ -43,7 +44,7 @@ export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: 
     <>
       {open && (
         <div className="chat-pop fixed inset-x-3 bottom-3 top-20 z-50 flex flex-col overflow-hidden rounded-[calc(var(--radius)+6px)] border bg-background shadow-2xl sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[620px] sm:max-h-[calc(100vh-8rem)] sm:w-[400px]">
-          <ChatPanel {...props} initialQuestion={question} onQuestionSent={() => setQuestion("")} onClose={() => setOpen(false)} />
+          <ChatPanel {...props} initialQuestion={question} onQuestionSent={clearQuestion} onClose={() => setOpen(false)} />
         </div>
       )}
       <button
@@ -82,13 +83,15 @@ export function useConciergeChat(storageKey: string) {
     if (status === "ready" && sessionId) safeStorage(() => localStorage.setItem(msgsKey, JSON.stringify(messages.slice(-30))), undefined);
   }, [messages, status, msgsKey, sessionId]);
 
-  const send = (text: string) => {
+  // Stable between renders while `busy` is unchanged, so effects that depend on it (the queued
+  // hero question) re-run when a reply finishes, not on every streamed token.
+  const send = useCallback((text: string) => {
     const t = text.trim();
     if (!t || busy) return false;
     clearError();
     sendMessage({ text: t });
     return true;
-  };
+  }, [busy, clearError, sendMessage]);
   const reset = () => {
     setMessages([]);
     setSessionId(crypto.randomUUID());
@@ -132,9 +135,11 @@ export function ChatPanel({ assistantName, greeting, storageKey, suggestions = D
   onClose?: () => void; initialQuestion?: string; onQuestionSent?: () => void;
 }) {
   const { messages, status, error, busy, send, reset, ready } = useConciergeChat(storageKey);
+  // A question handed over by the hero box is sent once the session is ready and the concierge is
+  // not mid-reply; while busy it waits, and `send` changing when the reply ends retries it once.
   useEffect(() => {
-    if (initialQuestion && ready && send(initialQuestion)) onQuestionSent?.();
-  }, [initialQuestion, ready, send, onQuestionSent]);
+    if (initialQuestion && ready && !busy && send(initialQuestion)) onQuestionSent?.();
+  }, [initialQuestion, ready, busy, send, onQuestionSent]);
   const [input, setInput] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
   // Braces matter: newer browsers return a Promise from scrollIntoView, which React would treat as a cleanup.

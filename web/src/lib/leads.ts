@@ -12,6 +12,7 @@ export type LeadInput = {
   message?: string;
   source: "form" | "chat";
   sessionId?: string;
+  clientHash?: string;
 };
 
 const clip = (v: string | undefined, n = 500) => (v ? v.trim().slice(0, n) || null : null);
@@ -27,6 +28,7 @@ export async function saveLead(db: SupabaseClient, tenant: Tenant, input: LeadIn
     message: clip(input.message, 4000),
     source: input.source,
     session_id: input.sessionId ?? null,
+    client_hash: input.clientHash ?? null,
   };
   const { data, error } = await db.from("leads").insert(row).select("id").single();
   if (error) throw error;
@@ -38,7 +40,7 @@ async function notifyAgent(tenant: Tenant, lead: Record<string, unknown>) {
   const to = tenant.contact?.email;
   const key = process.env.RESEND_API_KEY;
   const lines = Object.entries(lead)
-    .filter(([k, v]) => v && !["tenant_id", "session_id"].includes(k))
+    .filter(([k, v]) => v && !["tenant_id", "session_id", "client_hash"].includes(k))
     .map(([k, v]) => `${k}: ${v}`);
   if (!key || !to) {
     console.log(`[leads] new ${lead.source} lead for ${tenant.slug}:\n  ${lines.join("\n  ")}`);

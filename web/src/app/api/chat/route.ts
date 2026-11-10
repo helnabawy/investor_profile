@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import {
-  convertToModelMessages,
   createUIMessageStreamResponse,
   isStepCount,
   streamText,
   toUIMessageStream,
+  type ModelMessage,
   type UIMessage,
 } from "ai";
 import type { LanguageModelV4 } from "@ai-sdk/provider";
@@ -14,6 +14,7 @@ import { resolveModels } from "@/lib/ai/config";
 import { fallbackModel } from "@/lib/ai/fallback";
 import { buildInstructions, loadCatalogue, retrieveSnippets } from "@/lib/ai/knowledge";
 import { chatTools } from "@/lib/ai/tools";
+import { clientHash, LIMITS, minutesAgo } from "@/lib/rate-limit";
 
 export const maxDuration = 30;
 
@@ -25,21 +26,32 @@ const MAX_INPUT_CHARS = 2000;
 const json = (status: number, error: string) => Response.json({ error }, { status });
 
 export async function POST(req: Request) {
-  const site = (await headers()).get("x-site");
+  const h = await headers();
+  const site = h.get("x-site");
   if (!site) return json(400, "Unknown site");
   const tenant = await getTenantBySite(site);
   if (!tenant || tenant.ai_config?.enabled === false) return json(404, "Chat is not available");
 
+  // Only the visitor's newest message is taken from the request. Earlier turns come from our own
+  // chat_messages table, so a client cannot inflate the prompt or forge assistant replies.
   const body = (await req.json().catch(() => null)) as { messages?: UIMessage[]; sessionId?: string } | null;
-  const messages = (body?.messages ?? []).slice(-MAX_HISTORY);
-  const last = messages.at(-1);
+  const last = body?.messages?.at(-1);
   const lastText = last?.parts?.map((p) => (p.type === "text" ? p.text : "")).join("").trim() ?? "";
   if (!last || last.role !== "user" || !lastText) return json(400, "No message");
   if (lastText.length > MAX_INPUT_CHARS) return json(413, "Message too long");
 
   const db = supabaseAdmin();
+  const client = clientHash(h);
 
-  // Rate limits: per-tenant daily cap + per-session burst cap.
+  // Rate limits: per visitor (survives session rotation), per tenant per day, per session burst.
+  const [{ count: recent }, { count: today }] = await Promise.all([
+    db.from("chat_messages").select("id", { count: "exact", head: true }).eq("client_hash", client).eq("role", "user").gte("created_at", minutesAgo(10)),
+    db.from("chat_messages").select("id", { count: "exact", head: true }).eq("client_hash", client).eq("role", "user").gte("created_at", minutesAgo(24 * 60)),
+  ]);
+  if ((recent ?? 0) >= LIMITS.chatPer10Min || (today ?? 0) >= LIMITS.chatPerDay) {
+    return json(429, "You've sent a lot of messages. Please use the contact form and an advisor will reply.");
+  }
+
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const { count: daily } = await db.from("chat_messages").select("id", { count: "exact", head: true })
     .eq("tenant_id", tenant.id).eq("role", "user").gte("created_at", since);
@@ -55,17 +67,21 @@ export async function POST(req: Request) {
   const models = resolveModels(tenant.ai_config ?? {});
   if (!models.length) return json(503, "No AI provider configured. Set GOOGLE_GENERATIVE_AI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY or ANTHROPIC_API_KEY.");
 
-  await db.from("chat_messages").insert({ session_id: sessionId, tenant_id: tenant.id, role: "user", content: lastText });
-
-  const [catalogue, snippets] = await Promise.all([
+  const [{ data: past }, catalogue, snippets] = await Promise.all([
+    db.from("chat_messages").select("role,content").eq("session_id", sessionId).order("created_at", { ascending: false }).limit(MAX_HISTORY - 1),
     loadCatalogue(db, tenant.id),
     retrieveSnippets(db, tenant.id, lastText),
   ]);
+  const history: ModelMessage[] = [
+    ...((past ?? []) as { role: "user" | "assistant"; content: string }[]).reverse().map((m) => ({ role: m.role, content: m.content })),
+    { role: "user", content: lastText },
+  ];
+  await db.from("chat_messages").insert({ session_id: sessionId, tenant_id: tenant.id, role: "user", content: lastText, client_hash: client });
 
   const result = streamText({
     model: fallbackModel(models.map((m) => m.model as LanguageModelV4)),
     instructions: buildInstructions(tenant, catalogue, snippets),
-    messages: await convertToModelMessages(messages),
+    messages: history,
     tools: chatTools(db, tenant, sessionId),
     stopWhen: isStepCount(4),
     temperature: tenant.ai_config?.temperature ?? 0.4,

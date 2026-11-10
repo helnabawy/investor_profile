@@ -22,7 +22,8 @@ export default async function Overview({ searchParams }: { searchParams: Promise
   const providers = availableProviders();
   const url = siteUrl(tenant);
   const template = templateFor(tenant.theme?.layout);
-  const preset = PRESETS[(tenant.theme?.preset as PresetId) ?? "luxury-gold"]?.label ?? "Custom";
+  const presetId = tenant.theme?.preset ?? "luxury-gold";
+  const preset = Object.hasOwn(PRESETS, presetId) ? PRESETS[presetId as PresetId].label : "Custom";
   const contact = tenant.contact ?? {};
 
   const steps = [

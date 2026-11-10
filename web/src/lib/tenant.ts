@@ -2,13 +2,11 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { supabasePublic, supabaseServer } from "./supabase/server";
+import { supabaseAdmin, supabasePublic } from "./supabase/server";
 import type { Faq, Page, Project, Tenant } from "./types";
 import { PROJECT_COLUMNS } from "./types";
 import type { ThemeConfig } from "./theme";
-
-/** Holds the slug of the site being previewed. Set by the admin, read here and in proxy.ts. */
-export const PREVIEW_COOKIE = "es_preview";
+import { PREVIEW_COOKIE, verifyPreviewToken } from "./preview";
 
 const TENANT_COLUMNS = "id,slug,name,tagline,domains,plan,theme,ai_config,contact,nav,published";
 
@@ -28,14 +26,16 @@ export const getTenantBySite = cache(async (site: string): Promise<Tenant | null
 });
 
 /**
- * While an agent is in preview mode (cookie set from /admin/theme), their own site renders with
- * the unpublished theme. The draft is read with the visitor's session, so RLS only returns it to
- * members of this tenant; everyone else gets null and sees the live theme.
+ * While a browser holds a valid preview token for this tenant (see src/lib/preview.ts), the site
+ * renders the unpublished draft theme. Everyone else, and the same browser once the draft is
+ * published or discarded, sees the live theme.
  */
 async function previewTheme(tenant: Tenant): Promise<ThemeConfig | null> {
-  if ((await cookies()).get(PREVIEW_COOKIE)?.value !== tenant.slug) return null;
-  const db = await supabaseServer();
-  const { data } = await db.from("theme_drafts").select("theme").eq("tenant_id", tenant.id).maybeSingle();
+  const token = (await cookies()).get(PREVIEW_COOKIE)?.value;
+  if (!token || verifyPreviewToken(token) !== tenant.id) return null;
+  // The preview runs on the site host, where the admin's session cookie does not exist; the
+  // signed token is the authorisation, so read the draft with the service role.
+  const { data } = await supabaseAdmin().from("theme_drafts").select("theme").eq("tenant_id", tenant.id).maybeSingle();
   return (data?.theme as ThemeConfig | undefined) ?? null;
 }
 
@@ -56,7 +56,9 @@ export const getPage = cache(async (tenantId: string, slug: string) => {
   return data as Page | null;
 });
 
-export const getProjects = cache(async (tenantId: string, opts: { featured?: boolean; limit?: number } = {}) => {
+// Primitive arguments on purpose: React cache() compares arguments by identity, so an options
+// object would miss the cache on every call.
+export const getProjects = cache(async (tenantId: string, featuredOnly = false, limit = 0) => {
   let q = supabasePublic()
     .from("projects")
     .select(PROJECT_COLUMNS)
@@ -64,8 +66,8 @@ export const getProjects = cache(async (tenantId: string, opts: { featured?: boo
     .eq("published", true)
     .order("sort")
     .order("created_at", { ascending: false });
-  if (opts.featured) q = q.eq("featured", true);
-  if (opts.limit) q = q.limit(opts.limit);
+  if (featuredOnly) q = q.eq("featured", true);
+  if (limit) q = q.limit(limit);
   const { data } = await q;
   return (data ?? []) as Project[];
 });

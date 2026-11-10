@@ -8,7 +8,6 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import type { Section } from "@/lib/sections/registry";
 import type { ThemeConfig } from "@/lib/theme";
 import { addDomainToHosting, removeDomainFromHosting } from "@/lib/domains";
-import { PREVIEW_COOKIE } from "@/lib/tenant";
 
 export type ActionResult = { ok: boolean; error?: string; id?: string };
 
@@ -94,7 +93,6 @@ export async function previewTheme(theme: ThemeConfig): Promise<ActionResult> {
   const { db, tenant } = await getAdmin();
   const { error } = await db.from("theme_drafts").upsert({ tenant_id: tenant.id, theme: cleanTheme(theme) });
   if (error) return { ok: false, error: error.message };
-  (await cookies()).set(PREVIEW_COOKIE, tenant.slug, { path: "/", httpOnly: true, sameSite: "lax" });
   redirect("/admin/preview");
 }
 
@@ -106,7 +104,6 @@ export async function publishDraft() {
     if (error) throw new Error(error.message);
     await db.from("theme_drafts").delete().eq("tenant_id", tenant.id);
   }
-  (await cookies()).delete(PREVIEW_COOKIE);
   revalidatePath("/", "layout");
   redirect("/admin/theme?published=1");
 }
@@ -114,7 +111,6 @@ export async function publishDraft() {
 export async function discardDraft() {
   const { db, tenant } = await getAdmin();
   await db.from("theme_drafts").delete().eq("tenant_id", tenant.id);
-  (await cookies()).delete(PREVIEW_COOKIE);
   redirect("/admin/theme");
 }
 

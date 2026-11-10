@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getAdmin } from "@/lib/admin/context";
 import { PRESETS, type PresetId, type ThemeConfig } from "@/lib/theme";
 import { templateFor } from "@/lib/templates";
+import { createPreviewToken, previewOrigin } from "@/lib/preview";
 import { PreviewFrame } from "./preview-frame";
 
 export const metadata = { title: "Preview · EstateSite" };
@@ -11,7 +12,7 @@ function describeChanges(live: ThemeConfig, draft: ThemeConfig) {
   const out: { label: string; detail: string; href: string }[] = [];
   const liveTpl = templateFor(live.layout), draftTpl = templateFor(draft.layout);
   if (liveTpl.id !== draftTpl.id) out.push({ label: "Template", detail: `${liveTpl.name} → ${draftTpl.name}`, href: "/admin/theme" });
-  const presetName = (p?: string) => PRESETS[(p as PresetId) ?? "luxury-gold"]?.label ?? "Custom";
+  const presetName = (p?: string) => (p && Object.hasOwn(PRESETS, p) ? PRESETS[p as PresetId].label : p ? "Custom" : PRESETS["luxury-gold"].label);
   if ((live.preset ?? "luxury-gold") !== (draft.preset ?? "luxury-gold")) {
     out.push({ label: "Colours", detail: `${presetName(live.preset)} → ${presetName(draft.preset)}`, href: "/admin/theme" });
   }
@@ -31,6 +32,8 @@ export default async function PreviewPage() {
   return (
     <PreviewFrame
       siteName={tenant.name}
+      origin={previewOrigin(tenant.slug)}
+      token={createPreviewToken(tenant.id)}
       pages={pages}
       changes={describeChanges(tenant.theme ?? {}, data.theme as ThemeConfig)}
     />

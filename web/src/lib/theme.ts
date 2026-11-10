@@ -168,7 +168,9 @@ export const PRESETS = {
 export type PresetId = keyof typeof PRESETS;
 
 export function resolveTheme(config: ThemeConfig | null | undefined): ThemeTokens {
-  const preset = PRESETS[(config?.preset as PresetId) ?? "luxury-gold"] ?? PRESETS["luxury-gold"];
+  // Object.hasOwn, not a plain lookup: a stored value like "toString" must not resolve to a prototype member.
+  const id = config?.preset && Object.hasOwn(PRESETS, config.preset) ? (config.preset as PresetId) : "luxury-gold";
+  const preset = PRESETS[id];
   const out: ThemeTokens = { ...preset.tokens };
   for (const key of Object.keys(out) as (keyof ThemeTokens)[]) {
     const v = config?.[key];

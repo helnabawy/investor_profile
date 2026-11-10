@@ -89,7 +89,8 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
       );
 
     case "hero-split": {
-      const [featured] = await getProjects(tenant.id, { featured: true, limit: 1 });
+      // Same call as the featured grid below, so one query serves both sections.
+      const [featured] = await getProjects(tenant.id, true);
       const ai = tenant.ai_config ?? {};
       const yld = featured && yieldFigure(featured.roi);
       return (
@@ -132,7 +133,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
     case "quick-links":
       return (
         <nav aria-label="Start here" className="mx-auto grid max-w-7xl gap-4 px-5 pb-16 sm:grid-cols-2 lg:grid-cols-3">
-          {arr<P>(p.items).map((it, i) => {
+          {arr<P>(p.items).filter((it) => tenant.ai_config?.enabled !== false || str(it.href) !== "#chat").map((it, i) => {
             const Icon = QUICK_ICONS[str(it.icon) as keyof typeof QUICK_ICONS] ?? ArrowRight;
             return (
               <ChatAwareLink key={i} href={str(it.href) || "/"} className="c-card flex items-center gap-4 px-6 py-5 transition hover:border-primary">
@@ -238,7 +239,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
       );
 
     case "featured-projects": {
-      const projects = await getProjects(tenant.id, { featured: true, limit: Number(p.limit) || 3 });
+      const projects = (await getProjects(tenant.id, true)).slice(0, Number(p.limit) || 3);
       if (!projects.length) return null;
       const featuredGrid = (
         <Wrap>
@@ -337,7 +338,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
                 {str(p.body) && <p className="text-[1.06rem] text-white/80">{str(p.body)}</p>}
               </div>
               <div className="flex flex-wrap gap-3">
-                {str(p.ctaHref) && str(p.ctaLabel) && <Link href={str(p.ctaHref)} className="btn bg-white text-[color:var(--foreground)] hover:bg-white/90">{str(p.ctaLabel)}</Link>}
+                {str(p.ctaHref) && str(p.ctaLabel) && <Link href={str(p.ctaHref)} className="btn c-dark-btn">{str(p.ctaLabel)}</Link>}
                 {wa && <a href={wa} target="_blank" rel="noreferrer" className="btn border border-white/45 text-white hover:bg-white/10">Chat on WhatsApp</a>}
               </div>
             </Reveal>

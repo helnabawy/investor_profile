@@ -23,7 +23,7 @@ export async function createSite(_: { error?: string } | null, f: FormData): Pro
   // "look" is "<template>:<preset>" from the sign-up form, e.g. "classic:calm-green".
   const [tplRaw, presetRaw] = String(f.get("look") ?? "").split(":");
   const template = TEMPLATES.some((t) => t.id === tplRaw) ? tplRaw : "classic";
-  const preset = presetRaw && presetRaw in PRESETS ? presetRaw : templateFor(template).preset;
+  const preset = presetRaw && Object.hasOwn(PRESETS, presetRaw) ? presetRaw : templateFor(template).preset;
 
   const admin = supabaseAdmin();
   const { data: tenant, error } = await admin.from("tenants").insert({

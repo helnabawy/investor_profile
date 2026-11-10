@@ -20,26 +20,10 @@ function siteForHost(rawHost: string): string | null {
   return host.split(":")[0]; // custom domain
 }
 
-// Same name as PREVIEW_COOKIE in src/lib/tenant.ts (not imported: that module is server-only).
-const PREVIEW_COOKIE = "es_preview";
-
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isAppPath = APP_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
-  // Admin preview runs on the platform host so it shares the admin's session: while the cookie is
-  // set, non-app paths there are served as that tenant's site (the preview iframe loads "/").
-  const previewing = req.cookies.get(PREVIEW_COOKIE)?.value;
-  const previewSite = previewing && /^[a-z0-9-]+$/.test(previewing) ? previewing : null;
-  const site = siteForHost(req.headers.get("host") ?? ROOT) ?? previewSite;
-
-  // Leaving the preview screen for any other admin page ends preview mode.
-  if (previewing && pathname.startsWith("/admin") && pathname !== "/admin/preview") {
-    const res = NextResponse.next({ request: { headers: withSite(req, site) } });
-    res.cookies.delete(PREVIEW_COOKIE);
-    await refreshSession(req, res);
-    return res;
-  }
-
+  const site = siteForHost(req.headers.get("host") ?? ROOT);
   const headers = withSite(req, site);
 
   if (isAppPath) {

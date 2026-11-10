@@ -8,7 +8,9 @@ import { SubmitButton } from "@/components/admin/ui";
 type Change = { label: string; detail: string; href: string };
 
 /** Full-screen preview: the agent's real site, rendered with the draft theme, in an iframe. */
-export function PreviewFrame({ siteName, pages, changes }: { siteName: string; pages: { label: string; href: string }[]; changes: Change[] }) {
+export function PreviewFrame({ siteName, origin, token, pages, changes }: {
+  siteName: string; origin: string; token: string; pages: { label: string; href: string }[]; changes: Change[];
+}) {
   const [device, setDevice] = useState<"desktop" | "phone">("desktop");
   const [path, setPath] = useState("/");
   const count = changes.length;
@@ -82,7 +84,7 @@ export function PreviewFrame({ siteName, pages, changes }: { siteName: string; p
               <span aria-hidden className="flex gap-1.5">{[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-slate-300" />)}</span>
               <span className="min-w-0 flex-1 truncate rounded-md border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">{siteName} · preview{path === "/" ? "" : ` · ${path}`}</span>
             </div>
-            <iframe key={path} src={path} title={`${siteName} preview`} className="min-h-0 w-full flex-1 bg-white" />
+            <iframe key={path} src={`${origin}/api/preview?token=${encodeURIComponent(token)}&path=${encodeURIComponent(path)}`} title={`${siteName} preview`} className="min-h-0 w-full flex-1 bg-white" />
           </div>
         </section>
       </div>
