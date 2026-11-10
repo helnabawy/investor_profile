@@ -18,9 +18,15 @@ function safeStorage<T>(fn: () => T, fallback: T): T {
 /** Floating launcher shown on every page (except /concierge). Opens on `window.dispatchEvent(new Event("open-chat"))` or #chat links. */
 export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [question, setQuestion] = useState("");
   const pathname = usePathname();
   useEffect(() => {
-    const onOpen = () => setOpen(true);
+    // An "open-chat" CustomEvent may carry { question } to send straight away (e.g. the hero ask box).
+    const onOpen = (e: Event) => {
+      const q = (e as CustomEvent<{ question?: string } | undefined>).detail?.question?.trim();
+      if (q) setQuestion(q);
+      setOpen(true);
+    };
     const onHash = () => window.location.hash === "#chat" && setOpen(true);
     window.addEventListener("open-chat", onOpen);
     window.addEventListener("hashchange", onHash);
@@ -37,7 +43,7 @@ export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: 
     <>
       {open && (
         <div className="fixed inset-x-3 bottom-3 top-20 z-50 flex flex-col overflow-hidden rounded-[calc(var(--radius)+6px)] border bg-background shadow-2xl sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[620px] sm:max-h-[calc(100vh-8rem)] sm:w-[400px]">
-          <ChatPanel {...props} onClose={() => setOpen(false)} />
+          <ChatPanel {...props} initialQuestion={question} onQuestionSent={() => setQuestion("")} onClose={() => setOpen(false)} />
         </div>
       )}
       <button
@@ -88,7 +94,7 @@ export function useConciergeChat(storageKey: string) {
     setSessionId(crypto.randomUUID());
     safeStorage(() => localStorage.removeItem(msgsKey), undefined);
   };
-  return { messages, status, error, busy, send, reset };
+  return { messages, status, error, busy, send, reset, ready: Boolean(sessionId) };
 }
 
 /** Renders one message's parts (text, tool progress, lead confirmation). */
@@ -122,11 +128,17 @@ export function ChatError({ error }: { error: Error }) {
   return <div role="alert" className="rounded-[var(--radius)] border border-red-500/40 bg-red-500/10 p-3 text-sm">{errorText(error)}</div>;
 }
 
-export function ChatPanel({ assistantName, greeting, storageKey, suggestions = DEFAULT_SUGGESTIONS, onClose }: ChatProps & { onClose?: () => void }) {
-  const { messages, status, error, busy, send, reset } = useConciergeChat(storageKey);
+export function ChatPanel({ assistantName, greeting, storageKey, suggestions = DEFAULT_SUGGESTIONS, onClose, initialQuestion, onQuestionSent }: ChatProps & {
+  onClose?: () => void; initialQuestion?: string; onQuestionSent?: () => void;
+}) {
+  const { messages, status, error, busy, send, reset, ready } = useConciergeChat(storageKey);
+  useEffect(() => {
+    if (initialQuestion && ready && send(initialQuestion)) onQuestionSent?.();
+  }, [initialQuestion, ready, send, onQuestionSent]);
   const [input, setInput] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), [messages, status]);
+  // Braces matter: newer browsers return a Promise from scrollIntoView, which React would treat as a cleanup.
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [messages, status]);
   const submit = (t: string) => { if (send(t)) setInput(""); };
 
   return (

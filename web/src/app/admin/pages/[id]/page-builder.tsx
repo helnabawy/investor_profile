@@ -74,7 +74,7 @@ export function PageBuilder({ page, tenantId, siteUrl }: { page: Page; tenantId:
             <div className="mb-3 flex items-center justify-between"><p className="font-medium">Add a section</p><button className="text-sm text-slate-500" onClick={() => setAdding(false)}>Cancel</button></div>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {SECTION_DEFS.map((d) => (
-                <button key={d.type} className="rounded-lg border p-3 text-left hover:border-teal-500 hover:bg-teal-50" onClick={() => {
+                <button key={d.type} className="rounded-lg border p-3 text-left hover:border-blue-500 hover:bg-blue-50" onClick={() => {
                   const ns = newSection(d.type);
                   setSections((x) => [...x, ns]); setOpen(ns.id); setAdding(false);
                 }}>

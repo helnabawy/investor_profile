@@ -20,7 +20,7 @@ A personal-brand "lounge" for one advisor rather than a listings portal. The con
 ## Capabilities and Constraints
 - Multi-tenant (`DEPLOY_MODE=multi`, subdomain or custom domain) and single-tenant self-hosted (`DEPLOY_MODE=single`), from one codebase.
 - Everything tenant-facing must be configurable per tenant: copy, images, theme, navigation, sections, chatbot persona. Nothing may be hard-coded to one brand.
-- **Site layouts:** "Classic" (top navigation, long scrolling sections) and "Lounge" (sidebar shell, chat-first home, numbered story about, contact cards with form). The agent chooses one; new sites default to Lounge. Lounge's structure is modelled on hindlounge.com, which the user named as the reference. Its branding, photos and copy must not be reused.
+- **Site layouts:** "Classic" (top navigation, long scrolling sections) and "Lounge" (sidebar shell, chat-first home, numbered story about, contact cards with form). The agent chooses one in a template gallery (premium templates at extra cost are planned) and previews it on their own site before publishing; new sites default to Classic. Lounge's structure is modelled on hindlounge.com, which the user named as the reference. Its branding, photos and copy must not be reused.
 - Imagery: agents upload their own portrait and story photos. Demo content uses stock architecture and interior photos, never invented people.
 - AI runs on free or low-cost models (Gemini, Groq, OpenRouter, Claude Haiku) with automatic fallback.
 - Stack: Next.js 16 App Router, Tailwind v4, Supabase, Vercel AI SDK v7.

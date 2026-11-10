@@ -26,7 +26,8 @@ export default async function Home({ params }: { params: Promise<{ site: string 
   const page = await getPage(tenant.id, "");
   // A brand-new tenant without a home page still gets something sensible.
   const sections = page?.sections?.length ? page.sections : [
-    { ...newSection("hero"), props: { title: tenant.name, subtitle: tenant.tagline ?? "", ctaLabel: "View projects", ctaHref: "/projects" } },
+    { ...newSection("hero-split"), props: { eyebrow: tenant.tagline ?? "", title: `Find your next property with ${tenant.name}`, image: tenant.theme?.backdropUrl ?? "" } },
+    newSection("quick-links"),
     newSection("featured-projects"),
     newSection("contact"),
   ];

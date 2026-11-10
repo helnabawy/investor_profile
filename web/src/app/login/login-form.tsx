@@ -25,7 +25,7 @@ export function LoginForm({ allowSignup }: { allowSignup: boolean }) {
       <label className="field"><span>Password</span><input name="password" type="password" required autoComplete="current-password" /></label>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button className="a-btn a-btn-primary" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
-      {allowSignup && <p className="text-center text-sm text-slate-500">New here? <Link href="/signup" className="text-teal-700 underline">Create your site</Link></p>}
+      {allowSignup && <p className="text-center text-sm text-slate-500">New here? <Link href="/signup" className="text-blue-700 underline">Create your site</Link></p>}
     </form>
   );
 }

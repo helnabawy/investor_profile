@@ -7,6 +7,12 @@ export function formatPrice(value: number | null | undefined, currency = "AED") 
   return `${currency} ${short}`;
 }
 
+/** Full figure for detail pages: "AED 1,450,000". */
+export function formatFullPrice(value: number | null | undefined, currency = "AED") {
+  if (value == null) return "Price on request";
+  return `${currency} ${Number(value).toLocaleString("en-US")}`;
+}
+
 export function cn(...parts: (string | false | null | undefined)[]) {
   return parts.filter(Boolean).join(" ");
 }

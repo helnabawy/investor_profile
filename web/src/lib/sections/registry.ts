@@ -54,6 +54,56 @@ export const SECTION_DEFS: SectionDef[] = [
     defaults: { items: [{ title: "Chapter title", body: "" }] },
   },
   {
+    type: "hero-split",
+    label: "Hero with concierge",
+    description: "Headline and an ask-the-concierge box beside a photo with your top featured project",
+    fields: [
+      { name: "eyebrow", label: "Small line above the headline", type: "text" },
+      { name: "title", label: "Headline", type: "text" },
+      { name: "subtitle", label: "Subtitle", type: "textarea" },
+      { name: "image", label: "Photo", type: "image" },
+      { name: "askPlaceholder", label: "Question box placeholder", type: "text", placeholder: "e.g. What can I buy for AED 1.5M with a payment plan?" },
+    ],
+    defaults: { title: "Invest with clear numbers and one advisor you can reach", subtitle: "", askPlaceholder: "Ask about projects, prices or payment plans" },
+  },
+  {
+    type: "quick-links",
+    label: "Quick links",
+    description: "Three large shortcuts so visitors find their way in one tap",
+    fields: [
+      { name: "items", label: "Links", type: "list", itemFields: [
+        { name: "title", label: "Title", type: "text" },
+        { name: "body", label: "Short description", type: "text" },
+        { name: "href", label: "Link", type: "url", placeholder: "/projects, /contact or #chat" },
+        { name: "icon", label: "Icon", type: "select", options: ["building", "chart", "person", "chat"] },
+      ] },
+    ],
+    defaults: { items: [
+      { title: "Browse projects", body: "Filter by area, status and budget", href: "/projects", icon: "building" },
+      { title: "Ask the concierge", body: "Prices, payment plans and fees, answered now", href: "#chat", icon: "chat" },
+      { title: "Speak to an advisor", body: "Call, WhatsApp or book a consultation", href: "/contact", icon: "person" },
+    ] },
+  },
+  {
+    type: "steps",
+    label: "How we work",
+    description: "Numbered steps beside a photo",
+    fields: [
+      { name: "title", label: "Title", type: "text" },
+      { name: "subtitle", label: "Subtitle", type: "textarea" },
+      { name: "image", label: "Photo", type: "image" },
+      { name: "items", label: "Steps", type: "list", itemFields: [
+        { name: "title", label: "Title", type: "text" },
+        { name: "body", label: "Text", type: "textarea" },
+      ] },
+    ],
+    defaults: { title: "From first shortlist to handover", items: [
+      { title: "Tell us your goals", body: "Capital growth, rental yield or a home for the family. Share your budget and timeline." },
+      { title: "Get a shortlist with honest numbers", body: "Each project comes with a full cost sheet: price, fees, payment plan and expected yield." },
+      { title: "View, reserve and hand over", body: "We arrange viewings, guide you through reservation, and help with leasing or resale." },
+    ] },
+  },
+  {
     type: "hero",
     label: "Hero",
     description: "Full-width banner with headline and buttons",

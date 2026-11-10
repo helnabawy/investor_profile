@@ -16,7 +16,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
       <PageTitle title="Leads" subtitle="Enquiries from your contact forms and the AI concierge." />
       <div className="mb-4 flex gap-2 text-sm">
         {["", "new", "contacted", "qualified", "closed"].map((s) => (
-          <Link key={s} href={s ? `?status=${s}` : "?"} className={`rounded-full px-3 py-1 ${status === s || (!status && !s) ? "bg-teal-700 text-white" : "bg-white border"}`}>{s || "All"}</Link>
+          <Link key={s} href={s ? `?status=${s}` : "?"} className={`rounded-full px-3 py-1 ${status === s || (!status && !s) ? "bg-blue-700 text-white" : "bg-white border"}`}>{s || "All"}</Link>
         ))}
       </div>
       <div className="space-y-3">

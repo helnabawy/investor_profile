@@ -14,6 +14,12 @@
   --radius: 0.5rem;
   --font-heading: ui-serif, Georgia, serif;
   --font-body: ui-sans-serif, system-ui, sans-serif;
+  /* Photographic surfaces (page headers, story panels) use night tones in every template. */
+  --lounge-ink: color-mix(in srgb, #0b0a08 93%, var(--primary));
+  --lounge-text: #f5f3ee;
+  --lounge-muted: color-mix(in srgb, #f5f3ee 72%, transparent);
+  --lounge-glass: color-mix(in srgb, #0b0a08 58%, transparent);
+  --lounge-glass-line: color-mix(in srgb, #f5f3ee 16%, transparent);
 }
 
 @theme inline {
@@ -55,7 +61,7 @@ h1, h2, h3, h4, .font-heading {
   background: color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
-.site-header { background: color-mix(in srgb, var(--background) 95%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.site-header { background: color-mix(in srgb, var(--card) 96%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
 body:has(main [data-hero]) .site-header:not(.is-solid) {
   background: linear-gradient(to bottom, rgb(0 0 0 / 0.5), transparent);
   backdrop-filter: none;
@@ -66,8 +72,9 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 .eyebrow {
   font-family: var(--font-body);
   text-transform: uppercase;
-  letter-spacing: 0.28em;
-  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--primary);
 }
 
@@ -76,13 +83,32 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.8rem 1.6rem;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
   border-radius: var(--radius);
   font-size: 0.95rem;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
   cursor: pointer;
 }
+.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn-light { background: var(--card); color: var(--foreground); border: 1px solid var(--border); }
+.btn-light:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Classic template building blocks (token-driven, so every preset can wear them). */
+.c-card { background: var(--card); border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px); }
+.c-tile { background: color-mix(in srgb, var(--primary) 11%, var(--card)); color: var(--primary); }
+.c-chip {
+  display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 0.95rem; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--background); color: var(--foreground); font-size: 0.875rem; font-weight: 500;
+  transition: border-color 0.2s, color 0.2s;
+}
+.c-chip:hover { border-color: var(--primary); color: var(--primary); }
+.c-badge { display: inline-flex; align-items: center; border-radius: 0.375rem; padding: 0.3rem 0.6rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.c-label { font-size: 0.78rem; color: var(--muted-foreground); }
+.c-figure { font-family: var(--font-heading); font-weight: 700; font-variant-numeric: lining-nums tabular-nums; }
+.c-dark { background: color-mix(in srgb, var(--foreground) 88%, var(--primary)); color: #fff; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-primary { background: var(--primary); color: var(--primary-foreground); }
 .btn-primary:hover { background: color-mix(in srgb, var(--primary) 85%, var(--foreground)); }
@@ -106,25 +132,28 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 .prose-chat strong { font-weight: 600; }
 
 /* ───────── Admin dashboard (fixed design, independent of tenant themes) ───────── */
-.admin { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+/* Calm, high-contrast UI: one blue accent, 44px touch targets, white cards on a soft grey ground. */
+.admin { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #101828; }
 .admin h1, .admin h2, .admin h3 { font-family: inherit; letter-spacing: -0.015em; }
-.admin * { border-color: #e2e8f0; }
-.field { display: grid; gap: 0.35rem; font-size: 0.875rem; }
-.field > span { font-weight: 500; color: #334155; }
-.field small { color: #64748b; font-size: 0.78rem; }
+.admin * { border-color: #dfe3ea; }
+.field { display: grid; gap: 0.4rem; font-size: 0.9rem; }
+.field > span { font-weight: 600; color: #101828; }
+.field small { color: #5b6779; font-size: 0.8rem; }
 .field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), .field textarea, .field select, .a-input {
-  width: 100%; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.55rem 0.75rem; background: #fff; color: #0f172a; font-size: 0.9rem;
+  width: 100%; border: 1px solid #b4bcc9; border-radius: 0.625rem; padding: 0.6rem 0.85rem; min-height: 2.75rem; background: #fff; color: #101828; font-size: 0.95rem;
 }
-.field input:focus, .field textarea:focus, .field select:focus, .a-input:focus { outline: 2px solid #14b8a6; outline-offset: 0; border-color: #14b8a6; }
-.a-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; border-radius: 0.5rem; padding: 0.55rem 1rem; font-size: 0.875rem; font-weight: 500; transition: background 0.15s; cursor: pointer; }
+.field textarea { min-height: 0; }
+.field input:focus, .field textarea:focus, .field select:focus, .a-input:focus { outline: 2px solid #1e46b8; outline-offset: 0; border-color: #1e46b8; }
+.a-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; border-radius: 0.625rem; padding: 0.55rem 1.1rem; min-height: 2.75rem; font-size: 0.925rem; font-weight: 600; transition: background 0.15s; cursor: pointer; }
 .a-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.a-btn-primary { background: #0f766e; color: #fff; }
-.a-btn-primary:hover { background: #115e59; }
-.a-btn-ghost { border: 1px solid #cbd5e1; background: #fff; color: #0f172a; }
-.a-btn-ghost:hover { background: #f1f5f9; }
-.a-btn-danger { color: #b91c1c; border: 1px solid #fecaca; background: #fff; }
-.a-btn-danger:hover { background: #fef2f2; }
-.a-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 0.875rem; padding: 1.5rem; }
+.a-btn:focus-visible { outline: 2px solid #1e46b8; outline-offset: 2px; }
+.a-btn-primary { background: #1e46b8; color: #fff; }
+.a-btn-primary:hover { background: #17368f; }
+.a-btn-ghost { border: 1px solid #b4bcc9; background: #fff; color: #101828; }
+.a-btn-ghost:hover { background: #f6f7f9; }
+.a-btn-danger { color: #b42318; border: 1px solid #fecdca; background: #fff; }
+.a-btn-danger:hover { background: #fef3f2; }
+.a-card { background: #fff; border: 1px solid #dfe3ea; border-radius: 1rem; padding: 1.5rem; }
 
 /* ───────── Lounge layout (sidebar shell + chat-first home). All colours derive from tenant tokens. ───────── */
 .lounge {

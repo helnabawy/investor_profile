@@ -14,6 +14,6 @@ export default async function ProjectsPage({ params }: { params: Promise<{ site:
         { ...newSection("page-header"), props: { title: "The Portfolio", subtitle: "Hand-picked off-plan and ready projects. Ask the concierge about any of them." } },
         newSection("project-grid"),
       ]
-    : [newSection("project-grid")];
+    : [{ ...newSection("project-grid"), props: { title: "The portfolio", subtitle: "Hand-picked off-plan and ready projects. Every card shows the starting price, handover and expected return." } }];
   return <RenderSections sections={sections} tenant={tenant} />;
 }

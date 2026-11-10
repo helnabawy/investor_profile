@@ -6,20 +6,22 @@ export function PageTitle({ title, subtitle, children }: { title: string; subtit
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-semibold">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+        <h1 className="text-[1.75rem] font-bold leading-tight">{title}</h1>
+        {subtitle && <p className="mt-1 max-w-2xl text-slate-600">{subtitle}</p>}
       </div>
       {children}
     </div>
   );
 }
 
-export function SubmitButton({ children, className = "a-btn a-btn-primary" }: { children: React.ReactNode; className?: string }) {
+export function SubmitButton({ children, className = "a-btn a-btn-primary", pendingLabel = "Saving…" }: { children: React.ReactNode; className?: string; pendingLabel?: string }) {
   const { pending } = useFormStatus();
-  return <button className={className} disabled={pending}>{pending ? "Saving…" : children}</button>;
+  return <button className={className} disabled={pending}>{pending ? pendingLabel : children}</button>;
 }
 
 export function FormMessage({ state }: { state: ActionResult | null }) {
   if (!state) return null;
-  return state.ok ? <p className="text-sm text-teal-700">Saved ✓</p> : <p className="text-sm text-red-600">{state.error}</p>;
+  return state.ok
+    ? <p role="status" className="text-sm font-medium text-green-700">Saved ✓</p>
+    : <p role="alert" className="text-sm font-medium text-red-700">{state.error}</p>;
 }

@@ -30,7 +30,7 @@ ok(home.includes("Boutique advisory for Dubai investors"), "settings change show
 // Theme: switch to Desert Sand preset
 await page.goto(`${R}/admin/theme`);
 await page.click("button:has-text('Desert Sand')");
-await page.click("button:has-text('Save theme')");
+await page.click("button:has-text('Publish now')");
 await page.waitForSelector("text=Saved ✓");
 await page.screenshot({ path: `${out}/admin-theme.png` });
 const themed = await (await fetch("http://demo.localhost:3100/")).text();

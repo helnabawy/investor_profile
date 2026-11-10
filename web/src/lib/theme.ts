@@ -61,6 +61,40 @@ const FONT_WEIGHTS: Record<string, string> = {
 };
 
 export const PRESETS = {
+  "calm-green": {
+    label: "Calm Green",
+    tokens: {
+      background: "#f5f7f6",
+      foreground: "#0e1f1b",
+      card: "#ffffff",
+      muted: "#e3efea",
+      mutedForeground: "#44544f",
+      border: "#dde4e1",
+      primary: "#0b5d4b",
+      primaryForeground: "#ffffff",
+      accent: "#0b5d4b",
+      headingFont: "Plus Jakarta Sans",
+      bodyFont: "Inter",
+      radius: "0.75rem",
+    },
+  },
+  "classic-navy": {
+    label: "Classic Navy",
+    tokens: {
+      background: "#f4f6fa",
+      foreground: "#101828",
+      card: "#ffffff",
+      muted: "#e6ebf4",
+      mutedForeground: "#475467",
+      border: "#dfe3ea",
+      primary: "#1c3a6e",
+      primaryForeground: "#ffffff",
+      accent: "#1c3a6e",
+      headingFont: "Plus Jakarta Sans",
+      bodyFont: "Inter",
+      radius: "0.75rem",
+    },
+  },
   "luxury-gold": {
     label: "Luxury Gold",
     tokens: {

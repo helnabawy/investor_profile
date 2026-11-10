@@ -7,7 +7,6 @@ import { NotOnHome } from "@/components/lounge/not-on-home";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { ChatWidget } from "@/components/site/chat";
-import { whatsappLink } from "@/lib/format";
 
 type Props = { children: React.ReactNode; params: Promise<{ site: string }> };
 
@@ -73,7 +72,8 @@ export default async function TenantLayout({ children, params }: Props) {
         name={tenant.name}
         logoUrl={tenant.theme?.logoUrl}
         nav={tenant.nav ?? []}
-        whatsapp={whatsappLink(tenant.contact?.whatsapp, `Hi ${tenant.name}, I'd like to know more.`)}
+        phone={tenant.contact?.phone}
+        cta={{ label: tenant.theme?.ctaLabel || "Book a consultation", href: tenant.theme?.ctaHref || "/contact" }}
       />
       <main>{children}</main>
       <SiteFooter name={tenant.name} tagline={tenant.tagline} contact={tenant.contact ?? {}} nav={tenant.nav ?? []} poweredBy={tenant.plan === "free"} />

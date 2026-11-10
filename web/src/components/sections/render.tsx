@@ -3,9 +3,11 @@ import type { Section } from "@/lib/sections/registry";
 import type { Tenant } from "@/lib/types";
 import { getFaqs, getProjects } from "@/lib/tenant";
 import { ProjectCard } from "../site/project-card";
-import { ContactForm, OpenChatButton, ProjectExplorer, Reveal } from "./client";
-import { Mail, MapPin, Phone, Check, MessageCircle, Clock, ChevronDown } from "lucide-react";
-import { whatsappLink } from "@/lib/format";
+import { ChatAwareLink, ConciergeAsk, ContactForm, OpenChatButton, ProjectExplorer, Reveal } from "./client";
+import { Mail, MapPin, Phone, Check, MessageCircle, Clock, ChevronDown, ArrowRight, Building2, LineChart, UserRound, ChevronRight } from "lucide-react";
+import { formatPrice, whatsappLink } from "@/lib/format";
+import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";
+import { statusLabel, yieldFigure } from "../site/project-card";
 import { siteLayout, type SiteLayout } from "@/lib/theme";
 import { Backdrop } from "../lounge/backdrop";
 
@@ -19,26 +21,31 @@ function Btn({ href, label, variant = "primary" }: { href?: string; label?: stri
   return /^https?:/.test(href) ? <a href={href} className={cls} target="_blank" rel="noreferrer">{label}</a> : <Link href={href} className={cls}>{label}</Link>;
 }
 
-function Heading({ eyebrow, title, subtitle, center }: { eyebrow?: string; title?: string; subtitle?: string; center?: boolean }) {
+function Heading({ eyebrow, title, subtitle, center, as: Tag = "h2" }: { eyebrow?: string; title?: string; subtitle?: string; center?: boolean; as?: "h1" | "h2" }) {
   if (!title && !eyebrow) return null;
   return (
-    <Reveal className={center ? "mx-auto mb-12 max-w-2xl text-center" : "mb-10 max-w-2xl"}>
-      {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-      {title && <h2 className="text-3xl leading-tight md:text-5xl">{title}</h2>}
-      {subtitle && <p className="mt-4 text-lg text-muted-foreground">{subtitle}</p>}
+    <Reveal className={center ? "mx-auto mb-10 max-w-2xl text-center" : "mb-8 max-w-2xl"}>
+      {eyebrow && <p className="eyebrow mb-2.5">{eyebrow}</p>}
+      {title && <Tag className={`text-balance font-bold leading-[1.12] ${Tag === "h1" ? "text-[clamp(2rem,3.4vw,2.75rem)]" : "text-[clamp(1.75rem,2.6vw,2.15rem)]"}`}>{title}</Tag>}
+      {subtitle && <p className="mt-3 text-[1.06rem] text-muted-foreground">{subtitle}</p>}
     </Reveal>
   );
 }
 
-const Wrap = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <section className={`mx-auto max-w-7xl px-5 py-20 md:py-28 ${className}`}>{children}</section>
+const Wrap = ({ children, className = "", id }: { children: React.ReactNode; className?: string; id?: string }) => (
+  <section id={id} className={`mx-auto max-w-7xl px-5 py-16 md:py-20 ${className}`}>{children}</section>
 );
+
+/** Full-width band on the card colour, for alternating section grounds. */
+const Band = ({ children }: { children: React.ReactNode }) => <div className="border-y bg-card">{children}</div>;
+
+const QUICK_ICONS = { building: Building2, chart: LineChart, person: UserRound, chat: MessageCircle } as const;
 
 /** "Get in Touch" → Get in <accent>Touch</accent>. An explicit accent (matching the title's end) wins over the last word. */
 function AccentTitle({ title, accent, as: Tag = "h1", className = "" }: { title: string; accent?: string; as?: "h1" | "h2"; className?: string }) {
   const cut = accent && title.endsWith(accent) ? title.length - accent.length : accent ? title.length : title.lastIndexOf(" ") + 1;
   const head = title.slice(0, cut), tail = title.slice(cut);
-  return <Tag className={`text-balance font-heading ${className}`}>{head}{tail && <span className="text-[var(--accent)]">{tail}</span>}</Tag>;
+  return <Tag className={`text-balance font-heading ${className}`}>{head}{tail && <span className="text-[color-mix(in_srgb,var(--accent)_45%,#fff)]">{tail}</span>}</Tag>;
 }
 
 async function SectionView({ s, tenant, layout, index, next }: { s: Section; tenant: Tenant; layout: SiteLayout; index: number; next?: string }) {
@@ -81,6 +88,95 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
         </section>
       );
 
+    case "hero-split": {
+      const [featured] = await getProjects(tenant.id, { featured: true, limit: 1 });
+      const ai = tenant.ai_config ?? {};
+      const yld = featured && yieldFigure(featured.roi);
+      return (
+        <section className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-16 gap-y-12 px-5 pb-14 pt-10 md:pb-16 md:pt-16">
+          {/* Above the fold: render at once, no reveal animation. */}
+          <div className="flex min-w-0 flex-[1_1_28rem] flex-col gap-6">
+            {str(p.eyebrow) && <p className="eyebrow">{str(p.eyebrow)}</p>}
+            <h1 className="text-balance text-[clamp(2.1rem,4.2vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.02em]">{str(p.title)}</h1>
+            {str(p.subtitle) && <p className="max-w-[34rem] text-[1.12rem] text-muted-foreground">{str(p.subtitle)}</p>}
+            {ai.enabled !== false ? (
+              <ConciergeAsk
+                placeholder={str(p.askPlaceholder) || "Ask about projects, prices or payment plans"}
+                suggestions={ai.suggestions?.length ? ai.suggestions : DEFAULT_SUGGESTIONS}
+                note={`Answers come only from ${tenant.name}'s own portfolio and notes. A person follows up on request.`}
+              />
+            ) : (
+              <div className="flex flex-wrap gap-3"><Btn href="/projects" label="Browse projects" /><Btn href="/contact" label="Contact us" variant="outline" /></div>
+            )}
+          </div>
+          <div className="relative min-w-0 flex-[1_1_24rem]">
+            {str(p.image) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={str(p.image)} alt="" className="block h-[min(560px,70vw)] min-h-[340px] w-full rounded-[calc(var(--radius)+8px)] object-cover" />
+            ) : <div className="h-[460px] rounded-[calc(var(--radius)+8px)] bg-muted" />}
+            {featured && (
+              <Link href={`/projects/${featured.id}`} className="absolute inset-x-4 bottom-4 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 rounded-[calc(var(--radius)+2px)] bg-card px-5 py-4 shadow-[0_10px_28px_rgb(0_0_0/0.18)] transition hover:-translate-y-0.5 sm:inset-x-5 sm:bottom-5">
+                <span className="flex min-w-0 flex-col">
+                  <span className="text-xs font-semibold uppercase tracking-[0.06em] text-primary">Featured · {statusLabel(featured.status)}</span>
+                  <span className="font-heading font-bold">{featured.title}</span>
+                  <span className="text-sm text-muted-foreground">{[featured.area, yld && `${yld} expected gross yield`].filter(Boolean).join(" · ")}</span>
+                </span>
+                <span className="c-figure whitespace-nowrap">From {formatPrice(featured.price_from, featured.currency)}</span>
+              </Link>
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    case "quick-links":
+      return (
+        <nav aria-label="Start here" className="mx-auto grid max-w-7xl gap-4 px-5 pb-16 sm:grid-cols-2 lg:grid-cols-3">
+          {arr<P>(p.items).map((it, i) => {
+            const Icon = QUICK_ICONS[str(it.icon) as keyof typeof QUICK_ICONS] ?? ArrowRight;
+            return (
+              <ChatAwareLink key={i} href={str(it.href) || "/"} className="c-card flex items-center gap-4 px-6 py-5 transition hover:border-primary">
+                <span className="c-tile flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"><Icon size={22} aria-hidden /></span>
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="font-heading text-[1.05rem] font-semibold">{str(it.title)}</span>
+                  {str(it.body) && <span className="text-sm text-muted-foreground">{str(it.body)}</span>}
+                </span>
+                <ChevronRight size={18} className="shrink-0 text-primary" aria-hidden />
+              </ChatAwareLink>
+            );
+          })}
+        </nav>
+      );
+
+    case "steps":
+      return (
+        <section className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-16 gap-y-10 px-5 py-16 md:py-20">
+          {str(p.image) && (
+            <Reveal className="min-w-0 flex-[1_1_22rem]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={str(p.image)} alt="" loading="lazy" className="block h-[min(460px,80vw)] w-full rounded-[calc(var(--radius)+8px)] object-cover" />
+            </Reveal>
+          )}
+          <Reveal delay={0.08} className="flex min-w-0 flex-[1_1_28rem] flex-col gap-7">
+            <div className="flex flex-col gap-2.5">
+              <h2 className="text-balance text-[clamp(1.75rem,2.6vw,2.15rem)] font-bold leading-[1.12]">{str(p.title)}</h2>
+              {str(p.subtitle) && <p className="text-[1.06rem] text-muted-foreground">{str(p.subtitle)}</p>}
+            </div>
+            <ol className="flex flex-col gap-5">
+              {arr<P>(p.items).map((it, i) => (
+                <li key={i} className="flex gap-4">
+                  <span aria-hidden className="c-tile flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-heading font-bold">{i + 1}</span>
+                  <span className="flex flex-col gap-1">
+                    <span className="font-heading text-lg font-semibold">{str(it.title)}</span>
+                    <span className="text-muted-foreground">{str(it.body)}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+        </section>
+      );
+
     case "hero":
       return (
         <section data-hero className="relative flex min-h-[88vh] items-end overflow-hidden text-white">
@@ -91,7 +187,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
           <div className="relative mx-auto w-full max-w-7xl px-5 pb-20 pt-40 md:pb-28">
             <Reveal className="max-w-3xl">
-              {str(p.eyebrow) && <p className="eyebrow mb-5 !text-[var(--accent)] [text-shadow:0_1px_12px_rgb(0_0_0/0.6)]">{str(p.eyebrow)}</p>}
+              {str(p.eyebrow) && <p className="eyebrow mb-5 !text-[color-mix(in_srgb,var(--accent)_45%,#fff)] [text-shadow:0_1px_12px_rgb(0_0_0/0.6)]">{str(p.eyebrow)}</p>}
               <h1 className="text-4xl leading-[1.08] md:text-7xl">{str(p.title)}</h1>
               {str(p.subtitle) && <p className="mt-6 max-w-2xl text-lg text-white/80 md:text-xl">{str(p.subtitle)}</p>}
               <div className="mt-10 flex flex-wrap gap-4">
@@ -144,17 +240,18 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
     case "featured-projects": {
       const projects = await getProjects(tenant.id, { featured: true, limit: Number(p.limit) || 3 });
       if (!projects.length) return null;
-      return (
+      const featuredGrid = (
         <Wrap>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <Heading eyebrow="Portfolio" title={str(p.title)} subtitle={str(p.subtitle)} />
-            <Link href="/projects" className="mb-10 text-sm uppercase tracking-[0.18em] text-primary hover:underline">View all →</Link>
+          <div className="flex flex-wrap items-end justify-between gap-x-6">
+            <Heading title={str(p.title)} subtitle={str(p.subtitle)} />
+            <Link href="/projects" className="mb-8 inline-flex min-h-11 items-center gap-2 font-semibold text-primary hover:underline">View all projects <ArrowRight size={18} aria-hidden /></Link>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((pr, i) => <Reveal key={pr.id} delay={i * 0.08}><ProjectCard p={pr} /></Reveal>)}
+            {projects.map((pr, i) => <Reveal key={pr.id} delay={i * 0.08} className="h-full"><ProjectCard p={pr} /></Reveal>)}
           </div>
         </Wrap>
       );
+      return layout === "lounge" ? featuredGrid : <Band>{featuredGrid}</Band>;
     }
 
     case "project-grid": {
@@ -162,7 +259,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
       const headed = layout === "lounge" && index > 0; // a page-header above already titles the page
       return (
         <Wrap className={headed ? "!pt-12 md:!pt-16" : ""}>
-          {!headed && <Heading eyebrow={layout === "lounge" ? undefined : "Portfolio"} title={str(p.title)} subtitle={str(p.subtitle)} />}
+          {!headed && <Heading as={index === 0 ? "h1" : "h2"} title={str(p.title)} subtitle={str(p.subtitle)} />}
           <ProjectExplorer projects={projects} />
         </Wrap>
       );
@@ -230,15 +327,23 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
           </section>
         );
       }
-      return (
-        <Wrap>
-          <Reveal className="rounded-[var(--radius)] border bg-card px-8 py-16 text-center md:px-16">
-            <h2 className="text-3xl md:text-5xl">{str(p.title)}</h2>
-            {str(p.body) && <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">{str(p.body)}</p>}
-            <div className="mt-8"><Btn href={str(p.ctaHref)} label={str(p.ctaLabel)} /></div>
-          </Reveal>
-        </Wrap>
-      );
+      {
+        const wa = whatsappLink(tenant.contact?.whatsapp, `Hi ${tenant.name}, I'd like to know more.`);
+        return (
+          <Wrap>
+            <Reveal className="c-dark flex flex-wrap items-center justify-between gap-x-12 gap-y-7 rounded-[calc(var(--radius)+12px)] px-7 py-12 md:px-12 md:py-14">
+              <div className="flex min-w-0 flex-[1_1_26rem] flex-col gap-2.5">
+                <h2 className="text-balance text-[clamp(1.75rem,2.6vw,2.15rem)] font-bold leading-[1.12]">{str(p.title)}</h2>
+                {str(p.body) && <p className="text-[1.06rem] text-white/80">{str(p.body)}</p>}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {str(p.ctaHref) && str(p.ctaLabel) && <Link href={str(p.ctaHref)} className="btn bg-white text-[color:var(--foreground)] hover:bg-white/90">{str(p.ctaLabel)}</Link>}
+                {wa && <a href={wa} target="_blank" rel="noreferrer" className="btn border border-white/45 text-white hover:bg-white/10">Chat on WhatsApp</a>}
+              </div>
+            </Reveal>
+          </Wrap>
+        );
+      }
 
     case "chat-cta":
       if (tenant.ai_config?.enabled === false) return null;
@@ -259,20 +364,25 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
       const faqs = await getFaqs(tenant.id);
       if (!faqs.length) return null;
       return (
-        <Wrap className="max-w-4xl">
-          <Heading title={str(p.title)} center />
-          <div className="divide-y border-y">
-            {faqs.map((f) => (
-              <details key={f.id} className="group py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-heading text-xl">
-                  {f.question}
-                  <span className="text-primary transition group-open:rotate-45">+</span>
-                </summary>
-                <p className="mt-3 whitespace-pre-line text-muted-foreground">{f.answer}</p>
-              </details>
-            ))}
-          </div>
-        </Wrap>
+        <Band>
+          <Wrap id="faq" className="flex scroll-mt-20 flex-wrap gap-x-16 gap-y-8">
+            <div className="flex min-w-0 flex-[1_1_18rem] flex-col items-start gap-3">
+              <Heading title={str(p.title)} subtitle={str(p.subtitle) || "Straight answers on ownership, costs and payment plans."} />
+              {tenant.ai_config?.enabled !== false && <OpenChatButton label="Ask something else" variant="light" />}
+            </div>
+            <div className="flex min-w-0 flex-[2_1_30rem] flex-col gap-3">
+              {faqs.map((f, i) => (
+                <details key={f.id} open={i === 0} className="group rounded-[calc(var(--radius)+2px)] border bg-background px-5 open:bg-background">
+                  <summary className="flex min-h-[3.75rem] cursor-pointer list-none items-center justify-between gap-6 font-heading text-[1.05rem] font-semibold">
+                    {f.question}
+                    <ChevronDown size={20} aria-hidden className="shrink-0 text-primary transition group-open:rotate-180" />
+                  </summary>
+                  <p className="whitespace-pre-line pb-5 text-muted-foreground">{f.answer}</p>
+                </details>
+              ))}
+            </div>
+          </Wrap>
+        </Band>
       );
     }
 
@@ -325,21 +435,43 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
           </section>
         );
       }
+      const rows = [
+        wa && { icon: MessageCircle, label: "WhatsApp", value: "Usually the fastest reply", href: wa },
+        c.phone && { icon: Phone, label: "Call", value: c.phone, href: `tel:${c.phone.replace(/\s/g, "")}` },
+        c.email && { icon: Mail, label: "Email", value: c.email, href: `mailto:${c.email}` },
+      ].filter(Boolean) as { icon: typeof Mail; label: string; value: string; href: string }[];
+      const Title = index === 0 ? "h1" : "h2";
       return (
-        <Wrap>
-          <div className="grid gap-14 md:grid-cols-[1fr_1.3fr]">
-            <div>
-              <p className="eyebrow mb-3">Contact</p>
-              <h2 className="text-3xl md:text-5xl">{str(p.title)}</h2>
-              {str(p.subtitle) && <p className="mt-4 text-lg text-muted-foreground">{str(p.subtitle)}</p>}
-              <div className="mt-8 space-y-4 text-lg">
-                {c.phone && <a href={`tel:${c.phone.replace(/\s/g, "")}`} className="flex items-center gap-3 hover:text-primary"><Phone size={18} className="text-primary" />{c.phone}</a>}
-                {c.email && <a href={`mailto:${c.email}`} className="flex items-center gap-3 hover:text-primary"><Mail size={18} className="text-primary" />{c.email}</a>}
-                {c.address && <p className="flex items-center gap-3"><MapPin size={18} className="text-primary" />{c.address}</p>}
-              </div>
-              {wa && <a href={wa} target="_blank" rel="noreferrer" className="btn btn-outline mt-8">Message on WhatsApp</a>}
+        <Wrap className="flex flex-wrap items-start gap-x-16 gap-y-10">
+          <div className="flex min-w-0 flex-[1_1_24rem] flex-col gap-7">
+            <div className="flex flex-col gap-3">
+              <Title className="text-balance text-[clamp(2rem,3.4vw,2.75rem)] font-bold leading-[1.1]">{str(p.title)}</Title>
+              {str(p.subtitle) && <p className="text-[1.1rem] text-muted-foreground">{str(p.subtitle)}</p>}
             </div>
-            <div className="rounded-[var(--radius)] border bg-card p-6 md:p-10"><ContactForm /></div>
+            {rows.length > 0 && (
+              <ul className="flex flex-col gap-3">
+                {rows.map(({ icon: Icon, label, value, href }) => (
+                  <li key={label}>
+                    <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="c-card flex items-center gap-4 px-5 py-4 transition hover:border-primary">
+                      <span className="c-tile flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"><Icon size={21} aria-hidden /></span>
+                      <span className="flex min-w-0 flex-1 flex-col"><span className="font-heading font-semibold">{label}</span><span className="truncate text-[0.94rem] text-muted-foreground">{value}</span></span>
+                      <ArrowRight size={18} className="shrink-0 text-primary" aria-hidden />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {(c.address || c.hours) && (
+              <dl className="flex flex-wrap gap-x-12 gap-y-4 border-t pt-5">
+                {c.address && <div><dt className="c-label">Office</dt><dd className="font-medium">{c.address}</dd></div>}
+                {c.hours && <div><dt className="c-label">Hours</dt><dd className="font-medium">{c.hours}</dd></div>}
+              </dl>
+            )}
+          </div>
+          <div className="c-card min-w-0 flex-[1_1_28rem] p-6 shadow-[0_12px_32px_rgb(0_0_0/0.07)] md:p-9">
+            <h2 className="font-heading text-2xl font-bold">Send a message</h2>
+            <p className="mb-6 mt-1 text-[0.95rem] text-muted-foreground">An advisor replies within working hours.</p>
+            <ContactForm />
           </div>
         </Wrap>
       );

@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 import { starterPages, starterTheme, STARTER_NAV } from "@/lib/admin/starter";
 import { isMulti } from "@/lib/env";
+import { PRESETS } from "@/lib/theme";
+import { TEMPLATES, templateFor } from "@/lib/templates";
 
 const RESERVED = new Set(["www", "app", "admin", "api", "mail", "help", "support", "blog", "docs", "status", "s"]);
 
@@ -18,10 +20,15 @@ export async function createSite(_: { error?: string } | null, f: FormData): Pro
     return { error: "Choose a web address of 2–40 lowercase letters, numbers or dashes." };
   }
 
+  // "look" is "<template>:<preset>" from the sign-up form, e.g. "classic:calm-green".
+  const [tplRaw, presetRaw] = String(f.get("look") ?? "").split(":");
+  const template = TEMPLATES.some((t) => t.id === tplRaw) ? tplRaw : "classic";
+  const preset = presetRaw && presetRaw in PRESETS ? presetRaw : templateFor(template).preset;
+
   const admin = supabaseAdmin();
   const { data: tenant, error } = await admin.from("tenants").insert({
     slug, name,
-    theme: starterTheme(String(f.get("preset") ?? "luxury-gold")),
+    theme: starterTheme(template, preset),
     ai_config: { provider: "auto", assistantName: `${name} Concierge` },
     contact: { email: user.email },
     nav: STARTER_NAV,

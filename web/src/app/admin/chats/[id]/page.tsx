@@ -17,7 +17,7 @@ export default async function ChatTranscript({ params }: { params: Promise<{ id:
       <div className="a-card space-y-3">
         {msgs.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : ""}`}>
-            <p className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm ${m.role === "user" ? "bg-teal-700 text-white" : "bg-slate-100"}`}>{m.content}</p>
+            <p className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm ${m.role === "user" ? "bg-blue-700 text-white" : "bg-slate-100"}`}>{m.content}</p>
           </div>
         ))}
       </div>

@@ -39,12 +39,12 @@ export function AiForm({ config, providers, tenantName }: { config: AiConfig; pr
       <section className="a-card space-y-4">
         <h2 className="font-semibold">AI model</h2>
         <div className="grid gap-2 sm:grid-cols-2">
-          <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 has-[:checked]:border-teal-600 has-[:checked]:bg-teal-50">
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
             <input type="radio" name="provider" value="auto" checked={provider === "auto"} onChange={() => setProvider("auto")} className="mt-1" />
             <span><span className="text-sm font-medium">Automatic</span><span className="block text-xs text-slate-500">Cheapest available model, with automatic fallback.</span></span>
           </label>
           {providers.map((p) => (
-            <label key={p.id} className={`flex items-start gap-3 rounded-lg border p-3 has-[:checked]:border-teal-600 has-[:checked]:bg-teal-50 ${p.configured ? "cursor-pointer" : "opacity-50"}`}>
+            <label key={p.id} className={`flex items-start gap-3 rounded-lg border p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 ${p.configured ? "cursor-pointer" : "opacity-50"}`}>
               <input type="radio" name="provider" value={p.id} disabled={!p.configured} checked={provider === p.id} onChange={() => setProvider(p.id)} className="mt-1" />
               <span><span className="text-sm font-medium">{p.label}</span>
                 <span className="block text-xs text-slate-500">{p.note}{!p.configured && " · not configured on server"}</span></span>

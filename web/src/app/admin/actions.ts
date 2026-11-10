@@ -8,6 +8,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import type { Section } from "@/lib/sections/registry";
 import type { ThemeConfig } from "@/lib/theme";
 import { addDomainToHosting, removeDomainFromHosting } from "@/lib/domains";
+import { PREVIEW_COOKIE } from "@/lib/tenant";
 
 export type ActionResult = { ok: boolean; error?: string; id?: string };
 
@@ -76,11 +77,45 @@ export async function saveSite(_: ActionResult | null, f: FormData): Promise<Act
 }
 
 // ───────────── theme ─────────────
+const cleanTheme = (theme: ThemeConfig) =>
+  Object.fromEntries(Object.entries(theme).filter(([, v]) => typeof v === "string" && v.length < 500));
+
+/** Publishes a theme straight to the live site and drops any draft. */
 export async function saveTheme(theme: ThemeConfig): Promise<ActionResult> {
   const { db, tenant } = await getAdmin();
-  const clean = Object.fromEntries(Object.entries(theme).filter(([, v]) => typeof v === "string" && v.length < 500));
-  const { error } = await db.from("tenants").update({ theme: clean }).eq("id", tenant.id);
-  return error ? { ok: false, error: error.message } : done();
+  const { error } = await db.from("tenants").update({ theme: cleanTheme(theme) }).eq("id", tenant.id);
+  if (error) return { ok: false, error: error.message };
+  await db.from("theme_drafts").delete().eq("tenant_id", tenant.id);
+  return done();
+}
+
+/** Stores the theme as an unpublished draft and opens the preview screen on the agent's own site. */
+export async function previewTheme(theme: ThemeConfig): Promise<ActionResult> {
+  const { db, tenant } = await getAdmin();
+  const { error } = await db.from("theme_drafts").upsert({ tenant_id: tenant.id, theme: cleanTheme(theme) });
+  if (error) return { ok: false, error: error.message };
+  (await cookies()).set(PREVIEW_COOKIE, tenant.slug, { path: "/", httpOnly: true, sameSite: "lax" });
+  redirect("/admin/preview");
+}
+
+export async function publishDraft() {
+  const { db, tenant } = await getAdmin();
+  const { data } = await db.from("theme_drafts").select("theme").eq("tenant_id", tenant.id).maybeSingle();
+  if (data) {
+    const { error } = await db.from("tenants").update({ theme: data.theme }).eq("id", tenant.id);
+    if (error) throw new Error(error.message);
+    await db.from("theme_drafts").delete().eq("tenant_id", tenant.id);
+  }
+  (await cookies()).delete(PREVIEW_COOKIE);
+  revalidatePath("/", "layout");
+  redirect("/admin/theme?published=1");
+}
+
+export async function discardDraft() {
+  const { db, tenant } = await getAdmin();
+  await db.from("theme_drafts").delete().eq("tenant_id", tenant.id);
+  (await cookies()).delete(PREVIEW_COOKIE);
+  redirect("/admin/theme");
 }
 
 // ───────────── AI ─────────────

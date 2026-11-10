@@ -1,9 +1,14 @@
 import "server-only";
 import { cache } from "react";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { supabasePublic } from "./supabase/server";
+import { supabasePublic, supabaseServer } from "./supabase/server";
 import type { Faq, Page, Project, Tenant } from "./types";
 import { PROJECT_COLUMNS } from "./types";
+import type { ThemeConfig } from "./theme";
+
+/** Holds the slug of the site being previewed. Set by the admin, read here and in proxy.ts. */
+export const PREVIEW_COOKIE = "es_preview";
 
 const TENANT_COLUMNS = "id,slug,name,tagline,domains,plan,theme,ai_config,contact,nav,published";
 
@@ -16,8 +21,23 @@ export const getTenantBySite = cache(async (site: string): Promise<Tenant | null
   const key = decodeURIComponent(site).toLowerCase();
   const q = db.from("tenants").select(TENANT_COLUMNS).eq("published", true);
   const { data } = key.includes(".") ? await q.contains("domains", [key]).maybeSingle() : await q.eq("slug", key).maybeSingle();
-  return (data as Tenant | null) ?? null;
+  const tenant = (data as Tenant | null) ?? null;
+  if (!tenant) return null;
+  const draft = await previewTheme(tenant);
+  return draft ? { ...tenant, theme: draft } : tenant;
 });
+
+/**
+ * While an agent is in preview mode (cookie set from /admin/theme), their own site renders with
+ * the unpublished theme. The draft is read with the visitor's session, so RLS only returns it to
+ * members of this tenant; everyone else gets null and sees the live theme.
+ */
+async function previewTheme(tenant: Tenant): Promise<ThemeConfig | null> {
+  if ((await cookies()).get(PREVIEW_COOKIE)?.value !== tenant.slug) return null;
+  const db = await supabaseServer();
+  const { data } = await db.from("theme_drafts").select("theme").eq("tenant_id", tenant.id).maybeSingle();
+  return (data?.theme as ThemeConfig | undefined) ?? null;
+}
 
 export async function requireTenant(site: string) {
   const t = await getTenantBySite(site);

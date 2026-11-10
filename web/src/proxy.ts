@@ -20,15 +20,27 @@ function siteForHost(rawHost: string): string | null {
   return host.split(":")[0]; // custom domain
 }
 
+// Same name as PREVIEW_COOKIE in src/lib/tenant.ts (not imported: that module is server-only).
+const PREVIEW_COOKIE = "es_preview";
+
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const site = siteForHost(req.headers.get("host") ?? ROOT);
   const isAppPath = APP_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  // Admin preview runs on the platform host so it shares the admin's session: while the cookie is
+  // set, non-app paths there are served as that tenant's site (the preview iframe loads "/").
+  const previewing = req.cookies.get(PREVIEW_COOKIE)?.value;
+  const previewSite = previewing && /^[a-z0-9-]+$/.test(previewing) ? previewing : null;
+  const site = siteForHost(req.headers.get("host") ?? ROOT) ?? previewSite;
 
-  // Pass the resolved site to route handlers / server components.
-  const headers = new Headers(req.headers);
-  headers.delete("x-site"); // never trust a client-supplied value
-  if (site) headers.set("x-site", site);
+  // Leaving the preview screen for any other admin page ends preview mode.
+  if (previewing && pathname.startsWith("/admin") && pathname !== "/admin/preview") {
+    const res = NextResponse.next({ request: { headers: withSite(req, site) } });
+    res.cookies.delete(PREVIEW_COOKIE);
+    await refreshSession(req, res);
+    return res;
+  }
+
+  const headers = withSite(req, site);
 
   if (isAppPath) {
     const res = NextResponse.next({ request: { headers } });
@@ -44,6 +56,14 @@ export async function proxy(req: NextRequest) {
     return NextResponse.rewrite(url, { request: { headers } });
   }
   return NextResponse.next({ request: { headers } });
+}
+
+/** Passes the resolved site to route handlers / server components. */
+function withSite(req: NextRequest, site: string | null) {
+  const headers = new Headers(req.headers);
+  headers.delete("x-site"); // never trust a client-supplied value
+  if (site) headers.set("x-site", site);
+  return headers;
 }
 
 // Keeps the Supabase auth cookie fresh for admin pages.
