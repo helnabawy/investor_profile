@@ -22,6 +22,6 @@ export function SubmitButton({ children, className = "a-btn a-btn-primary", pend
 export function FormMessage({ state }: { state: ActionResult | null }) {
   if (!state) return null;
   return state.ok
-    ? <p role="status" className="text-sm font-medium text-green-700">Saved ✓</p>
-    : <p role="alert" className="text-sm font-medium text-red-700">{state.error}</p>;
+    ? <p role="status" className="rise text-sm font-medium text-green-700">Saved ✓</p>
+    : <p role="alert" className="rise text-sm font-medium text-red-700">{state.error}</p>;
 }

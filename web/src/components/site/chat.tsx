@@ -42,7 +42,7 @@ export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: 
   return (
     <>
       {open && (
-        <div className="fixed inset-x-3 bottom-3 top-20 z-50 flex flex-col overflow-hidden rounded-[calc(var(--radius)+6px)] border bg-background shadow-2xl sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[620px] sm:max-h-[calc(100vh-8rem)] sm:w-[400px]">
+        <div className="chat-pop fixed inset-x-3 bottom-3 top-20 z-50 flex flex-col overflow-hidden rounded-[calc(var(--radius)+6px)] border bg-background shadow-2xl sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[620px] sm:max-h-[calc(100vh-8rem)] sm:w-[400px]">
           <ChatPanel {...props} initialQuestion={question} onQuestionSent={() => setQuestion("")} onClose={() => setOpen(false)} />
         </div>
       )}

@@ -45,7 +45,7 @@ export function AdminNav({ mobile }: { mobile?: boolean }) {
           <p className="px-3 pb-1 pt-4 text-xs font-semibold uppercase tracking-wider text-slate-500 first:pt-1">{g.title}</p>
           {g.items.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} aria-current={active(href) ? "page" : undefined}
-              className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-[0.925rem] ${active(href) ? "bg-blue-50 font-semibold text-blue-900" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}>
+              className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-[0.925rem] transition-colors ${active(href) ? "bg-blue-50 font-semibold text-blue-900" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}>
               <Icon size={17} aria-hidden /> {label}
             </Link>
           ))}

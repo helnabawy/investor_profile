@@ -1,14 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, Check, Home, Inbox, LayoutTemplate, MessageCircle } from "lucide-react";
+import { ArrowRight, Check, Home } from "lucide-react";
 import { env } from "@/lib/env";
+import { ProductFlow } from "@/components/marketing/flow";
+import { TemplateThumb } from "@/components/template-thumb";
+import { TEMPLATES } from "@/lib/templates";
 
 // Platform marketing page (root domain in multi-tenant mode). Tenant sites never reach this route.
-const FEATURES = [
-  { icon: LayoutTemplate, title: "Your portfolio site", body: "Projects with prices, payment plans and yields on every card. Pick a template, then add your name, colours and domain." },
-  { icon: MessageCircle, title: "An AI concierge", body: "Answers buyers day and night, only from your own projects, FAQs and notes. It never invents listings." },
-  { icon: Inbox, title: "A leads inbox", body: "Every form and chat enquiry arrives with the buyer's interest, budget and the full conversation." },
-];
-
 const STEPS = [
   ["Create your account", "Enter your business name, pick a site address and choose a starting template."],
   ["Add your projects", "Upload photos, prices and payment plans. Add FAQs so the concierge answers well."],
@@ -33,7 +30,7 @@ export default function Landing() {
             EstateSite
           </Link>
           <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-            {[["#features", "What you get"], ["#how", "How it works"], ["#pricing", "Pricing"]].map(([href, label]) => (
+            {[["#features", "What you get"], ["#how", "How it works"], ["#templates", "Templates"], ["#pricing", "Pricing"]].map(([href, label]) => (
               <a key={href} href={href} className="rounded-md px-3.5 py-3 text-[0.94rem] font-medium text-slate-600 hover:text-slate-900">{label}</a>
             ))}
             <a href={demo} className="rounded-md px-3.5 py-3 text-[0.94rem] font-medium text-slate-600 hover:text-slate-900">Live demo</a>
@@ -65,8 +62,8 @@ export default function Landing() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=70" alt="" className="h-64 w-full object-cover" />
           <div className="flex flex-col gap-3 p-5 text-[0.95rem]">
-            <p className="max-w-[80%] self-end rounded-2xl rounded-br-sm bg-[#1e46b8] px-4 py-2.5 text-white">What can I buy for AED 1.5M with a payment plan?</p>
-            <p className="max-w-[88%] self-start rounded-2xl rounded-bl-sm bg-slate-100 px-4 py-2.5">Marina Vista Residences starts from AED 1.45M on a 60/40 plan. Shall I connect you with the advisor?</p>
+            <p className="rise max-w-[80%] self-end rounded-2xl rounded-br-sm bg-[#1e46b8] px-4 py-2.5 text-white" style={{ animationDelay: "0.5s" }}>What can I buy for AED 1.5M with a payment plan?</p>
+            <p className="rise max-w-[88%] self-start rounded-2xl rounded-bl-sm bg-slate-100 px-4 py-2.5" style={{ animationDelay: "1.4s" }}>Marina Vista Residences starts from AED 1.45M on a 60/40 plan. Shall I connect you with the advisor?</p>
           </div>
         </div>
       </section>
@@ -77,15 +74,7 @@ export default function Landing() {
             <h2 className="text-[2.1rem] font-bold leading-tight">Three things, working together</h2>
             <p className="mt-2 text-lg text-slate-600">One sign-up gives you a public site, an assistant that knows your inventory, and one place where every enquiry lands.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {FEATURES.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="flex flex-col gap-3 rounded-2xl border p-7">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-[#1e46b8]"><Icon size={24} aria-hidden /></span>
-                <h3 className="text-xl font-bold">{title}</h3>
-                <p className="text-slate-600">{body}</p>
-              </div>
-            ))}
-          </div>
+          <ProductFlow />
         </div>
       </section>
 
@@ -100,6 +89,29 @@ export default function Landing() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section id="templates" className="border-t bg-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-10 px-5 py-20">
+          <div className="max-w-2xl">
+            <h2 className="text-[2.1rem] font-bold leading-tight">Start from a template</h2>
+            <p className="mt-2 text-lg text-slate-600">Each one sets the layout of your whole site. Switch any time and preview the change on your own site before buyers see it.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {TEMPLATES.map((t) => (
+              <article key={t.id} className="flex flex-col overflow-hidden rounded-2xl border transition-shadow hover:shadow-[0_16px_30px_-20px_rgb(0_0_0/0.35)]">
+                <TemplateThumb kind={t.id} />
+                <div className="flex flex-col gap-3 p-6">
+                  <h3 className="text-xl font-bold">{t.name}</h3>
+                  <ul aria-label="Tags" className="flex flex-wrap gap-1.5">
+                    {t.tags.map((tag) => <li key={tag} className="rounded-md border border-slate-300 px-2.5 py-0.5 text-xs font-medium text-slate-700">{tag}</li>)}
+                  </ul>
+                  <p className="text-slate-600">{t.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section id="pricing" className="border-y bg-white">

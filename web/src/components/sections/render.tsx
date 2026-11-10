@@ -372,7 +372,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
             </div>
             <div className="flex min-w-0 flex-[2_1_30rem] flex-col gap-3">
               {faqs.map((f, i) => (
-                <details key={f.id} open={i === 0} className="group rounded-[calc(var(--radius)+2px)] border bg-background px-5 open:bg-background">
+                <details key={f.id} open={i === 0} className="faq-item group rounded-[calc(var(--radius)+2px)] border bg-background px-5 open:bg-background">
                   <summary className="flex min-h-[3.75rem] cursor-pointer list-none items-center justify-between gap-6 font-heading text-[1.05rem] font-semibold">
                     {f.question}
                     <ChevronDown size={20} aria-hidden className="shrink-0 text-primary transition group-open:rotate-180" />

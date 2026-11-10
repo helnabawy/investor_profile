@@ -45,7 +45,7 @@ export function SiteHeader({ name, logoUrl, nav, phone, cta }: Props) {
         <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {nav.map((n) => (
             <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined}
-              className={cn("rounded-md px-3.5 py-3 text-[0.94rem] hover:text-primary", isActive(n.href) ? "font-semibold text-primary" : "font-medium opacity-80")}>
+              className={cn("nav-link rounded-md px-3.5 py-3 text-[0.94rem] transition-colors hover:text-primary", isActive(n.href) ? "font-semibold text-primary" : "font-medium opacity-80")}>
               {n.label}
             </Link>
           ))}

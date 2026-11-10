@@ -70,7 +70,7 @@ export default async function Overview({ searchParams }: { searchParams: Promise
             <span className="text-sm font-semibold text-slate-600">{doneCount} of {steps.length} done</span>
           </div>
           <div role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={doneCount} aria-label="Setup progress" className="h-2 overflow-hidden rounded-full bg-blue-50">
-            <span className="block h-full rounded-full bg-[#1e46b8]" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+            <span className="grow-x block h-full rounded-full bg-[#1e46b8]" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
           </div>
           <ol className="space-y-3">
             {steps.map((s, i) => {
