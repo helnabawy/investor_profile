@@ -147,7 +147,7 @@ console.log(`Copied ${media.size} media files.`);
 
 // ───────── 4. write the files ─────────
 const replacements = [...media].sort((a, b) => b[0].length - a[0].length);
-const apiTag = `<script>window.__ESTATESITE_API__=${JSON.stringify(site.origin)}</script>`;
+const apiTag = `<script>window.__ESTATEPROFILE_API__=${JSON.stringify(site.origin)}</script>`;
 const write = (rel, data) => {
   const f = join(out, rel);
   mkdirSync(dirname(f), { recursive: true });

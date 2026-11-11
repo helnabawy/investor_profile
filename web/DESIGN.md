@@ -1,5 +1,5 @@
 ---
-name: EstateSite tenant sites
+name: EstateProfile tenant sites
 description: A private advisory lounge per agent, themed entirely by tenant tokens; the concierge is the front door.
 colors:
   background: "#0e0d0b"
@@ -202,7 +202,7 @@ components:
     padding: "24px"
 ---
 
-# Design System: EstateSite tenant sites
+# Design System: EstateProfile tenant sites
 
 ## Overview
 

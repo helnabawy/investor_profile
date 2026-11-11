@@ -5,7 +5,7 @@ import { templateFor } from "@/lib/templates";
 import { createPreviewToken, previewOrigin } from "@/lib/preview";
 import { PreviewFrame } from "./preview-frame";
 
-export const metadata = { title: "Preview · EstateSite" };
+export const metadata = { title: "Preview · EstateProfile" };
 
 /** Human list of what the draft changes compared with the live theme. */
 function describeChanges(live: ThemeConfig, draft: ThemeConfig) {

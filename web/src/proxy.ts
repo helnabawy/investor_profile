@@ -13,6 +13,8 @@ function siteForHost(rawHost: string): string | null {
   if (MODE === "single") return TENANT_SLUG;
   const host = rawHost.toLowerCase();
   if (host === ROOT || host === `www.${ROOT}`) return null;
+  // Vercel's own deployment URLs (production alias and per-branch previews) serve the platform root.
+  if (host.endsWith(".vercel.app")) return null;
   if (host.endsWith(`.${ROOT}`)) {
     const sub = host.slice(0, -(ROOT.length + 1));
     return /^[a-z0-9-]+$/.test(sub) ? sub : null;

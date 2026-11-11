@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "EstateSite — websites & AI concierge for real-estate agents",
+  title: "EstateProfile — websites & AI concierge for real-estate agents",
   description: "Launch a beautiful property portfolio site with an AI concierge that captures leads 24/7.",
 };
 

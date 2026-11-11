@@ -10,3 +10,11 @@ export const env = {
 };
 
 export const isMulti = env.mode === "multi";
+
+/** http for local dev hosts (localhost, *.localhost), https everywhere else. */
+export const rootProtocol = /^(localhost|[^/]*\.localhost)(:\d+)?$/.test(env.rootDomain) ? "http" : "https";
+
+/** Public URL of a tenant's platform subdomain, e.g. https://demo.example.com. */
+export function subdomainUrl(slug: string) {
+  return `${rootProtocol}://${slug}.${env.rootDomain}`;
+}

@@ -47,7 +47,7 @@ async function notifyAgent(tenant: Tenant, lead: Record<string, unknown>) {
     return;
   }
   await new Resend(key).emails.send({
-    from: process.env.LEADS_FROM_EMAIL ?? "EstateSite <leads@resend.dev>",
+    from: process.env.LEADS_FROM_EMAIL ?? "EstateProfile <leads@resend.dev>",
     to,
     subject: `New ${lead.source} lead — ${lead.name ?? "website visitor"}`,
     text: `You have a new lead from your website.\n\n${lines.join("\n")}`,

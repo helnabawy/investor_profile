@@ -1,0 +1,31 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "estatesite-dev",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "web",
+        "dev"
+      ],
+      "port": 3100
+    },
+    {
+      "name": "estatesite-prod",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "web",
+        "start",
+        "-p",
+        "3100"
+      ],
+      "port": 3100
+    }
+  ]
+}

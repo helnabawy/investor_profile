@@ -25,7 +25,7 @@ export function SiteFooter({ name, tagline, contact, nav, poweredBy }: { name: s
       </div>
       <div className="border-t px-5 py-5 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} {name}
-        {poweredBy && <> · Powered by <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateSite</a></>}
+        {poweredBy && <> · Powered by <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateProfile</a></>}
       </div>
     </footer>
   );

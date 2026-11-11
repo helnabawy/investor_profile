@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseServer } from "../supabase/server";
 import type { Tenant } from "../types";
-import { env, isMulti } from "../env";
+import { isMulti, subdomainUrl } from "../env";
 
 export const ADMIN_TENANT_COOKIE = "admin_tenant";
 
@@ -30,8 +30,7 @@ export const getAdmin = cache(async () => {
 
 /** Public URL of a tenant site, for "View site" links. */
 export function siteUrl(t: Pick<Tenant, "slug" | "domains">) {
-  const proto = env.rootDomain.startsWith("localhost") ? "http" : "https";
   if (!isMulti) return "/";
   if (t.domains?.[0]) return `https://${t.domains[0]}`;
-  return `${proto}://${t.slug}.${env.rootDomain}`;
+  return subdomainUrl(t.slug);
 }

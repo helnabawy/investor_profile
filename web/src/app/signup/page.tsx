@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/admin/auth-shell";
 import { SignupForm } from "./signup-form";
-import { env, isMulti } from "@/lib/env";
+import { env, isMulti, subdomainUrl } from "@/lib/env";
 import { supabaseServer } from "@/lib/supabase/server";
 
-export const metadata = { title: "Create your site" };
+export const metadata = { title: "Create your site", icons: { icon: "/logo-mark.svg" } };
 
 const NEXT = [
   ["Your site goes live straight away", "At the address you chose, with your name and starting template."],
@@ -30,7 +30,7 @@ export default async function SignupPage() {
               </li>
             ))}
           </ol>
-          <a href={`http://demo.${env.rootDomain}`} className="inline-flex min-h-11 items-center font-semibold text-blue-700 hover:text-blue-900">See what a finished site looks like</a>
+          <a href={subdomainUrl("demo")} className="inline-flex min-h-11 items-center font-semibold text-blue-700 hover:text-blue-900">See what a finished site looks like</a>
         </div>
       }
     >

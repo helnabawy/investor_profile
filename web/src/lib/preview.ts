@@ -1,6 +1,6 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { env, isMulti } from "./env";
+import { isMulti, subdomainUrl } from "./env";
 
 // Theme preview runs on the agent's own site host (not the platform host), so it never changes
 // what the platform's landing page serves. The admin hands the iframe a short-lived signed token;
@@ -43,6 +43,5 @@ export function verifyPreviewToken(token: string | undefined | null): string | n
  */
 export function previewOrigin(slug: string) {
   if (!isMulti) return "";
-  const proto = env.rootDomain.startsWith("localhost") ? "http" : "https";
-  return `${proto}://${slug}.${env.rootDomain}`;
+  return subdomainUrl(slug);
 }

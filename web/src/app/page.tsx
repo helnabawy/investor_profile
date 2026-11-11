@@ -1,10 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, Check, Home } from "lucide-react";
-import { env } from "@/lib/env";
+import { ArrowRight, Check } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
+import { env, subdomainUrl } from "@/lib/env";
 import { ProductFlow } from "@/components/marketing/flow";
 import { TemplateThumb } from "@/components/template-thumb";
 import { TEMPLATES } from "@/lib/templates";
 import { PLANS as LIMITS } from "@/lib/plans";
+
+export const metadata = { icons: { icon: "/logo-mark.svg" } };
 
 // Platform marketing page (root domain in multi-tenant mode). Tenant sites never reach this route.
 const STEPS = [
@@ -18,7 +21,7 @@ const STEPS = [
 const perDay = (n: number) => `${n.toLocaleString("en")} concierge messages a day`;
 const PLANS = [
   { name: LIMITS.free.name, price: "Free", desc: "Try it with your listings", cta: "Start free", href: "/signup",
-    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "Both templates", "EstateSite badge in the footer"] },
+    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "Both templates", "EstateProfile badge in the footer"] },
   { name: LIMITS.solo.name, price: "AED 199/mo", desc: "For independent agents", cta: "Start free, upgrade later", href: "/signup", highlight: true,
     items: ["Your own domain", "Unlimited projects", perDay(LIMITS.solo.dailyChat), "Both templates", "No badge"] },
   { name: LIMITS.team.name, price: "Contact us", desc: "For brokerages", cta: "Start free, upgrade later", href: "/signup",
@@ -26,15 +29,12 @@ const PLANS = [
 ];
 
 export default function Landing() {
-  const demo = `http://demo.${env.rootDomain}`;
+  const demo = subdomainUrl("demo");
   return (
     <div className="admin bg-[#f6f7f9] text-slate-900">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-3">
-          <Link href="/" className="flex min-h-11 items-center gap-2.5 text-lg font-bold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1e46b8] text-white"><Home size={18} aria-hidden /></span>
-            EstateSite
-          </Link>
+          <Logo />
           <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
             {[["#features", "What you get"], ["#how", "How it works"], ["#templates", "Templates"], ["#pricing", "Pricing"]].map(([href, label]) => (
               <a key={href} href={href} className="rounded-md px-3.5 py-3 text-[0.94rem] font-medium text-slate-600 hover:text-slate-900">{label}</a>
@@ -156,7 +156,7 @@ export default function Landing() {
 
       <footer className="border-t bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-6 text-sm text-slate-600">
-          <span>© {new Date().getFullYear()} EstateSite</span>
+          <span>© {new Date().getFullYear()} EstateProfile</span>
           <Link href="/login" className="inline-flex min-h-11 items-center hover:text-slate-900">Sign in</Link>
         </div>
       </footer>

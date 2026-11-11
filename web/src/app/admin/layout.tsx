@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { getAdmin, siteUrl } from "@/lib/admin/context";
 import { signOut, switchTenant } from "./actions";
 import { AdminNav } from "@/components/admin/nav";
-import { ExternalLink, Home } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 
-export const metadata = { title: "Dashboard · EstateSite" };
+export const metadata = { title: "Dashboard · EstateProfile", icons: { icon: "/logo-mark.svg" } };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, sites, tenant } = await getAdmin();
@@ -12,10 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="admin flex min-h-screen bg-[#f6f7f9] text-slate-900">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto border-r bg-white md:flex">
         <div className="border-b p-4">
-          <Link href="/admin" className="flex min-h-11 items-center gap-2.5 font-bold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1e46b8] text-white"><Home size={18} aria-hidden /></span>
-            EstateSite
-          </Link>
+          <Logo href="/admin" />
           {sites.length > 1 ? (
             <form action={async (f) => { "use server"; await switchTenant(String(f.get("t"))); }} className="mt-3 flex gap-2">
               <select name="t" defaultValue={tenant.id} className="a-input text-sm" aria-label="Switch site">

@@ -1,4 +1,4 @@
-# EstateSite
+# EstateProfile
 
 Portfolio websites with an AI concierge for real-estate agents and brokers. One codebase runs two ways:
 
@@ -55,10 +55,9 @@ pnpm test:e2e    # browser flow: login, edit settings/theme/pages/projects, sign
 ```
 
 ## Deploying
-**SaaS on Vercel**
-- Create a Supabase project and run `supabase db push`.
-- Add a wildcard domain `*.yourdomain.com`, and set `NEXT_PUBLIC_ROOT_DOMAIN=yourdomain.com`.
-- Set `VERCEL_TOKEN` and `VERCEL_PROJECT_ID` so custom domains added in the admin are registered automatically. Tenants point a CNAME to `cname.vercel-dns.com`.
+**SaaS on Vercel**: see **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**. It covers creating the dev and prod Supabase projects, pushing migrations, auth and email settings, the Vercel project (Root Directory `web`), Preview vs Production env vars, wildcard and custom domains, the first admin, and troubleshooting.
+
+Quick reference: `pnpm build:dev` / `pnpm start:dev` use `.env.dev.local`, and `pnpm build:prod` / `pnpm start:prod` use `.env.prod.local` (templates: `.env.dev.example`, `.env.prod.example`). On Vercel, keep the build command as `pnpm build` and set the variables per environment.
 
 **Self-hosted client**
 - Create the client's Supabase project and run `supabase db push`. Seed data is not applied to remote projects.

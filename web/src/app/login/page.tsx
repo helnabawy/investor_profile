@@ -2,7 +2,7 @@ import { AuthShell } from "@/components/admin/auth-shell";
 import { LoginForm } from "./login-form";
 import { isMulti } from "@/lib/env";
 
-export const metadata = { title: "Sign in" };
+export const metadata = { title: "Sign in", icons: { icon: "/logo-mark.svg" } };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
