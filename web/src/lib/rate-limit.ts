@@ -4,10 +4,13 @@ import { createHash } from "node:crypto";
 /**
  * Stable, non-reversible id for the visitor behind a request, used to rate-limit public endpoints.
  * Takes the first X-Forwarded-For hop (set by Vercel and most proxies) or X-Real-IP.
- * Requests with neither (local dev without a proxy) share one bucket.
+ * Behind Cloudflare a visitor can put anything in the first hop, so those installs set
+ * TRUSTED_IP_HEADER=cf-connecting-ip and that header is used instead.
+ * Requests with none of these (local dev without a proxy) share one bucket.
  */
 export function clientHash(h: Headers) {
-  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip")?.trim() || "unknown";
+  const trusted = process.env.TRUSTED_IP_HEADER;
+  const ip = (trusted && h.get(trusted)?.trim()) || h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip")?.trim() || "unknown";
   const salt = process.env.PREVIEW_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || "estatesite";
   return createHash("sha256").update(`${salt}:${ip}`).digest("base64url").slice(0, 32);
 }

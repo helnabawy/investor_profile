@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { authCookieName, supabaseServerUrl } from "@/lib/env";
 
 // Paths that are never tenant pages (app-level routes).
 const APP_PATHS = ["/admin", "/api", "/login", "/signup", "/auth"];
@@ -54,7 +55,8 @@ function withSite(req: NextRequest, site: string | null) {
 
 // Keeps the Supabase auth cookie fresh for admin pages.
 async function refreshSession(req: NextRequest, res: NextResponse) {
-  const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+  const supabase = createServerClient(supabaseServerUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    cookieOptions: { name: authCookieName },
     cookies: {
       getAll: () => req.cookies.getAll(),
       setAll: (list) => list.forEach(({ name, value, options }) => res.cookies.set(name, value, options)),

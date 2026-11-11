@@ -1,0 +1,51 @@
+# API gateway for the self-hosted Supabase services. It gives supabase-js the same paths as
+# Supabase Cloud (/auth/v1, /rest/v1, /storage/v1) and answers browser CORS preflights.
+# Each service checks the JWT itself, so no keys live in this file.
+_format_version: "1.1"
+
+services:
+  # Links in confirmation / password emails are opened without an API key.
+  - name: auth-v1-open
+    url: http://auth:9999/verify
+    routes:
+      - name: auth-v1-open
+        strip_path: true
+        paths: [/auth/v1/verify]
+    plugins:
+      - name: cors
+
+  - name: auth-v1
+    url: http://auth:9999/
+    routes:
+      - name: auth-v1-all
+        strip_path: true
+        paths: [/auth/v1/]
+    plugins:
+      - name: cors
+      - &apikey-as-bearer
+        name: request-transformer
+        config:
+          add:
+            # Only added when the request has no Authorization header of its own.
+            headers:
+              - "Authorization: Bearer $(headers.apikey)"
+
+  - name: rest-v1
+    url: http://rest:3000/
+    routes:
+      - name: rest-v1-all
+        strip_path: true
+        paths: [/rest/v1/]
+    plugins:
+      - name: cors
+      - *apikey-as-bearer
+
+  - name: storage-v1
+    url: http://storage:5000/
+    routes:
+      - name: storage-v1-all
+        strip_path: true
+        paths: [/storage/v1/]
+    plugins:
+      - name: cors
+      - *apikey-as-bearer

@@ -5,7 +5,7 @@ import { FormMessage, PageTitle, SubmitButton, UpgradeNote } from "@/components/
 import type { NavItem, Tenant } from "@/lib/types";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 
-export function SettingsForm({ tenant, multi, rootDomain, planName, customDomains }: { tenant: Tenant; multi: boolean; rootDomain: string; planName: string; customDomains: boolean }) {
+export function SettingsForm({ tenant, multi, rootDomain, planName, customDomains, cnameTarget }: { tenant: Tenant; multi: boolean; rootDomain: string; planName: string; customDomains: boolean; cnameTarget: string }) {
   const [state, action] = useActionState(saveSite, null);
   const [nav, setNav] = useState<NavItem[]>(tenant.nav ?? []);
   const c = tenant.contact ?? {};
@@ -55,7 +55,7 @@ export function SettingsForm({ tenant, multi, rootDomain, planName, customDomain
           {!customDomains && <UpgradeNote>You are on the {planName} plan. Using your own domain is part of the Solo and Team plans.</UpgradeNote>}
           {customDomains && <label className="field"><span>Custom domains</span>
             <input name="domains" defaultValue={tenant.domains.join(", ")} placeholder="www.youragency.com" />
-            <small>Point a CNAME record for each domain to <code>cname.vercel-dns.com</code> (or your host), then save. Separate several with commas.</small>
+            <small>Point a CNAME record for each domain to <code>{cnameTarget}</code>, then save. Separate several with commas.</small>
           </label>}
         </section>
       )}
