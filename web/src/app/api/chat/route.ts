@@ -6,6 +6,7 @@ import {
   toUIMessageStream,
   type ModelMessage,
   type UIMessage,
+  type UIMessageChunk,
 } from "ai";
 import type { LanguageModelV4 } from "@ai-sdk/provider";
 import { getTenantBySite, tenantPlan } from "@/lib/tenant";
@@ -17,7 +18,9 @@ import { chatTools } from "@/lib/ai/tools";
 import { clientHash, LIMITS, minutesAgo } from "@/lib/rate-limit";
 import { corsFor, preflight } from "@/lib/cors";
 
-export const maxDuration = 30;
+// Leaves room for the model timeouts below, so a slow or rate-limited provider ends in a readable
+// error instead of the platform cutting the stream off with the visitor still waiting.
+export const maxDuration = 60;
 
 const MAX_HISTORY = 20;
 const MAX_INPUT_CHARS = 2000;
@@ -91,6 +94,9 @@ export async function POST(req: Request) {
     messages: history,
     tools: chatTools(db, tenant, sessionId),
     stopWhen: isStepCount(4),
+    // Free tiers answer 429 with a long retry-after; waiting it out silently outlasts the function.
+    maxRetries: 1,
+    timeout: { firstChunkMs: 15_000, totalMs: 30_000 },
     temperature: tenant.ai_config?.temperature ?? 0.4,
     maxOutputTokens: 600,
     onEnd: async ({ text }) => {
@@ -101,7 +107,42 @@ export async function POST(req: Request) {
     onError: ({ error }) => console.error("[chat] stream error", error),
   });
 
-  return createUIMessageStreamResponse({ stream: toUIMessageStream({ stream: result.stream }), headers: cors });
+  return createUIMessageStreamResponse({
+    stream: toUIMessageStream({
+      stream: result.stream,
+      onError: (error) => {
+        console.error("[chat] failed", error);
+        return visitorError(error);
+      },
+    }).pipeThrough(
+      // A timeout ends the stream as an "abort", which the chat would show as a silent stop.
+      new TransformStream<UIMessageChunk, UIMessageChunk>({
+        transform(chunk, out) {
+          if (chunk.type === "abort") {
+            console.error("[chat] timed out", chunk);
+            out.enqueue({ type: "error", errorText: TIMEOUT_MESSAGE });
+          } else out.enqueue(chunk);
+        },
+      }),
+    ),
+    headers: cors,
+  });
+}
+
+const TIMEOUT_MESSAGE = "The concierge is taking too long to answer. Please try again, or use the contact form.";
+
+/** What the visitor sees when the model fails: the cause in plain words, never the provider's raw error. */
+function visitorError(error: unknown) {
+  const e = error as { name?: string; message?: string; statusCode?: number } | undefined;
+  const text = `${e?.name ?? ""} ${e?.message ?? ""}`;
+  if (e?.statusCode === 429 || /429|quota|rate.?limit|resource.?exhausted/i.test(text)) {
+    return "The concierge has reached its usage limit for now. Please try again later, or use the contact form and an advisor will reply.";
+  }
+  if (/timeout|timed out|abort/i.test(text)) return TIMEOUT_MESSAGE;
+  if (e?.statusCode === 400 || e?.statusCode === 401 || e?.statusCode === 403 || /api key|permission|not found/i.test(text)) {
+    return "The concierge isn't available right now. Please use the contact form and an advisor will reply.";
+  }
+  return "The concierge couldn't answer just now. Please try again, or use the contact form.";
 }
 
 // The widget generates the session id (kept in localStorage) so it can resume conversations.
