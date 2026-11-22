@@ -1,43 +1,79 @@
 import Link from "next/link";
+import { ChevronRight, Plus } from "lucide-react";
 import { getAdmin } from "@/lib/admin/context";
 import { PageTitle, UpgradeNote } from "@/components/admin/ui";
 import { tenantPlan } from "@/lib/tenant";
-import { formatPrice } from "@/lib/format";
+import { formatFullPrice } from "@/lib/format";
 import { PROJECT_COLUMNS, type Project } from "@/lib/types";
 
-export default async function ProjectsAdmin() {
+const STATUS: Record<Project["status"], [string, string]> = {
+  "off-plan": ["Off-plan", "a-pill-blue"],
+  ready: ["Ready", "a-pill-green"],
+  "sold-out": ["Sold out", "a-pill-grey"],
+};
+const COLS = "grid-cols-[minmax(0,2.2fr)_96px_140px_96px_minmax(0,1.2fr)_96px_20px]";
+
+export default async function ProjectsAdmin({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const { db, tenant } = await getAdmin();
+  const { status } = await searchParams;
   const { data } = await db.from("projects").select(PROJECT_COLUMNS).eq("tenant_id", tenant.id).order("sort").order("created_at", { ascending: false });
-  const projects = (data ?? []) as Project[];
+  const all = (data ?? []) as Project[];
+  const projects = status ? all.filter((p) => p.status === status) : all;
   const plan = tenantPlan(tenant);
-  const full = plan.maxProjects !== null && projects.length >= plan.maxProjects;
+  const full = plan.maxProjects !== null && all.length >= plan.maxProjects;
   return (
     <div>
       <PageTitle title="Projects" subtitle="Your property portfolio. The AI concierge answers from these.">
-        <div className="flex items-center gap-3">
-          {plan.maxProjects !== null && <p className="text-sm text-slate-600">{projects.length} of {plan.maxProjects} projects used</p>}
-          {!full && <Link href="/admin/projects/new" className="a-btn a-btn-primary">+ New project</Link>}
+        <div className="flex flex-wrap items-center gap-3">
+          {plan.maxProjects !== null && <p className="a-muted text-sm">{all.length} of {plan.maxProjects} projects used</p>}
+          {!full && <Link href="/admin/projects/new" className="a-btn a-btn-primary"><Plus size={16} aria-hidden /> Add project</Link>}
         </div>
       </PageTitle>
       {full && <div className="mb-4"><UpgradeNote>The {plan.name} plan includes up to {plan.maxProjects} projects. Upgrade to add more, or delete one you no longer need.</UpgradeNote></div>}
-      <div className="a-card divide-y !p-0">
-        {projects.map((p) => (
-          <Link key={p.id} href={`/admin/projects/${p.id}`} className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {p.images[0] ? <img src={p.images[0]} alt="" className="h-12 w-16 rounded object-cover" /> : <div className="h-12 w-16 rounded bg-slate-100" />}
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{p.title}</p>
-              <p className="truncate text-xs text-slate-500">{[p.area, p.developer, p.status].filter(Boolean).join(" · ")}</p>
-            </div>
-            <p className="hidden text-sm sm:block">{formatPrice(p.price_from, p.currency)}</p>
-            <div className="flex gap-1">
-              {p.featured && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800">Featured</span>}
-              {!p.published && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs">Hidden</span>}
-            </div>
+
+      <nav aria-label="Filter by status" className="mb-4 flex flex-wrap gap-1.5">
+        {[["", "All"] as const, ...(Object.entries(STATUS) as [string, [string, string]][]).map(([k, [label]]) => [k, label] as const)].map(([k, label]) => (
+          <Link key={k} href={k ? `?status=${k}` : "?"} aria-current={(status ?? "") === k ? "page" : undefined} className="a-tab">
+            {label} <span>{k ? all.filter((p) => p.status === k).length : all.length}</span>
           </Link>
         ))}
-        {!projects.length && <p className="p-6 text-sm text-slate-500">No projects yet — add your first listing.</p>}
+      </nav>
+
+      <div className="overflow-x-auto rounded-xl border bg-white">
+        <div className="stagger min-w-[880px]">
+          <div aria-hidden className={`grid ${COLS} gap-4 px-5 py-3 text-[0.85rem] font-medium text-[#5a6475]`}>
+            <span>Project</span><span>Status</span><span>Price from</span><span>Handover</span><span>Payment plan</span><span>On site</span><span />
+          </div>
+          {projects.map((p) => {
+            const [label, cls] = STATUS[p.status] ?? STATUS["off-plan"];
+            const meta = [p.area, p.property_type, p.featured && "Featured"].filter(Boolean).join(" · ");
+            return (
+              <Link key={p.id} href={`/admin/projects/${p.id}`} className={`a-row grid ${COLS} min-h-[76px] items-center gap-4 border-t px-5 py-2`}>
+                <span className="flex min-w-0 items-center gap-3.5">
+                  {p.images[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.images[0]} alt="" className="h-[54px] w-[72px] shrink-0 rounded-md border object-cover" />
+                  ) : (
+                    <span className="flex h-[54px] w-[72px] shrink-0 items-center justify-center rounded-md border border-[#ebcb85] bg-[#fdf1d7] text-center text-xs font-medium text-[#6b4200]">No photo</span>
+                  )}
+                  <span className="flex min-w-0 flex-col leading-snug">
+                    <span className="truncate font-semibold">{p.title}</span>
+                    <span className={`truncate text-[0.85rem] ${p.images[0] ? "a-muted" : "text-[#6b4200]"}`}>{p.images[0] ? meta : `${meta ? `${meta} · ` : ""}Add a photo`}</span>
+                  </span>
+                </span>
+                <span><span className={`a-pill ${cls}`}>{label}</span></span>
+                <span className="tabular-nums">{p.price_from ? formatFullPrice(p.price_from, p.currency) : "—"}</span>
+                <span className="text-[0.95rem]">{p.handover ?? "—"}</span>
+                <span className="truncate text-[0.95rem] text-[#3d4658]">{p.payment_plan ?? "—"}</span>
+                <span className={`text-[0.9rem] font-medium ${p.published ? "text-[#136c3f]" : "text-[#5a6475]"}`}>{p.published ? "Published" : "Hidden"}</span>
+                <ChevronRight size={18} className="text-[#6a7385]" aria-hidden />
+              </Link>
+            );
+          })}
+          {!projects.length && <p className="a-muted border-t px-5 py-9 text-center">{status ? "No projects with this status." : "No projects yet. Add your first listing."}</p>}
+        </div>
       </div>
+      <p className="a-muted mt-4 text-sm">Featured projects appear on your home page.</p>
     </div>
   );
 }

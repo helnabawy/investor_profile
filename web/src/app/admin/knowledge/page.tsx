@@ -10,10 +10,12 @@ export default async function KnowledgePage() {
     db.from("knowledge").select("id,title,content").eq("tenant_id", tenant.id).order("created_at"),
   ]);
   return (
-    <div className="space-y-8">
-      <PageTitle title="FAQ & knowledge" subtitle="FAQs appear on your site and teach the concierge. Knowledge notes are private — only the concierge reads them." />
-      <FaqEditor faqs={(faqs.data ?? []) as Faq[]} />
-      <KnowledgeEditor notes={(notes.data ?? []) as { id: string; title: string; content: string }[]} />
+    <div>
+      <PageTitle title="FAQ & knowledge" subtitle="FAQs appear on your site and teach the concierge. Knowledge notes are private: only the concierge reads them." />
+      <div className="flex flex-wrap items-start gap-6">
+        <div className="min-w-0 flex-[1.3_1_440px]"><FaqEditor faqs={(faqs.data ?? []) as Faq[]} /></div>
+        <div className="min-w-0 flex-[1_1_340px]"><KnowledgeEditor notes={(notes.data ?? []) as { id: string; title: string; content: string }[]} /></div>
+      </div>
     </div>
   );
 }

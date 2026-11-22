@@ -1,23 +1,30 @@
 import Link from "next/link";
-import { Check, ExternalLink, Inbox } from "lucide-react";
+import { Check, ExternalLink, Inbox, Plus } from "lucide-react";
 import { getAdmin, siteUrl } from "@/lib/admin/context";
 import { availableProviders, PROVIDERS } from "@/lib/ai/config";
 import { templateFor } from "@/lib/templates";
 import { PRESETS, type PresetId } from "@/lib/theme";
+import { whatsappLink } from "@/lib/format";
 import type { Lead } from "@/lib/types";
+import { timeAgo } from "@/lib/admin/time";
+import { CountUp } from "@/components/motion/count-up";
 
 export default async function Overview({ searchParams }: { searchParams: Promise<{ welcome?: string }> }) {
   const { db, tenant } = await getAdmin();
   const { welcome } = await searchParams;
   // eslint-disable-next-line react-hooks/purity -- per-request server render
   const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
-  const [projects, leads, newLeads, chats, recent, faqs] = await Promise.all([
-    db.from("projects").select("id", { count: "exact", head: true }).eq("tenant_id", tenant.id),
-    db.from("leads").select("id", { count: "exact", head: true }).eq("tenant_id", tenant.id).gte("created_at", since),
-    db.from("leads").select("id", { count: "exact", head: true }).eq("tenant_id", tenant.id).eq("status", "new"),
-    db.from("chat_sessions").select("id", { count: "exact", head: true }).eq("tenant_id", tenant.id).gte("created_at", since),
-    db.from("leads").select("*").eq("tenant_id", tenant.id).order("created_at", { ascending: false }).limit(5),
-    db.from("faqs").select("id", { count: "exact", head: true }).eq("tenant_id", tenant.id),
+  const count = { count: "exact", head: true } as const;
+  const [projects, published, leads, chatLeads, chats, waiting, faqs, notes, pages] = await Promise.all([
+    db.from("projects").select("id", count).eq("tenant_id", tenant.id),
+    db.from("projects").select("id", count).eq("tenant_id", tenant.id).eq("published", true),
+    db.from("leads").select("id", count).eq("tenant_id", tenant.id).gte("created_at", since),
+    db.from("leads").select("id", count).eq("tenant_id", tenant.id).gte("created_at", since).not("session_id", "is", null),
+    db.from("chat_sessions").select("id", count).eq("tenant_id", tenant.id).gte("created_at", since),
+    db.from("leads").select("*").eq("tenant_id", tenant.id).eq("status", "new").order("created_at", { ascending: false }).limit(4),
+    db.from("faqs").select("id", count).eq("tenant_id", tenant.id),
+    db.from("knowledge").select("id", count).eq("tenant_id", tenant.id),
+    db.from("pages").select("id", count).eq("tenant_id", tenant.id),
   ]);
   const providers = availableProviders();
   const url = siteUrl(tenant);
@@ -25,110 +32,150 @@ export default async function Overview({ searchParams }: { searchParams: Promise
   const presetId = tenant.theme?.preset ?? "luxury-gold";
   const preset = Object.hasOwn(PRESETS, presetId) ? PRESETS[presetId as PresetId].label : "Custom";
   const contact = tenant.contact ?? {};
+  const newLeads = (waiting.data ?? []) as Lead[];
 
   const steps = [
     { done: true, title: "Choose your template", body: `${template.name} with ${preset} colours.`, href: "/admin/theme", cta: "Change" },
-    { done: (projects.count ?? 0) > 0, title: "Add your first project", body: "Photos, price, payment plan and expected yield. About five minutes.", href: "/admin/projects", cta: "Add project" },
+    { done: (projects.count ?? 0) > 0, title: "Add your first project", body: "Photos, price, payment plan and expected yield. About five minutes.", href: "/admin/projects/new", cta: "Add project" },
     { done: Boolean(contact.phone || contact.whatsapp), title: "Set your contact details", body: "Phone, WhatsApp, email and office hours shown to buyers.", href: "/admin/settings", cta: "Set up" },
     { done: (faqs.count ?? 0) > 0, title: "Teach your AI concierge", body: "Add the questions buyers ask you most, so it answers well.", href: "/admin/knowledge", cta: "Set up" },
   ];
   const doneCount = steps.filter((s) => s.done).length;
-  const next = steps.findIndex((s) => !s.done);
+  const next = steps.find((s) => !s.done);
+  const stats: [string, number][] = [
+    ["Leads", leads.count ?? 0],
+    ["Concierge chats", chats.count ?? 0],
+    ["Chats that became leads", chatLeads.count ?? 0],
+    ["Published projects", published.count ?? 0],
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[1.75rem] font-bold leading-tight">{welcome ? "Welcome" : "Welcome back"}, {tenant.name}</h1>
-          <p className="mt-1 text-slate-600">{doneCount < steps.length ? `${steps.length - doneCount} short step${steps.length - doneCount > 1 ? "s" : ""} make your site yours.` : "Your site is fully set up."}</p>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-[1.6rem] font-semibold leading-tight tracking-[-0.02em]">{welcome ? "Welcome" : "Welcome back"}, {tenant.name}</h1>
+          <p className="a-muted mt-1">Your site is {tenant.published === false ? "not published yet" : "live at"} <a href={url} target="_blank" rel="noreferrer" className="a-link break-all">{url.replace(/^https?:\/\//, "")}</a></p>
         </div>
-        <a href={url} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost">View my site <ExternalLink size={16} aria-hidden /></a>
+        <div className="flex flex-wrap gap-2">
+          <a href={url} target="_blank" rel="noreferrer" className="a-btn a-btn-ghost">View my site <ExternalLink size={15} aria-hidden /></a>
+          <Link href="/admin/projects/new" className="a-btn a-btn-primary"><Plus size={16} aria-hidden /> Add project</Link>
+        </div>
       </div>
 
       {welcome && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-green-200 bg-green-50 px-6 py-5">
-          <div className="flex items-center gap-3.5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-700 text-white"><Check size={20} aria-hidden /></span>
-            <div>
-              <p className="font-bold text-green-950">Your site is live</p>
-              <a href={url} target="_blank" rel="noreferrer" className="break-all text-green-900 underline">{url.replace(/^https?:\/\//, "")}</a>
-            </div>
-          </div>
+        <div className="flex items-center gap-3.5 rounded-xl border border-[#b7e0c6] bg-[#eef8f2] px-5 py-4">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1a7f4b] text-white"><Check size={18} aria-hidden /></span>
+          <p className="text-[#0f3d25]"><span className="font-semibold">Your site is live.</span> Add a project next, then share your link.</p>
         </div>
       )}
 
       {!providers.length && (
-        <div className="a-card border-amber-200 bg-amber-50 text-amber-950">
+        <div className="a-card border-[#ebcb85] bg-[#fdf8ea] text-[#4d3000]">
           <p className="font-semibold">The AI concierge needs an API key</p>
           <p className="mt-1 text-sm">Add one of these to your environment: {Object.values(PROVIDERS).map((p) => p.envKey).join(", ")}. Gemini and Groq both have free tiers.</p>
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <section className="a-card space-y-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-lg font-bold">{doneCount < steps.length ? "Finish setting up" : "Setup complete"}</h2>
-            <span className="text-sm font-semibold text-slate-600">{doneCount} of {steps.length} done</span>
+      <div className="flex flex-wrap items-start gap-6">
+        <section className="min-w-0 flex-[2_1_480px] overflow-hidden rounded-xl border bg-white">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-6 pb-4 pt-5">
+            <div>
+              <h2 className="text-lg font-semibold">
+                {newLeads.length ? `${newLeads.length === 4 ? "4 or more" : newLeads.length} ${newLeads.length === 1 ? "buyer is" : "buyers are"} waiting for a reply` : "No buyers waiting"}
+              </h2>
+              <p className="a-muted text-sm">New enquiries from your contact form and the concierge.</p>
+            </div>
+            <Link href="/admin/leads" className="a-link inline-flex min-h-11 items-center text-[0.95rem]">Open all leads</Link>
           </div>
-          <div role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={doneCount} aria-label="Setup progress" className="h-2 overflow-hidden rounded-full bg-blue-50">
-            <span className="grow-x block h-full rounded-full bg-[#1e46b8]" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+          {newLeads.length ? (
+            <ul className="stagger">
+              {newLeads.map((l) => {
+                const wa = whatsappLink(l.phone ?? undefined, `Hi ${l.name ?? ""}, this is ${tenant.name}.`);
+                return (
+                  <li key={l.id} className="a-row flex flex-wrap items-center gap-x-4 gap-y-2.5 border-t px-6 py-4">
+                    <Link href={`/admin/leads?id=${l.id}`} className="flex min-w-0 flex-[1_1_260px] flex-col gap-0.5">
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold">{l.name ?? "Anonymous"}</span>
+                        <span className={`a-pill ${l.source === "chat" ? "a-pill-blue" : "a-pill-grey"}`}>{l.source === "chat" ? "Concierge" : "Form"}</span>
+                        <span className="a-muted text-[0.85rem]">{timeAgo(l.created_at)}</span>
+                      </span>
+                      <span className="line-clamp-2 text-[0.95rem] text-[#3d4658]">{[l.interest, l.budget && `Budget ${l.budget}`].filter(Boolean).join(" · ") || l.message || "No details given"}</span>
+                    </Link>
+                    <span className="flex gap-2">
+                      {l.session_id && <Link href={`/admin/chats/${l.session_id}`} className="a-btn a-btn-ghost a-btn-sm">Transcript</Link>}
+                      {wa ? <a href={wa} target="_blank" rel="noreferrer" className="a-btn a-btn-primary a-btn-sm">Reply on WhatsApp</a>
+                        : l.email ? <a href={`mailto:${l.email}`} className="a-btn a-btn-primary a-btn-sm">Reply by email</a> : null}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <div className="flex flex-col items-center gap-2 border-t px-6 py-10 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6ecfb] text-[#1e46b8]"><Inbox size={22} aria-hidden /></span>
+              <p className="font-semibold">You are all caught up</p>
+              <p className="a-muted max-w-sm text-sm">New enquiries from your contact form and the AI concierge appear here first.</p>
+            </div>
+          )}
+          <div className="flex flex-col gap-3 border-t bg-[#fafbfc] px-6 pb-5 pt-4">
+            <h2 className="text-[0.95rem] font-semibold">Last 30 days</h2>
+            <dl className="flex flex-wrap gap-x-12 gap-y-3.5">
+              {stats.map(([label, value]) => (
+                <div key={label}><dt className="a-muted text-[0.85rem]">{label}</dt><dd className="text-[1.4rem] font-semibold tabular-nums"><CountUp value={value} /></dd></div>
+              ))}
+            </dl>
           </div>
-          <ol className="space-y-3">
-            {steps.map((s, i) => {
-              const current = i === next;
-              return (
-                <li key={s.title} className={`flex flex-wrap items-center gap-3.5 rounded-xl px-4 py-3.5 ${s.done ? "border bg-slate-50" : current ? "border-2 border-[#1e46b8] bg-white" : "border bg-white"}`}>
-                  <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${s.done ? "bg-green-700 text-white" : current ? "bg-[#1e46b8] text-white" : "bg-blue-50 text-blue-900"}`}>
-                    {s.done ? <Check size={16} aria-label="Done" /> : i + 1}
-                  </span>
-                  <span className="min-w-[14rem] flex-1">
-                    <span className={`block font-semibold ${s.done ? "text-slate-600" : ""}`}>{s.title}</span>
-                    <span className="block text-sm text-slate-600">{s.body}</span>
-                  </span>
-                  <Link href={s.href} className={current ? "a-btn a-btn-primary" : "inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 hover:text-blue-900"}>{s.cta}</Link>
-                </li>
-              );
-            })}
-          </ol>
         </section>
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              ["Projects", projects.count ?? 0, "/admin/projects"],
-              ["New leads", newLeads.count ?? 0, "/admin/leads"],
-              ["Leads, 30 days", leads.count ?? 0, "/admin/leads"],
-              ["Chats, 30 days", chats.count ?? 0, "/admin/chats"],
-            ].map(([label, value, href]) => (
-              <Link key={label as string} href={href as string} className="a-card !p-4 hover:border-blue-300">
-                <p className="text-sm text-slate-600">{label}</p>
-                <p className="mt-1 text-2xl font-bold">{value}</p>
-              </Link>
-            ))}
-          </div>
-
-          <section className="a-card space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold">Latest leads</h2>
-              <Link href="/admin/leads" className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 hover:text-blue-900">View all</Link>
+        <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-6">
+          <section className="overflow-hidden rounded-xl border bg-white">
+            <div className="relative h-[140px] bg-[#0f1728]">
+              {tenant.theme?.backdropUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={tenant.theme.backdropUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-75" />
+              )}
+              <span className={`a-pill absolute left-3.5 top-3.5 bg-white ${tenant.published === false ? "text-[#6b4200]" : "text-[#136c3f]"}`}>
+                <span aria-hidden className={`h-[7px] w-[7px] rounded-full ${tenant.published === false ? "bg-[#b26a00]" : "bg-[#1a7f4b]"}`} />
+                {tenant.published === false ? "Not published" : "Published"}
+              </span>
             </div>
-            {(recent.data as Lead[] | null)?.length ? (
-              <ul className="divide-y">
-                {(recent.data as Lead[]).map((l) => (
-                  <li key={l.id} className="py-3 text-sm">
-                    <p className="flex items-center justify-between gap-2"><span className="font-semibold">{l.name ?? "Anonymous"}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs">{l.source === "chat" ? "Concierge" : "Form"}</span></p>
-                    <p className="mt-0.5 truncate text-slate-600">{l.interest ?? l.message?.slice(0, 60) ?? ""}</p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 px-5 py-7 text-center">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><Inbox size={22} aria-hidden /></span>
-                <p className="font-semibold">No leads yet</p>
-                <p className="text-sm text-slate-600">They will appear here from your contact form and the AI concierge.</p>
+            <div className="flex flex-col gap-3 px-5 pb-5 pt-4">
+              <div>
+                <h2 className="font-semibold">Your site</h2>
+                <p className="a-muted text-sm">{template.name} template · {preset} colours · {pages.count ?? 0} pages</p>
               </div>
-            )}
+              <div className="flex flex-wrap gap-2">
+                <Link href="/admin/pages" className="a-btn a-btn-ghost a-btn-sm flex-1">Edit pages</Link>
+                <Link href="/admin/theme" className="a-btn a-btn-ghost a-btn-sm flex-1">Change theme</Link>
+              </div>
+            </div>
           </section>
+
+          <section className="rounded-xl border bg-white px-5 pt-4">
+            <h2 className="font-semibold">What the concierge knows</h2>
+            <p className="a-muted text-sm">It answers only from these.</p>
+            <ul className="mt-2.5 text-[0.95rem]">
+              {([["Published projects", published.count ?? 0, "/admin/projects"], ["FAQs", faqs.count ?? 0, "/admin/knowledge"], ["Knowledge notes", notes.count ?? 0, "/admin/knowledge"]] as const).map(([label, value, href]) => (
+                <li key={label} className="border-t"><Link href={href} className="flex min-h-11 items-center justify-between gap-3 hover:text-[#1e46b8]"><span>{label}</span><span className="font-semibold tabular-nums">{value}</span></Link></li>
+              ))}
+            </ul>
+          </section>
+
+          {next && (
+            <section className="flex flex-col gap-3 rounded-xl border bg-white px-5 py-4">
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="font-semibold">Setup</h2>
+                <span className="a-muted text-[0.85rem]">{doneCount} of {steps.length} done</span>
+              </div>
+              <div role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={doneCount} aria-label="Setup progress" className="h-1.5 overflow-hidden rounded-full bg-[#e6ecfb]">
+                <span className="grow-x block h-full rounded-full bg-[#1e46b8]" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <span className="flex min-w-[10rem] flex-1 flex-col"><span className="font-medium">{next.title}</span><span className="a-muted text-[0.85rem]">{next.body}</span></span>
+                <Link href={next.href} className="a-btn a-btn-primary a-btn-sm">{next.cta}</Link>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </div>

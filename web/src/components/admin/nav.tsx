@@ -23,30 +23,32 @@ const GROUPS = [
   ] },
 ];
 
-export function AdminNav({ mobile }: { mobile?: boolean }) {
+/** `newLeads` puts a count on Leads so waiting buyers are visible from every screen. */
+export function AdminNav({ mobile, newLeads = 0 }: { mobile?: boolean; newLeads?: number }) {
   const path = usePathname();
   const active = (href: string) => (href === "/admin" ? path === href : path.startsWith(href));
+  const badge = (href: string) => href === "/admin/leads" && newLeads > 0
+    ? <span className="ml-auto rounded-full bg-[#1e46b8] px-2 py-px text-[0.8rem] font-semibold text-white">{newLeads} new</span>
+    : null;
   if (mobile) {
     return (
       <nav aria-label="Admin" className="-mx-4 mt-2 flex gap-1 overflow-x-auto px-4 pb-1">
         {GROUPS.flatMap((g) => g.items).map((i) => (
-          <Link key={i.href} href={i.href} aria-current={active(i.href) ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-lg px-3 text-sm ${active(i.href) ? "bg-blue-50 font-semibold text-blue-900" : "text-slate-600"}`}>
-            {i.label}
+          <Link key={i.href} href={i.href} aria-current={active(i.href) ? "page" : undefined} className="a-nav whitespace-nowrap">
+            {i.label}{badge(i.href)}
           </Link>
         ))}
       </nav>
     );
   }
   return (
-    <nav aria-label="Admin" className="flex flex-col gap-0.5 p-3">
+    <nav aria-label="Admin" className="flex flex-col gap-0.5 px-2.5 pb-3">
       {GROUPS.map((g) => (
         <div key={g.title} className="flex flex-col gap-0.5">
-          <p className="px-3 pb-1 pt-4 text-xs font-semibold uppercase tracking-wider text-slate-500 first:pt-1">{g.title}</p>
+          <p className="px-3 pb-1.5 pt-[18px] text-[0.8rem] font-medium text-[#6a7385]">{g.title}</p>
           {g.items.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} aria-current={active(href) ? "page" : undefined}
-              className={`flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-[0.925rem] transition-colors ${active(href) ? "bg-blue-50 font-semibold text-blue-900" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}>
-              <Icon size={17} aria-hidden /> {label}
+            <Link key={href} href={href} aria-current={active(href) ? "page" : undefined} className="a-nav">
+              <Icon size={18} strokeWidth={1.7} aria-hidden /> {label}{badge(href)}
             </Link>
           ))}
         </div>
