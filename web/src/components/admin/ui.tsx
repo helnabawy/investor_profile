@@ -6,7 +6,7 @@ import { upgradeUrl } from "@/lib/plans";
 /** One line telling an agent that something needs a higher plan, with the way to get it. */
 export function UpgradeNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    <p className="rounded-lg bg-warning-soft px-4 py-3 text-sm text-warning-strong">
       {children}{" "}
       {upgradeUrl ? <a href={upgradeUrl} className="font-semibold underline">See plans</a> : "Contact us to upgrade."}
     </p>
@@ -33,6 +33,6 @@ export function SubmitButton({ children, className = "a-btn a-btn-primary", pend
 export function FormMessage({ state }: { state: ActionResult | null }) {
   if (!state) return null;
   return state.ok
-    ? <p role="status" className="rise text-sm font-medium text-green-700">Saved ✓</p>
-    : <p role="alert" className="rise text-sm font-medium text-red-700">{state.error}</p>;
+    ? <p role="status" className="rise text-sm font-medium text-success">Saved ✓</p>
+    : <p role="alert" className="rise text-sm font-medium text-danger">{state.error}</p>;
 }

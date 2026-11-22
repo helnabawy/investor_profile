@@ -44,8 +44,8 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
         </div>
       </PageTitle>
 
-      {justPublished && !state && <p role="status" className="rise rounded-lg border border-[#b7e0c6] bg-[#eef8f2] px-4 py-3 text-sm font-medium text-[#0f3d25]">Published. Buyers now see your new look.</p>}
-      {hasDraft && !state && <p className="rounded-lg border border-[#ebcb85] bg-[#fdf8ea] px-4 py-3 text-sm text-[#4d3000]">You have unpublished changes. They are loaded below; buyers still see your live site.</p>}
+      {justPublished && !state && <p role="status" className="rise rounded-lg border border-success-line bg-success-soft px-4 py-3 text-sm font-medium text-success-strong">Published. Buyers now see your new look.</p>}
+      {hasDraft && !state && <p className="rounded-lg border border-warning-line bg-warning-soft px-4 py-3 text-sm text-warning-strong">You have unpublished changes. They are loaded below; buyers still see your live site.</p>}
       <FormMessage state={state} />
 
       <section className="a-card" aria-labelledby="tpl-h">
@@ -55,26 +55,26 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
           {galleryTemplates().map((tpl) => {
             const on = current.id === tpl.id;
             return (
-              <article key={tpl.id} className={`flex flex-col overflow-hidden rounded-xl border bg-white transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_-20px_rgb(0_0_0/0.35)] ${on ? "border-[#1e46b8] shadow-[0_0_0_1px_#1e46b8]" : ""}`}>
+              <article key={tpl.id} className={`flex flex-col overflow-hidden rounded-xl border bg-surface transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_-20px_rgb(0_0_0/0.35)] ${on ? "border-brand shadow-[0_0_0_1px_var(--c-brand)]" : ""}`}>
                 <div className="relative">
                   <TemplateThumb kind={tpl.id} />
                   <span className="absolute left-3 top-3 flex gap-1.5">
                     {tpl.tier === "premium"
-                      ? <span className="inline-flex items-center gap-1.5 a-pill bg-[#0f1728] text-[#f5d58a]"><Crown size={13} aria-hidden /> Premium</span>
+                      ? <span className="inline-flex items-center gap-1.5 a-pill bg-inverse text-[#f5d58a]"><Crown size={13} aria-hidden /> Premium</span>
                       : <span className="a-pill a-pill-green">Free</span>}
-                    {on && <span className="a-pill bg-[#1e46b8] text-white">Selected</span>}
+                    {on && <span className="a-pill bg-brand text-white">Selected</span>}
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   <h3 className="text-[1.05rem] font-semibold">{tpl.name}</h3>
                   <ul aria-label="Tags" className="flex flex-wrap gap-1.5">
-                    {tpl.tags.map((tag) => <li key={tag} className="rounded-full border border-[#c9cfda] px-2.5 py-0.5 text-[0.82rem] text-[#3d4658]">{tag}</li>)}
+                    {tpl.tags.map((tag) => <li key={tag} className="rounded-full border border-line-strong px-2.5 py-0.5 text-[0.82rem] text-ink-2">{tag}</li>)}
                   </ul>
                   <p className="a-muted text-sm">{tpl.description}</p>
                   <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
                     {tpl.price && <span className="mr-auto font-semibold">{tpl.price}</span>}
                     {on
-                      ? <span className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[#16348c]"><Check size={16} aria-hidden /> In this draft</span>
+                      ? <span className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand-strong"><Check size={16} aria-hidden /> In this draft</span>
                       : <button type="button" className="a-btn a-btn-primary" onClick={() => pickTemplate(tpl)}>Use this template</button>}
                   </div>
                 </div>
@@ -94,7 +94,7 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
                 const on = (cfg.preset ?? "luxury-gold") === id;
                 return (
                   <button key={id} type="button" aria-pressed={on} onClick={() => { setCfg({ ...brand(cfg), layout: cfg.layout, preset: id }); setState(null); }}
-                    className={`overflow-hidden rounded-lg border text-left transition-[border-color,box-shadow] duration-200 ${on ? "border-[#1e46b8] shadow-[0_0_0_1px_#1e46b8]" : "hover:border-[#8a93a3]"}`}>
+                    className={`overflow-hidden rounded-lg border text-left transition-[border-color,box-shadow] duration-200 ${on ? "border-brand shadow-[0_0_0_1px_var(--c-brand)]" : "hover:border-line-bold"}`}>
                     <span className="flex h-14 items-end gap-1.5 p-2.5" style={{ background: p.tokens.background }}>
                       <span className="h-3 w-7 rounded" style={{ background: p.tokens.primary }} />
                       <span className="h-3 w-11 rounded" style={{ background: p.tokens.muted }} />
@@ -129,7 +129,7 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
           <details className="a-card group">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-[1.05rem] font-semibold">
               Advanced: custom colours and fonts
-              <span aria-hidden className="text-[#1e46b8] transition-transform duration-300 group-open:rotate-45">+</span>
+              <span aria-hidden className="text-brand-ink transition-transform duration-300 group-open:rotate-45">+</span>
             </summary>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {COLORS.map(([key, label]) => (

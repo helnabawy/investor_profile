@@ -49,7 +49,7 @@ export function SettingsForm({ tenant, multi, rootDomain, planName, customDomain
 
       <Group title="Navigation menu" hint="The links at the top of your site, left to right.">
         {nav.length > 0 && (
-          <div aria-hidden className="-mb-2 flex gap-2.5 pr-[146px] text-[0.85rem] font-medium text-[#5a6475]"><span className="flex-1">Label</span><span className="flex-[1.4]">Link</span></div>
+          <div aria-hidden className="-mb-2 flex gap-2.5 pr-[146px] text-[0.85rem] font-medium text-quiet"><span className="flex-1">Label</span><span className="flex-[1.4]">Link</span></div>
         )}
         {nav.map((n, i) => (
           <div key={i} className="flex items-center gap-2.5">
@@ -65,7 +65,7 @@ export function SettingsForm({ tenant, multi, rootDomain, planName, customDomain
 
       {multi ? (
         <Group title="Domains" hint="Where buyers find your site.">
-          <div className="overflow-hidden rounded-xl border bg-white">
+          <div className="overflow-hidden rounded-xl border bg-surface">
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3.5">
               <span className="min-w-0"><span className="block font-medium [overflow-wrap:anywhere]">{tenant.slug}.{rootDomain}</span><span className="a-muted text-sm">Your free EstateProfile address. Always works.</span></span>
               <span className={`a-pill ${tenant.published === false ? "a-pill-amber" : "a-pill-green"}`}>{tenant.published === false ? "Not published" : "Live"}</span>
@@ -83,7 +83,7 @@ export function SettingsForm({ tenant, multi, rootDomain, planName, customDomain
                 <input name="domains" defaultValue={tenant.domains.join(", ")} placeholder="www.youragency.com" />
                 <small>Separate several with commas.</small>
               </label>
-              <div className="flex flex-col gap-2.5 rounded-lg bg-[#eef0f3] px-4 py-3.5">
+              <div className="flex flex-col gap-2.5 rounded-lg bg-wash px-4 py-3.5">
                 <p className="text-sm">At your domain provider, point each domain to us with this record, then save.</p>
                 <dl className="flex flex-wrap gap-x-9 gap-y-2.5 text-sm">
                   <div><dt className="a-muted text-[0.8rem]">Type</dt><dd className="font-mono">CNAME</dd></div>

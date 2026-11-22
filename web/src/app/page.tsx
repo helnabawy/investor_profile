@@ -33,16 +33,16 @@ const PLANS = [
 ];
 
 const IMG = (id: string, w = 1400) => `https://images.unsplash.com/photo-${id}?w=${w}&q=70`;
-const FRAME = "overflow-hidden rounded-xl border border-[#dfe3ea] bg-white";
-const LEAD = "m-0 text-[1.05rem] text-[#4a5466]";
+const FRAME = "overflow-hidden rounded-xl border border-line bg-surface";
+const LEAD = "m-0 text-[1.05rem] text-ink-3";
 const H2 = "text-balance text-[clamp(1.9rem,3.2vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em]";
 
 const D = (s: number) => ({ "--d": `${s}s` }) as React.CSSProperties;
 
 function Bubble({ who, children, className = "", style }: { who: "buyer" | "bot"; children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   return who === "buyer"
-    ? <p style={style} className={`max-w-[90%] self-end rounded-[12px_4px_12px_12px] bg-[#1e46b8] px-3.5 py-2.5 text-[0.95rem] text-white ${className}`}>{children}</p>
-    : <p style={style} className={`max-w-[92%] self-start rounded-[4px_12px_12px_12px] border border-[#dfe3ea] bg-[#fafbfc] px-3.5 py-2.5 text-[0.95rem] ${className}`}>{children}</p>;
+    ? <p style={style} className={`max-w-[90%] self-end rounded-[12px_4px_12px_12px] bg-brand px-3.5 py-2.5 text-[0.95rem] text-white ${className}`}>{children}</p>
+    : <p style={style} className={`max-w-[92%] self-start rounded-[4px_12px_12px_12px] border border-line bg-subtle px-3.5 py-2.5 text-[0.95rem] ${className}`}>{children}</p>;
 }
 
 /** Headline words that rise in one after another; `from` continues the stagger across spans. */
@@ -57,7 +57,7 @@ function HeadlineWords({ text, from }: { text: string; from: number }) {
 function Typing({ d, until, className = "" }: { d: number; until: number; className?: string }) {
   return (
     <span aria-hidden style={{ "--d": `${d}s`, "--until": `${until}s` } as React.CSSProperties}
-      className={`p-typing typing flex items-center gap-1 self-start rounded-[4px_12px_12px_12px] border border-[#dfe3ea] bg-[#fafbfc] px-3.5 py-3.5 text-[#6a7385] ${className}`}>
+      className={`p-typing typing flex items-center gap-1 self-start rounded-[4px_12px_12px_12px] border border-line bg-subtle px-3.5 py-3.5 text-faint ${className}`}>
       <span /><span /><span />
     </span>
   );
@@ -66,14 +66,14 @@ function Typing({ d, until, className = "" }: { d: number; until: number; classN
 export default function Landing() {
   const demo = subdomainUrl("demo");
   return (
-    <div className={`platform ${platformFont.variable} min-h-screen bg-white`}>
+    <div className={`platform ${platformFont.variable} min-h-screen bg-canvas`}>
       <RevealOnScroll />
       <LandingNav demoUrl={demo} />
       {/* The app bar's bottom edge is the logo's roof, hanging into the hero and drawn in on load. */}
-      <RoofEdge invert color="#ffffff" ground="#f4f5f7" line="#dfe3ea" dots="#1e46b8" className="app-roof" />
+      <RoofEdge invert color="var(--c-surface)" ground="var(--c-sunken)" line="var(--c-line)" dots="var(--c-brand)" className="app-roof" />
 
       {/* Hero: the claim and the action on the left, the product doing it on the right. */}
-      <section className="relative overflow-hidden bg-[linear-gradient(to_bottom,#f4f5f7_0%,#f4f5f7_62%,#ffffff_100%)]">
+      <section className="relative overflow-hidden bg-[linear-gradient(to_bottom,var(--c-sunken)_0%,var(--c-sunken)_62%,var(--c-canvas)_100%)]">
         <Skyline />
         {/* The skyline stands on the bottom edge of the hero. */}
         <div data-skyline-base aria-hidden className="absolute inset-x-0 bottom-14 h-0" />
@@ -82,25 +82,25 @@ export default function Landing() {
           <div data-skyline-avoid className="flex min-w-0 flex-[1_1_440px] flex-col gap-7">
             <h1 data-skyline-avoid className="max-w-[15ch] text-balance text-[clamp(2.4rem,4.6vw,4.1rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
               <HeadlineWords from={0} text="A professional property website with an" />{" "}
-              <span className="text-[#1e46b8]"><HeadlineWords from={6} text="AI concierge," /></span>{" "}
+              <span className="text-brand-ink"><HeadlineWords from={6} text="AI concierge," /></span>{" "}
               <span className="h-mark"><HeadlineWords from={8} text="live in minutes." /></span>
             </h1>
             <div style={D(0.2)} className="p-in flex flex-col gap-5">
-              <p className="max-w-[46ch] text-[1.15rem] text-[#3d4658]">Show your portfolio clearly, answer buyers instantly, and turn every conversation into a lead. No web team needed.</p>
+              <p className="max-w-[46ch] text-[1.15rem] text-ink-2">Show your portfolio clearly, answer buyers instantly, and turn every conversation into a lead. No web team needed.</p>
               <div className="flex flex-wrap gap-2.5">
                 <Link href="/signup" className="a-btn a-btn-primary !min-h-[52px] !px-6 !text-[1.05rem]">Start free <ArrowRight size={18} aria-hidden /></Link>
                 <a href={demo} className="a-btn a-btn-ghost !min-h-[52px] !px-6 !text-[1.05rem]">See a live demo</a>
               </div>
-              <p className="text-[0.95rem] text-[#4a5466]">Set up in three steps. Your own subdomain or custom domain.</p>
+              <p className="text-[0.95rem] text-ink-3">Set up in three steps. Your own subdomain or custom domain.</p>
             </div>
           </div>
 
           {/* Right: the product doing it — an agent's site, the concierge answering, the lead that results. */}
           <div className="flex min-w-0 flex-[1.15_1_480px] flex-col">
             <div style={D(0.35)} className={`p-in ${FRAME} shadow-[0_30px_60px_-36px_rgb(15_23_40/0.55)]`}>
-              <div className="flex items-center gap-2.5 border-b border-[#dfe3ea] bg-[#fafbfc] px-3.5 py-2.5">
-                <span aria-hidden className="flex gap-[5px]">{[0, 1, 2].map((i) => <span key={i} className="h-[9px] w-[9px] rounded-full bg-[#d0d5dd]" />)}</span>
-                <span className="flex-1 truncate rounded-md bg-[#eef0f3] px-3 py-0.5 text-[0.8rem] text-[#3d4658]">aurelia.{env.rootDomain}</span>
+              <div className="flex items-center gap-2.5 border-b border-line bg-subtle px-3.5 py-2.5">
+                <span aria-hidden className="flex gap-[5px]">{[0, 1, 2].map((i) => <span key={i} className="h-[9px] w-[9px] rounded-full bg-line-strong" />)}</span>
+                <span className="flex-1 truncate rounded-md bg-wash px-3 py-0.5 text-[0.8rem] text-ink-2">aurelia.{env.rootDomain}</span>
               </div>
               <div className="relative flex min-h-[300px] flex-col justify-end overflow-hidden bg-[#10221b] text-[#f6f4ef] md:min-h-[400px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -117,20 +117,20 @@ export default function Landing() {
             </div>
             <div aria-hidden className="relative z-[1] -mt-20 flex flex-wrap items-start gap-4 px-4 md:px-6">
               <div style={D(0.55)} className={`p-pop ${FRAME} flex min-w-0 flex-[1.2_1_250px] flex-col gap-2.5 px-4 py-4 shadow-[0_24px_48px_-28px_rgb(15_23_40/0.5)]`}>
-                <p className="text-[0.82rem] font-medium text-[#5a6475]">Aurelia Concierge</p>
+                <p className="text-[0.82rem] font-medium text-quiet">Aurelia Concierge</p>
                 <Bubble who="buyer" className="p-pop" style={D(0.8)}>What can I buy for AED 1.5M with a payment plan?</Bubble>
                 <div className="grid">
                   <Typing d={1.2} until={1.95} className="col-start-1 row-start-1" />
                   <Bubble who="bot" className="p-pop col-start-1 row-start-1" style={D(1.95)}>Marina Vista Residences starts from AED 1.45M on a 60/40 plan. Shall I connect you with the advisor?</Bubble>
                 </div>
               </div>
-              <div style={D(2.55)} className={`p-lead ${FRAME} mt-10 flex min-w-0 flex-[1_1_220px] flex-col gap-2 border-[#b9c8f2] px-4 py-4 shadow-[0_24px_48px_-28px_rgb(30_70_184/0.55)]`}>
+              <div style={D(2.55)} className={`p-lead ${FRAME} mt-10 flex min-w-0 flex-[1_1_220px] flex-col gap-2 border-brand-line px-4 py-4 shadow-[0_24px_48px_-28px_rgb(30_70_184/0.55)]`}>
                 <div className="flex items-center justify-between gap-3"><span className="font-semibold">New lead</span><span className="a-pill a-pill-blue">Concierge</span></div>
-                <p className="text-[0.95rem] text-[#3d4658]">2-bedroom in Dubai Marina · Budget AED 1.5M · full conversation attached</p>
-                <span className="self-start rounded-lg bg-[#1e46b8] px-3.5 py-2 text-sm font-medium text-white">Reply on WhatsApp</span>
+                <p className="text-[0.95rem] text-ink-2">2-bedroom in Dubai Marina · Budget AED 1.5M · full conversation attached</p>
+                <span className="self-start rounded-lg bg-brand px-3.5 py-2 text-sm font-medium text-white">Reply on WhatsApp</span>
               </div>
             </div>
-            <p style={D(2.9)} className="p-in mt-4 px-4 text-[0.85rem] text-[#5a6475] md:px-6">Example with a fictional agent and sample data.</p>
+            <p style={D(2.9)} className="p-in mt-4 px-4 text-[0.85rem] text-quiet md:px-6">Example with a fictional agent and sample data.</p>
           </div>
         </div>
       </section>
@@ -154,26 +154,26 @@ export default function Landing() {
             <div className="flex flex-col gap-1.5"><h3 className="text-[1.2rem] font-semibold tracking-[-0.01em]">Your portfolio site</h3><p className={LEAD}>Projects with prices, payment plans and yields on every card. Pick a template, then add your name, colours and domain.</p></div>
           </div>
           <div data-reveal style={D(0.1)} className="flex min-w-0 flex-[1_1_300px] flex-col gap-5">
-            <div aria-hidden className={`p-lift ${FRAME} flex h-[232px] flex-col justify-center gap-2.5 bg-[#fafbfc] p-5`}>
+            <div aria-hidden className={`p-lift ${FRAME} flex h-[232px] flex-col justify-center gap-2.5 bg-subtle p-5`}>
               <Bubble who="buyer">Anything ready under AED 1.5M?</Bubble>
-              <p className="max-w-[92%] self-start rounded-[4px_12px_12px_12px] border border-[#dfe3ea] bg-white px-3.5 py-2.5 text-[0.95rem]">Yes, from AED 1.15M in Downtown.</p>
-              <p className="mt-1 text-[0.82rem] text-[#5a6475]">Answered from your projects</p>
+              <p className="max-w-[92%] self-start rounded-[4px_12px_12px_12px] border border-line bg-surface px-3.5 py-2.5 text-[0.95rem]">Yes, from AED 1.15M in Downtown.</p>
+              <p className="mt-1 text-[0.82rem] text-quiet">Answered from your projects</p>
             </div>
             <div className="flex flex-col gap-1.5"><h3 className="text-[1.2rem] font-semibold tracking-[-0.01em]">A buyer asks the concierge</h3><p className={LEAD}>It answers day and night, only from your own projects, FAQs and notes. It never invents listings.</p></div>
           </div>
           <div data-reveal style={D(0.2)} className="flex min-w-0 flex-[1_1_300px] flex-col gap-5">
             <div aria-hidden className={`p-lift ${FRAME} flex h-[232px] flex-col`}>
-              <p className="border-b border-[#dfe3ea] px-4 py-3 text-[0.82rem] font-medium text-[#5a6475]">Leads</p>
-              <div className="flex flex-col gap-0.5 bg-[#f1f5fe] px-4 py-3.5 shadow-[inset_3px_0_0_#1e46b8]"><span className="flex items-center justify-between gap-3"><span className="font-semibold">New enquiry</span><span className="a-pill a-pill-blue">New</span></span><span className="text-sm text-[#3d4658]">Downtown · Budget AED 1.5M</span></div>
-              <div className="flex flex-col gap-0.5 border-t border-[#dfe3ea] px-4 py-3.5"><span className="flex items-center justify-between gap-3"><span className="font-semibold">Earlier enquiry</span><span className="a-pill a-pill-amber">Contacted</span></span><span className="text-sm text-[#3d4658]">Dubai Marina · Budget AED 2.5M</span></div>
+              <p className="border-b border-line px-4 py-3 text-[0.82rem] font-medium text-quiet">Leads</p>
+              <div className="flex flex-col gap-0.5 bg-brand-tint px-4 py-3.5 shadow-[inset_3px_0_0_var(--c-brand)]"><span className="flex items-center justify-between gap-3"><span className="font-semibold">New enquiry</span><span className="a-pill a-pill-blue">New</span></span><span className="text-sm text-ink-2">Downtown · Budget AED 1.5M</span></div>
+              <div className="flex flex-col gap-0.5 border-t border-line px-4 py-3.5"><span className="flex items-center justify-between gap-3"><span className="font-semibold">Earlier enquiry</span><span className="a-pill a-pill-amber">Contacted</span></span><span className="text-sm text-ink-2">Dubai Marina · Budget AED 2.5M</span></div>
             </div>
             <div className="flex flex-col gap-1.5"><h3 className="text-[1.2rem] font-semibold tracking-[-0.01em]">The lead lands in your inbox</h3><p className={LEAD}>Every form and chat enquiry arrives with the buyer&apos;s interest, budget and the full conversation.</p></div>
           </div>
         </div>
       </section>
 
-      <RoofEdge color="#0f1728" line="#1e46b8" dots="#8ea2ea" />
-      <section id="how" className="scroll-mt-4 bg-[#0f1728] text-white">
+      <RoofEdge color="var(--c-inverse)" line="var(--c-brand)" dots="var(--c-brand-dot)" />
+      <section id="how" className="scroll-mt-4 bg-inverse text-white">
         <div className="mx-auto flex max-w-[1240px] flex-wrap gap-x-20 gap-y-12 px-6 py-24 md:py-28">
           <h2 data-reveal className={`${H2} min-w-0 max-w-[10ch] flex-[1_1_280px]`}>Live in three steps</h2>
           <ol className="flex min-w-0 flex-[2_1_480px] flex-col">
@@ -187,7 +187,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <TailEdge color="#0f1728" />
+      <TailEdge color="var(--c-inverse)" />
       <section id="templates" className="flex scroll-mt-4 flex-col gap-9 overflow-hidden pb-14 pt-14 md:pb-16 md:pt-16">
         <div data-reveal className="mx-auto flex w-full max-w-[1240px] flex-col gap-3.5 px-6">
           <h2 className={H2}>Start from a template</h2>
@@ -198,8 +198,8 @@ export default function Landing() {
         </div>
       </section>
 
-      <RoofEdge color="#f4f5f7" line="#dfe3ea" />
-      <section id="pricing" className="scroll-mt-4 bg-[#f4f5f7]">
+      <RoofEdge color="var(--c-sunken)" line="var(--c-line)" />
+      <section id="pricing" className="scroll-mt-4 bg-sunken">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-11 px-6 pb-14 pt-16 md:pb-16 md:pt-20">
           <div data-reveal className="flex flex-col gap-3.5">
             <h2 className={H2}>Simple pricing</h2>
@@ -207,14 +207,14 @@ export default function Landing() {
           </div>
           <div className="flex flex-wrap items-stretch gap-5">
             {PLANS.map((p, i) => (
-              <div key={p.name} data-reveal style={D(i * 0.1)} className={`p-lift flex min-w-0 flex-[1_1_300px] flex-col gap-5 rounded-[14px] border p-7 ${p.highlight ? "border-[#0f1728] bg-[#0f1728] text-white shadow-[0_28px_56px_-32px_rgb(15_23_40/0.7)]" : "border-[#dfe3ea] bg-white"}`}>
+              <div key={p.name} data-reveal style={D(i * 0.1)} className={`p-lift flex min-w-0 flex-[1_1_300px] flex-col gap-5 rounded-[14px] border p-7 ${p.highlight ? "border-inverse-line bg-inverse text-white shadow-[0_28px_56px_-32px_rgb(15_23_40/0.7)]" : "border-line bg-surface"}`}>
                 <div>
                   <h3 className="text-[1.2rem] font-semibold">{p.name}</h3>
-                  <p className={`text-[0.95rem] ${p.highlight ? "text-[#c9cfdd]" : "text-[#4a5466]"}`}>{p.desc}</p>
+                  <p className={`text-[0.95rem] ${p.highlight ? "text-[#c9cfdd]" : "text-ink-3"}`}>{p.desc}</p>
                 </div>
-                <p className="text-[2.35rem] font-semibold leading-none tracking-[-0.03em]">{p.price}{p.per && <span className={`text-[1.05rem] font-normal tracking-normal ${p.highlight ? "text-[#c9cfdd]" : "text-[#4a5466]"}`}>{p.per}</span>}</p>
+                <p className="text-[2.35rem] font-semibold leading-none tracking-[-0.03em]">{p.price}{p.per && <span className={`text-[1.05rem] font-normal tracking-normal ${p.highlight ? "text-[#c9cfdd]" : "text-ink-3"}`}>{p.per}</span>}</p>
                 <ul className="flex flex-col gap-2.5">
-                  {p.items.map((i) => <li key={i} className="flex items-start gap-2.5 text-[0.97rem]"><Check size={18} strokeWidth={2.2} className={`mt-0.5 shrink-0 ${p.highlight ? "text-[#a9b8e8]" : "text-[#1e46b8]"}`} aria-hidden />{i}</li>)}
+                  {p.items.map((i) => <li key={i} className="flex items-start gap-2.5 text-[0.97rem]"><Check size={18} strokeWidth={2.2} className={`mt-0.5 shrink-0 ${p.highlight ? "text-[#a9b8e8]" : "text-brand-ink"}`} aria-hidden />{i}</li>)}
                 </ul>
                 <Link href={p.href} className={`a-btn mt-auto !min-h-[50px] !text-base ${p.highlight ? "bg-white text-[#0f1728] hover:bg-[#e6ecfb]" : "a-btn-ghost"}`}>{p.cta}</Link>
               </div>
@@ -223,19 +223,19 @@ export default function Landing() {
         </div>
       </section>
 
-      <RoofEdge invert color="#f4f5f7" ground="#1e46b8" line="#9fb1e6" dots="#1e46b8" />
-      <section className="bg-[#1e46b8] text-white">
+      <RoofEdge invert color="var(--c-sunken)" ground="var(--c-brand)" line="#9fb1e6" dots="var(--c-brand)" />
+      <section className="bg-brand text-white">
         <div className="mx-auto flex max-w-[1240px] flex-wrap items-end justify-between gap-x-16 gap-y-8 px-6 py-20 md:py-24">
           <div data-reveal className="flex min-w-0 flex-[1_1_420px] flex-col gap-3.5">
             <h2 className="max-w-[16ch] text-balance text-[clamp(2.1rem,4.4vw,3.75rem)] font-semibold leading-[1.04] tracking-[-0.03em]">Ready to put your portfolio online?</h2>
             <p className="text-[1.15rem] text-[#e1e7f8]">Create your site now and add your first project today.</p>
           </div>
-          <Link href="/signup" className="a-btn !min-h-14 bg-white !px-7 !text-[1.05rem] !font-semibold text-[#16348c] hover:bg-[#e6ecfb]">Create your site <ArrowRight size={18} aria-hidden /></Link>
+          <Link href="/signup" className="a-btn !min-h-14 bg-surface !px-7 !text-[1.05rem] !font-semibold text-brand-strong hover:bg-brand-soft">Create your site <ArrowRight size={18} aria-hidden /></Link>
         </div>
       </section>
 
-      <footer className="border-t border-[#dfe3ea] bg-white">
-        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4 text-[0.95rem] text-[#4a5466]">
+      <footer className="border-t border-line bg-surface">
+        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4 text-[0.95rem] text-ink-3">
           <span>© {new Date().getFullYear()} EstateProfile</span>
           <Link href="/login" className="a-link inline-flex min-h-11 items-center">Sign in</Link>
         </div>

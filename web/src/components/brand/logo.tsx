@@ -10,7 +10,7 @@ export const LOGO_MARK_PATH =
 
 export function LogoMark({ size = 36, className = "" }: { size?: number; className?: string }) {
   return (
-    <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden className={`shrink-0 text-[#1e46b8] ${className}`}>
+    <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden className={`shrink-0 text-brand-ink ${className}`}>
       <path d={LOGO_MARK_PATH} fill="currentColor" fillRule="evenodd" />
     </svg>
   );
@@ -18,7 +18,7 @@ export function LogoMark({ size = 36, className = "" }: { size?: number; classNa
 
 export function Logo({ href = "/" }: { href?: string }) {
   return (
-    <Link href={href} aria-label="EstateProfile home" className="flex min-h-11 items-center gap-2 text-xl font-bold tracking-[-0.03em] text-slate-900">
+    <Link href={href} aria-label="EstateProfile home" className="flex min-h-11 items-center gap-2 text-xl font-bold tracking-[-0.03em] text-ink">
       <LogoMark />
       <span>Estate<span className="font-normal">Profile</span></span>
     </Link>

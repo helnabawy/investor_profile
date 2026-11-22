@@ -12,12 +12,12 @@ export default async function PagesList() {
   return (
     <div className="flex flex-col gap-6">
       <PageTitle title="Pages" subtitle="Build each page from sections. The Projects and Concierge pages are built in." />
-      <div className="stagger overflow-hidden rounded-xl border bg-white">
+      <div className="stagger overflow-hidden rounded-xl border bg-surface">
         {pages.map((p, i) => (
           <Link key={p.id} href={`/admin/pages/${p.id}`} className={`a-row flex min-h-[68px] items-center gap-4 px-5 py-3 ${i ? "border-t" : ""}`}>
             <span className="flex min-w-0 flex-1 flex-col"><span className="font-semibold">{p.title}</span><span className="a-muted text-[0.85rem]">/{p.slug} · {p.sections.length} sections</span></span>
             <span className={`a-pill ${p.published ? "a-pill-green" : "a-pill-grey"}`}>{p.published ? "Published" : "Draft"}</span>
-            <ChevronRight size={18} className="text-[#6a7385]" aria-hidden />
+            <ChevronRight size={18} className="text-faint" aria-hidden />
           </Link>
         ))}
         {!pages.length && <p className="a-muted p-8 text-center">No pages yet.</p>}
