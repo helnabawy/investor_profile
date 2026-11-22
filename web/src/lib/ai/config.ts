@@ -66,9 +66,15 @@ export function resolveModels(cfg: AiConfig) {
   const available = availableProviders();
   const chosen = cfg.provider && cfg.provider !== "auto" && available.includes(cfg.provider) ? cfg.provider : undefined;
   const order = chosen ? [chosen, ...available.filter((p) => p !== chosen)] : available;
-  return order.map((p) => ({
-    provider: p,
-    modelId: p === chosen && cfg.model ? cfg.model : PROVIDERS[p].defaultModel,
-    model: build(p, p === chosen && cfg.model ? cfg.model : PROVIDERS[p].defaultModel),
-  }));
+  return order.flatMap((p) => {
+    const modelId = p === chosen && cfg.model ? cfg.model : PROVIDERS[p].defaultModel;
+    // A second model on the same key: when the main one is overloaded ("high demand", 503, common
+    // on Gemini's free tier), its lighter sibling usually still answers.
+    const backup = SAME_KEY_BACKUP[p];
+    const ids = backup && backup !== modelId ? [modelId, backup] : [modelId];
+    return ids.map((id) => ({ provider: p, modelId: id, model: build(p, id) }));
+  });
 }
+
+/** Lighter model tried on the same provider key before moving to the next provider. */
+const SAME_KEY_BACKUP: Partial<Record<ProviderId, string>> = { google: "gemini-flash-lite-latest" };
