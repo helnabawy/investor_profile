@@ -217,11 +217,17 @@ export function Status({ children }: { children: ReactNode }) {
   return <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 size={14} className="animate-spin" />{children}</p>;
 }
 
+/**
+ * The server's own words when it sent any: a JSON body for refusals before the stream (rate limits,
+ * no provider), or the stream's error text, which the API already writes for visitors.
+ */
 function errorText(error: Error) {
+  const msg = error.message?.trim() ?? "";
   try {
-    const parsed = JSON.parse(error.message);
+    const parsed = JSON.parse(msg);
     if (parsed?.error) return parsed.error as string;
   } catch {}
+  if (msg && msg.length <= 240 && !/^(failed to fetch|load failed|networkerror)/i.test(msg) && !msg.includes("{")) return msg;
   return "Sorry, I couldn't respond just now. Please try again in a moment or use the contact form.";
 }
 
