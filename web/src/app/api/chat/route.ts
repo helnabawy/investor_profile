@@ -96,7 +96,8 @@ export async function POST(req: Request) {
     stopWhen: isStepCount(4),
     // Free tiers answer 429 with a long retry-after; waiting it out silently outlasts the function.
     maxRetries: 1,
-    timeout: { firstChunkMs: 15_000, totalMs: 30_000 },
+    // A stuck first model is skipped after 12s by fallbackModel, so allow time for the next one.
+    timeout: { firstChunkMs: 28_000, totalMs: 45_000 },
     temperature: tenant.ai_config?.temperature ?? 0.4,
     maxOutputTokens: 600,
     onEnd: async ({ text }) => {
@@ -138,7 +139,10 @@ function visitorError(error: unknown) {
   if (e?.statusCode === 429 || /429|quota|rate.?limit|resource.?exhausted/i.test(text)) {
     return "The concierge has reached its usage limit for now. Please try again later, or use the contact form and an advisor will reply.";
   }
-  if (/timeout|timed out|abort/i.test(text)) return TIMEOUT_MESSAGE;
+  if (e?.statusCode === 503 || /overload|unavailable|503|high demand|try again later/i.test(text)) {
+    return "The concierge is very busy right now. Please try again in a minute, or use the contact form.";
+  }
+  if (/timeout|timed out|abort|no output within/i.test(text)) return TIMEOUT_MESSAGE;
   if (e?.statusCode === 400 || e?.statusCode === 401 || e?.statusCode === 403 || /api key|permission|not found/i.test(text)) {
     return "The concierge isn't available right now. Please use the contact form and an advisor will reply.";
   }
