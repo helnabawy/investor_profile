@@ -39,7 +39,7 @@ function Avatar({ src, name, size }: { src?: string; name: string; size: "lg" | 
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt="" className="h-full w-full object-cover" />
       ) : (
-        <span className={cn("font-heading text-[var(--accent)]", size === "lg" ? "text-3xl" : "text-sm")}>{initials}</span>
+        <span className={cn("font-heading text-[var(--lounge-accent)]", size === "lg" ? "text-3xl" : "text-sm")}>{initials}</span>
       )}
     </motion.span>
   );
@@ -69,7 +69,7 @@ export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, stora
   return (
     <MotionConfig reducedMotion="user">
     <LayoutGroup>
-      <section className="on-photo relative isolate flex h-[100dvh] flex-col px-4 pb-5 pt-20 sm:px-8 lg:pt-8">
+      <section className="on-photo lounge-room flex h-[100dvh] flex-col px-4 pb-5 pt-20 [--room-pad:2rem] sm:px-8 lg:pt-8">
         <Backdrop src={backdropUrl} />
         {/* Header: the lobby title, which condenses into a bar once the conversation starts. */}
         <AnimatePresence mode="popLayout" initial={false}>
@@ -84,7 +84,7 @@ export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, stora
             >
               <Avatar src={portraitUrl} name={name} size="sm" />
               <motion.p layoutId="lounge-title" transition={{ duration: 0.6, ease: EASE }} className="font-heading text-lg leading-tight">
-                {first} <span className="text-[var(--accent)]">{last}</span>
+                {first} <span className="text-[var(--lounge-accent)]">{last}</span>
               </motion.p>
               <button onClick={reset} className="font-ui ml-auto flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-[var(--lounge-muted)] transition hover:bg-white/10 hover:text-[var(--lounge-text)]">
                 <RotateCcw size={13} /> New conversation
@@ -103,7 +103,7 @@ export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, stora
                 transition={{ duration: 0.6, ease: EASE }}
                 className="mt-6 text-balance font-heading text-[clamp(2.2rem,4.6vw,3.6rem)] leading-[1.05]"
               >
-                {first} <span className="text-[var(--accent)]">{last}</span>
+                {first} <span className="text-[var(--lounge-accent)]">{last}</span>
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 8 }}

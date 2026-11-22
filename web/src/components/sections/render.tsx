@@ -46,7 +46,7 @@ const QUICK_ICONS = { building: Building2, chart: LineChart, person: UserRound, 
 function AccentTitle({ title, accent, as: Tag = "h1", className = "" }: { title: string; accent?: string; as?: "h1" | "h2"; className?: string }) {
   const cut = accent && title.endsWith(accent) ? title.length - accent.length : accent ? title.length : title.lastIndexOf(" ") + 1;
   const head = title.slice(0, cut), tail = title.slice(cut);
-  return <Tag className={`text-balance font-heading ${className}`}>{head}{tail && <span className="text-[color-mix(in_srgb,var(--accent)_45%,#fff)]">{tail}</span>}</Tag>;
+  return <Tag className={`text-balance font-heading ${className}`}>{head}{tail && <span className="text-[var(--lounge-accent,color-mix(in_srgb,var(--accent)_45%,#fff))]">{tail}</span>}</Tag>;
 }
 
 async function SectionView({ s, tenant, layout, index, next }: { s: Section; tenant: Tenant; layout: SiteLayout; index: number; next?: string }) {
@@ -58,7 +58,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
     case "page-header": {
       const tall = index === 0 && !["project-grid", "featured-projects"].includes(next ?? "");
       return (
-        <section data-hero className={`on-photo relative isolate flex flex-col items-center justify-center overflow-hidden px-5 text-center ${tall ? "min-h-[62vh] pb-20 pt-28 lg:pt-20" : "pb-16 pt-28 lg:pt-24"}`}>
+        <section data-hero className={`on-photo relative isolate flex flex-col items-center justify-center overflow-hidden px-5 text-center ${layout === "lounge" ? "lounge-room [--room-pad:1.25rem]" : ""} ${tall ? "min-h-[62vh] pb-20 pt-28 lg:pt-20" : "pb-16 pt-28 lg:pt-24"}`}>
           <Backdrop src={str(p.image) || tenant.theme?.backdropUrl} />
           <Reveal className="max-w-3xl">
             <AccentTitle title={str(p.title)} accent={str(p.accent) || undefined} className="text-[clamp(2.6rem,6vw,4.75rem)] leading-[1.04]" />
@@ -71,10 +71,12 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
 
     case "story":
       return (
-        <section className="mx-auto max-w-[88rem] space-y-6 px-4 py-16 sm:px-6 md:space-y-8 md:py-24">
+        // In Lounge the chapters continue the page header's night ground edge to edge, so the page reads
+        // as one sequence instead of a photo, a band of page colour, then a card.
+        <section className={layout === "lounge" ? "lounge-rooms" : "mx-auto max-w-[88rem] space-y-6 px-4 py-16 sm:px-6 md:space-y-8 md:py-24"}>
           {arr<P>(p.items).map((it, i) => (
             <Reveal key={i}>
-              <article className="on-photo relative isolate grid md:min-h-[34rem] md:items-center overflow-hidden rounded-[calc(var(--radius)+6px)] bg-[var(--lounge-ink)] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <article className={`on-photo relative isolate grid md:min-h-[34rem] md:items-center overflow-hidden md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] ${layout === "lounge" ? "lounge-room" : "rounded-[calc(var(--radius)+6px)] bg-[var(--lounge-ink)]"}`}>
                 {str(it.image) && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={str(it.image)} alt="" loading="lazy" className="lounge-story-img aspect-[4/3] w-full object-cover md:absolute md:inset-0 md:-z-10 md:aspect-auto md:h-full" />
@@ -84,7 +86,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
                   <p aria-hidden className="font-heading text-[clamp(3.2rem,6vw,5rem)] font-normal leading-none text-[color-mix(in_srgb,var(--lounge-text)_62%,transparent)] md:text-[color-mix(in_srgb,var(--lounge-text)_38%,transparent)] [font-variant-numeric:lining-nums]">{String(i + 1).padStart(2, "0")}</p>
                   <h2 className="mt-5 max-w-[16ch] text-balance font-heading text-[clamp(1.8rem,3vw,2.6rem)] leading-[1.1]">{str(it.title)}</h2>
                   <p className="muted font-ui mt-5 max-w-[46ch] whitespace-pre-line text-[0.98rem] leading-[1.7]">{str(it.body)}</p>
-                  <span aria-hidden className="mt-8 block h-px w-14 bg-[color-mix(in_srgb,var(--accent)_70%,transparent)]" />
+                  <span aria-hidden className="mt-8 block h-px w-14 bg-[color-mix(in_srgb,var(--lounge-accent,var(--accent))_70%,transparent)]" />
                 </div>
               </article>
             </Reveal>
@@ -320,7 +322,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
     case "cta":
       if (layout === "lounge") {
         return (
-          <section className="px-5 pb-24 pt-8 text-center md:pb-32">
+          <section className="px-5 pb-24 pt-16 text-center md:pb-32 md:pt-24">
             <Reveal className="mx-auto max-w-2xl">
               <h2 className="text-balance font-heading text-[clamp(2rem,4vw,3rem)] leading-[1.1]">{str(p.title)}</h2>
               {str(p.body) && <p className="font-ui mx-auto mt-4 max-w-[52ch] text-[1.02rem] leading-relaxed text-muted-foreground">{str(p.body)}</p>}
@@ -403,7 +405,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
           c.hours && { icon: Clock, label: "Hours", value: c.hours },
         ].filter(Boolean) as { icon: typeof Mail; label: string; value: string; href?: string }[];
         return (
-          <section className="on-photo relative isolate overflow-hidden px-4 pb-20 pt-28 sm:px-6 lg:pt-20">
+          <section className="on-photo lounge-room px-4 pb-20 pt-28 [--room-pad:1.5rem] sm:px-6 lg:pt-20">
             <Backdrop src={tenant.theme?.backdropUrl} />
             <Reveal className="mx-auto max-w-3xl text-center">
               <AccentTitle title={str(p.title) || "Get in Touch"} className="text-[clamp(2.6rem,6vw,4.5rem)] leading-[1.04]" />
@@ -414,7 +416,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
                 {channels.map(({ icon: Icon, label, value, href }) => {
                   const body = (
                     <>
-                      <Icon size={20} strokeWidth={1.5} className="mt-0.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                      <Icon size={20} strokeWidth={1.5} className="mt-0.5 shrink-0 text-[var(--lounge-accent)]" aria-hidden />
                       <span>
                         <span className="block font-heading text-[1.05rem]">{label}</span>
                         <span className="muted font-ui mt-1 block whitespace-pre-line text-[0.92rem]">{value}</span>

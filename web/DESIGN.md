@@ -230,7 +230,7 @@ The palette is a role contract filled per tenant; the presets below are the name
 - **Primary Foreground** (`{colors.primary-foreground}`): text on primary fills.
 
 ### Secondary
-- **Tenant Accent** (`{colors.accent}`): the Lounge's live colour. The accent word in display names and page titles, the user's chat bubble, send button on hover, the solid submit button, chip/composer/input focus rings, caret colour, contact channel icons, and the short rule under each story chapter. Also warms the sidebar ground.
+- **Tenant Accent** (`{colors.accent}`): the Lounge's live colour. On a photograph it is used as **Lounge Accent**, the accent lifted to at least oklch lightness 0.8 (a 55% white mix where relative colour is unsupported), so dark brand accents such as calm green or navy stay legible on night ground. The solid submit button is the brand primary on the theme ground and Lounge Accent on a photograph. The accent word in display names and page titles, the user's chat bubble, send button on hover, the solid submit button, chip/composer/input focus rings, caret colour, contact channel icons, and the short rule under each story chapter. Also warms the sidebar ground.
 
 ### Neutral (tenant roles)
 - **Background / Foreground** (`{colors.background}`, `{colors.foreground}`): page ground and text. In Lounge they also swap roles to make the sidebar.
@@ -298,7 +298,9 @@ Classic headings: h2 at 1.875rem rising to 3rem at md; hero h1 at 2.25rem rising
 
 **Chat home.** One full-height (100dvh) screen with no footer. Lobby: avatar 96px, name, subtitle centred in the upper area; 3 to 7 chips and the composer anchored at the bottom in a 640px column. Once talking, the title lifts into a compact header bar (40px avatar), messages fill the same 640px column, and the composer stays.
 
-**Inner pages.** A photographic page header (62vh when it leads a page and no project grid follows), then content on the theme ground. The photo dissolves into the background over its bottom 28%. Story chapters are full-width panels in an 88rem container, 24px apart (32px from 768px), min 34rem tall on desktop, text in the left half over a gradient, photo masked in from the right. Contact sits entirely on the photo: channel list (0.85fr) beside the form panel (1.25fr) in a 72rem container.
+**Rooms.** Every photographic region (chat home, page header, story chapters, contact) is a room on the night ground that runs edge to edge, reaching back under the floating sidebar on desktop, with its content kept clear of the sidebar. Rooms never fade into the theme ground and are never separated by bands of it: consecutive rooms touch, divided by a 1px glass-line hairline.
+
+**Inner pages.** A photographic page header (62vh when it leads a page and no project grid follows), then the story chapters directly beneath it on the same night ground, min 34rem tall on desktop, text in the left half over a gradient, photo masked in from the right. Content that is not photographic (project grid, closing CTA, footer) sits on the theme ground after the rooms. Contact sits entirely on the photo: channel list (0.85fr) beside the form panel (1.25fr) in a 72rem container.
 
 **Classic.** Fixed transparent-over-hero header, sections in a 80rem container with 80px vertical padding (112px from 768px), 20px gutters.
 
@@ -350,7 +352,7 @@ Corners follow the tenant radius and step up by fixed offsets: controls at the b
 - **Classic header:** uppercase 0.875rem with 0.18em tracking, transparent with white type over a hero, 95% background with 8px blur once scrolled.
 
 ### Concierge Thread (signature)
-Assistant bubbles are 66% night ink glass with a hairline; user bubbles are solid accent with night-ink text; links in accent. The lobby-to-conversation transition shares `layoutId` between the lobby and bar avatar/title over 0.6s on the house easing. All motion respects reduced-motion.
+Assistant bubbles are 66% night ink glass with a hairline; user bubbles are solid accent with night-ink text; links in accent. The lobby-to-conversation transition shares `layoutId` between the lobby and bar avatar/title over 0.6s on the house easing. On every page load each room's photograph settles into focus (scale 1.16 to 1.06, blur 16px to 5px, brightness 0.38 to 0.62 over 1.6s on cubic-bezier(0.16, 1, 0.3, 1)); only the photograph moves, never the content. Story photographs sweep in from the right as they scroll into view (scroll-driven mask, desktop only, skipped where unsupported). All motion respects reduced-motion.
 
 ### Admin
 System sans; `.a-card` white with slate hairline at 14px radius and 24px padding; `.a-btn` 8px radius, 0.875rem/500, primary teal, ghost white with slate border, danger red; `.field` grids a 500-weight label, control and 0.78rem hint; focus is a 2px teal outline.

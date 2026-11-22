@@ -235,6 +235,11 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
   --lounge-muted: color-mix(in srgb, #f5f3ee 72%, transparent);
   --lounge-glass: color-mix(in srgb, #0b0a08 58%, transparent);
   --lounge-glass-line: color-mix(in srgb, #f5f3ee 16%, transparent);
+  /* The accent as it reads on a photograph: lifted so a dark brand accent (calm green, navy) stays legible. */
+  --lounge-accent: color-mix(in srgb, var(--accent) 55%, #fff);
+}
+@supports (color: oklch(from red l c h)) {
+  .lounge { --lounge-accent: oklch(from var(--accent) max(l, 0.8) min(c, 0.13) h); }
 }
 .font-ui { font-family: var(--font-ui); }
 
@@ -278,8 +283,8 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
   backdrop-filter: blur(8px);
   transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 }
-.lounge-chip:hover { border-color: color-mix(in srgb, var(--accent) 70%, transparent); color: var(--lounge-text); background: color-mix(in srgb, #0b0a08 45%, transparent); }
-.lounge-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lounge-chip:hover { border-color: color-mix(in srgb, var(--lounge-accent) 70%, transparent); color: var(--lounge-text); background: color-mix(in srgb, #0b0a08 45%, transparent); }
+.lounge-chip:focus-visible { outline: 2px solid var(--lounge-accent); outline-offset: 2px; }
 
 .lounge-composer {
   background: color-mix(in srgb, #0b0a08 62%, transparent);
@@ -289,18 +294,18 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
   box-shadow: 0 18px 50px -20px rgb(0 0 0 / 0.7);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.lounge-composer:focus-within { border-color: color-mix(in srgb, var(--accent) 60%, transparent); box-shadow: 0 18px 50px -20px rgb(0 0 0 / 0.7), 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent); }
-.lounge-composer textarea { background: transparent; color: var(--lounge-text); font-family: var(--font-ui); caret-color: var(--accent); }
+.lounge-composer:focus-within { border-color: color-mix(in srgb, var(--lounge-accent) 60%, transparent); box-shadow: 0 18px 50px -20px rgb(0 0 0 / 0.7), 0 0 0 4px color-mix(in srgb, var(--lounge-accent) 14%, transparent); }
+.lounge-composer textarea { background: transparent; color: var(--lounge-text); font-family: var(--font-ui); caret-color: var(--lounge-accent); }
 .lounge-composer textarea::placeholder { color: color-mix(in srgb, var(--lounge-text) 55%, transparent); }
-.lounge-send { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--lounge-text); border-radius: calc(var(--radius) + 4px); transition: background-color 0.2s; }
-.lounge-send:not(:disabled):hover { background: var(--accent); color: #0b0a08; }
+.lounge-send { background: color-mix(in srgb, var(--lounge-accent) 22%, transparent); color: var(--lounge-text); border-radius: calc(var(--radius) + 4px); transition: background-color 0.2s; }
+.lounge-send:not(:disabled):hover { background: var(--lounge-accent); color: #0b0a08; }
 .lounge-send:disabled { opacity: 0.45; }
 
 /* Conversation bubbles on the photographic ground. */
 .lounge-thread .prose-chat { font-family: var(--font-ui); font-size: 0.95rem; }
 .lounge-thread .bubble-assistant { background: color-mix(in srgb, #0b0a08 66%, transparent); color: var(--lounge-text); border: 1px solid var(--lounge-glass-line); backdrop-filter: blur(10px); }
-.lounge-thread .bubble-user { background: var(--accent); color: #0b0a08; }
-.lounge-thread .prose-chat a { color: var(--accent); }
+.lounge-thread .bubble-user { background: var(--lounge-accent); color: #0b0a08; }
+.lounge-thread .prose-chat a { color: var(--lounge-accent); }
 .lounge-thread .bubble-user a { color: #0b0a08; }
 
 .lounge-thread::-webkit-scrollbar { width: 6px; }
@@ -316,22 +321,57 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
   border-radius: var(--radius); padding: 0.75rem 0.95rem; transition: border-color 0.2s, box-shadow 0.2s;
 }
 .lounge-input::placeholder { color: color-mix(in srgb, var(--lounge-text) 45%, transparent); }
-.lounge-input:focus { outline: none; border-color: color-mix(in srgb, var(--accent) 70%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+.lounge-input:focus { outline: none; border-color: color-mix(in srgb, var(--lounge-accent) 70%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lounge-accent) 16%, transparent); }
 .lounge-submit {
   font-family: var(--font-ui); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em;
-  color: #120f09; background: var(--accent); border-radius: var(--radius); padding: 0.9rem 1.2rem;
-  box-shadow: 0 10px 28px -12px color-mix(in srgb, var(--accent) 70%, transparent); transition: transform 0.2s, background-color 0.2s;
+  /* On the theme ground the solid button is the brand primary; on a photograph it is the lifted accent. */
+  --submit: var(--primary); --submit-fg: var(--primary-foreground);
+  color: var(--submit-fg); background: var(--submit); border-radius: var(--radius); padding: 0.9rem 1.2rem;
+  box-shadow: 0 10px 28px -12px color-mix(in srgb, var(--submit) 70%, transparent); transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
-.lounge-submit:hover:not(:disabled) { transform: translateY(-1px); background: color-mix(in srgb, var(--accent) 88%, #fff); }
+.on-photo .lounge-submit { --submit: var(--lounge-accent); --submit-fg: #120f09; }
+.lounge-submit:hover:not(:disabled) { transform: translateY(-1px); background: color-mix(in srgb, var(--submit) 88%, var(--submit-fg)); box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--submit) 80%, transparent); }
+.lounge-submit:active:not(:disabled) { transform: translateY(0); transition-duration: 0.08s; }
 .lounge-submit:disabled { opacity: 0.6; }
-.lounge-submit:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.lounge-submit:focus-visible { outline: 2px solid var(--submit); outline-offset: 3px; }
+/* The one authored moment: as a page opens, its room's photograph settles into focus, the way a room's
+   light comes up. Content is never hidden by it; only the photograph moves. */
+@keyframes lounge-settle {
+  from { transform: scale(1.16); filter: grayscale(0.85) sepia(0.35) contrast(1.05) brightness(0.38) blur(16px); }
+}
+.lounge-room .lounge-backdrop-img { animation: lounge-settle 1.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes lounge-story-sweep { from { --story-reveal: 38%; } }
+@supports (animation-timeline: view()) {
+  @media (min-width: 768px) {
+    .lounge-story-img { animation: lounge-story-sweep linear both; animation-timeline: view(); animation-range: entry 10% cover 45%; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lounge-room .lounge-backdrop-img, .lounge-story-img { animation: none; }
+}
 @keyframes lounge-drift { 0%, 100% { transform: translateY(0); opacity: 0.55; } 50% { transform: translateY(5px); opacity: 1; } }
 .lounge-drift { animation: lounge-drift 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
 @media (prefers-reduced-motion: reduce) { .lounge-drift { animation: none; } }
 
-/* Review fixes: photo regions dissolve into the page ground; cards speak in the UI face. */
-.lounge-backdrop-tint::after { content: ""; position: absolute; inset: auto 0 0 0; height: 28%; background: linear-gradient(to bottom, transparent, var(--background)); }
-.lounge-story-img { mask-image: linear-gradient(90deg, transparent 0%, transparent 18%, #000 62%); -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 18%, #000 62%); }
+/* Rooms: every photographic region (chat home, page header, story chapters, contact) runs edge to edge
+   on the night ground, under the floating sidebar, with no theme-coloured gaps between them. A photograph
+   never dissolves into the theme ground (on a light preset that reads as grey haze). */
+.lounge-room { position: relative; isolation: isolate; overflow: hidden; background: var(--lounge-ink); }
+@media (min-width: 1024px) {
+  /* Reach back under the sidebar; --room-pad is the room's own left padding, kept clear of the sidebar. */
+  .lounge-room { margin-left: -16rem; padding-left: calc(16rem + var(--room-pad, 0px)); }
+}
+/* Consecutive chapters share one night ground, divided by a hairline. */
+.lounge-rooms { background: var(--lounge-ink); }
+.lounge-rooms .lounge-room { border-top: 1px solid var(--lounge-glass-line); }
+@media (min-width: 1024px) { .lounge-rooms { margin-left: -16rem; } .lounge-rooms .lounge-room { margin-left: 0; } }
+
+/* Story photographs come in from the right, behind the chapter text. */
+@property --story-reveal { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
+.lounge-story-img {
+  --mask: linear-gradient(90deg, transparent calc(18% + var(--story-reveal)), #000 calc(62% + var(--story-reveal)));
+  mask-image: var(--mask); -webkit-mask-image: var(--mask);
+}
 @media (max-width: 767px) { .lounge-story-img { mask-image: none; -webkit-mask-image: none; } }
 .lounge .card-ui { font-family: var(--font-ui); font-variant-numeric: lining-nums tabular-nums; }
 .lounge-ghost {
