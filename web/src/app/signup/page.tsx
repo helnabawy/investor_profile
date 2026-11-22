@@ -25,7 +25,7 @@ export default async function SignupPage() {
           <ol className="flex flex-col gap-4">
             {NEXT.map(([title, body], i) => (
               <li key={title} className="flex gap-3.5">
-                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${i === 0 ? "bg-[#1e46b8] text-white" : "bg-[#e6ecfb] text-[#16348c]"}`}>{i + 1}</span>
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${i === 0 ? "bg-brand text-white" : "bg-brand-soft text-brand-strong"}`}>{i + 1}</span>
                 <span><span className="block font-medium">{title}</span><span className="a-muted block text-[0.95rem]">{body}</span></span>
               </li>
             ))}

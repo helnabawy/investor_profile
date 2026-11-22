@@ -11,7 +11,7 @@ import { useEffect, useRef } from "react";
  */
 
 const PITCH = 20; // px between dots
-const INK = "rgb(15 23 40 / 0.2)";
+const INK = "rgb(15 23 40 / 0.2)"; // fallbacks; the live values come from --c-sky-ink / --c-brand-rgb
 const DOT = 1.9; // px radius
 const BLUE = "30 70 184";
 
@@ -38,6 +38,15 @@ export function Skyline() {
     const ctx = canvas?.getContext("2d");
     if (!canvas || !host || !ctx) return;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Dot and light colours follow the platform theme; re-read when it changes.
+    let ink = INK, blue = BLUE;
+    const readColors = () => {
+      const cs = getComputedStyle(canvas);
+      ink = cs.getPropertyValue("--c-sky-ink").trim() || INK;
+      blue = cs.getPropertyValue("--c-brand-rgb").trim() || BLUE;
+    };
+    readColors();
 
     let w = 0, baseY = 0;
     let heights: number[] = [];
@@ -102,7 +111,7 @@ export function Skyline() {
       const k = reduce ? 1 : Math.min(1, (now - born) / 1700);
       const rise = 1 - Math.pow(1 - k, 3);
 
-      ctx.fillStyle = INK;
+      ctx.fillStyle = ink;
       ctx.beginPath();
       for (let c = 0; c < heights.length; c++) {
         const top = Math.ceil(heights[c] * rise);
@@ -119,9 +128,9 @@ export function Skyline() {
         if (now < l.t0 || l.r >= heights[l.c] * rise) continue;
         const a = Math.sin(Math.PI * ((now - l.t0) / l.dur));
         const { x, y } = pos(l.c, l.r);
-        ctx.fillStyle = `rgb(${BLUE} / ${0.16 * a})`;
+        ctx.fillStyle = `rgb(${blue} / ${0.16 * a})`;
         ctx.beginPath(); ctx.arc(x, y, 8.5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = `rgb(${BLUE} / ${a})`;
+        ctx.fillStyle = `rgb(${blue} / ${a})`;
         ctx.beginPath(); ctx.arc(x, y, 2.9, 0, Math.PI * 2); ctx.fill();
       }
     };
@@ -154,7 +163,14 @@ export function Skyline() {
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; play(); });
     io.observe(host);
     document.addEventListener("visibilitychange", play);
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); document.removeEventListener("visibilitychange", play); };
+    const scheme = matchMedia("(prefers-color-scheme: dark)");
+    const onTheme = () => { readColors(); if (reduce) still(); };
+    window.addEventListener("ep-theme", onTheme);
+    scheme.addEventListener("change", onTheme);
+    return () => {
+      cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); document.removeEventListener("visibilitychange", play);
+      window.removeEventListener("ep-theme", onTheme); scheme.removeEventListener("change", onTheme);
+    };
   }, []);
 
   return (

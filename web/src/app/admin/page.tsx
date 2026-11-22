@@ -63,21 +63,21 @@ export default async function Overview({ searchParams }: { searchParams: Promise
       </div>
 
       {welcome && (
-        <div className="flex items-center gap-3.5 rounded-xl border border-[#b7e0c6] bg-[#eef8f2] px-5 py-4">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1a7f4b] text-white"><Check size={18} aria-hidden /></span>
-          <p className="text-[#0f3d25]"><span className="font-semibold">Your site is live.</span> Add a project next, then share your link.</p>
+        <div className="flex items-center gap-3.5 rounded-xl border border-success-line bg-success-soft px-5 py-4">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-success-fill text-white"><Check size={18} aria-hidden /></span>
+          <p className="text-success-strong"><span className="font-semibold">Your site is live.</span> Add a project next, then share your link.</p>
         </div>
       )}
 
       {!providers.length && (
-        <div className="a-card border-[#ebcb85] bg-[#fdf8ea] text-[#4d3000]">
+        <div className="a-card border-warning-line bg-warning-soft text-warning-strong">
           <p className="font-semibold">The AI concierge needs an API key</p>
           <p className="mt-1 text-sm">Add one of these to your environment: {Object.values(PROVIDERS).map((p) => p.envKey).join(", ")}. Gemini and Groq both have free tiers.</p>
         </div>
       )}
 
       <div className="flex flex-wrap items-start gap-6">
-        <section className="min-w-0 flex-[2_1_480px] overflow-hidden rounded-xl border bg-white">
+        <section className="min-w-0 flex-[2_1_480px] overflow-hidden rounded-xl border bg-surface">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-6 pb-4 pt-5">
             <div>
               <h2 className="text-lg font-semibold">
@@ -99,7 +99,7 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                         <span className={`a-pill ${l.source === "chat" ? "a-pill-blue" : "a-pill-grey"}`}>{l.source === "chat" ? "Concierge" : "Form"}</span>
                         <span className="a-muted text-[0.85rem]">{timeAgo(l.created_at)}</span>
                       </span>
-                      <span className="line-clamp-2 text-[0.95rem] text-[#3d4658]">{[l.interest, l.budget && `Budget ${l.budget}`].filter(Boolean).join(" · ") || l.message || "No details given"}</span>
+                      <span className="line-clamp-2 text-[0.95rem] text-ink-2">{[l.interest, l.budget && `Budget ${l.budget}`].filter(Boolean).join(" · ") || l.message || "No details given"}</span>
                     </Link>
                     <span className="flex gap-2">
                       {l.session_id && <Link href={`/admin/chats/${l.session_id}`} className="a-btn a-btn-ghost a-btn-sm">Transcript</Link>}
@@ -112,12 +112,12 @@ export default async function Overview({ searchParams }: { searchParams: Promise
             </ul>
           ) : (
             <div className="flex flex-col items-center gap-2 border-t px-6 py-10 text-center">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e6ecfb] text-[#1e46b8]"><Inbox size={22} aria-hidden /></span>
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-brand-ink"><Inbox size={22} aria-hidden /></span>
               <p className="font-semibold">You are all caught up</p>
               <p className="a-muted max-w-sm text-sm">New enquiries from your contact form and the AI concierge appear here first.</p>
             </div>
           )}
-          <div className="flex flex-col gap-3 border-t bg-[#fafbfc] px-6 pb-5 pt-4">
+          <div className="flex flex-col gap-3 border-t bg-subtle px-6 pb-5 pt-4">
             <h2 className="text-[0.95rem] font-semibold">Last 30 days</h2>
             <dl className="flex flex-wrap gap-x-12 gap-y-3.5">
               {stats.map(([label, value]) => (
@@ -128,14 +128,14 @@ export default async function Overview({ searchParams }: { searchParams: Promise
         </section>
 
         <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-6">
-          <section className="overflow-hidden rounded-xl border bg-white">
-            <div className="relative h-[140px] bg-[#0f1728]">
+          <section className="overflow-hidden rounded-xl border bg-surface">
+            <div className="relative h-[140px] bg-inverse">
               {tenant.theme?.backdropUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={tenant.theme.backdropUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-75" />
               )}
-              <span className={`a-pill absolute left-3.5 top-3.5 bg-white ${tenant.published === false ? "text-[#6b4200]" : "text-[#136c3f]"}`}>
-                <span aria-hidden className={`h-[7px] w-[7px] rounded-full ${tenant.published === false ? "bg-[#b26a00]" : "bg-[#1a7f4b]"}`} />
+              <span className={`a-pill absolute left-3.5 top-3.5 bg-surface ${tenant.published === false ? "text-warning" : "text-success"}`}>
+                <span aria-hidden className={`h-[7px] w-[7px] rounded-full ${tenant.published === false ? "bg-warning-fill" : "bg-success-fill"}`} />
                 {tenant.published === false ? "Not published" : "Published"}
               </span>
             </div>
@@ -151,24 +151,24 @@ export default async function Overview({ searchParams }: { searchParams: Promise
             </div>
           </section>
 
-          <section className="rounded-xl border bg-white px-5 pt-4">
+          <section className="rounded-xl border bg-surface px-5 pt-4">
             <h2 className="font-semibold">What the concierge knows</h2>
             <p className="a-muted text-sm">It answers only from these.</p>
             <ul className="mt-2.5 text-[0.95rem]">
               {([["Published projects", published.count ?? 0, "/admin/projects"], ["FAQs", faqs.count ?? 0, "/admin/knowledge"], ["Knowledge notes", notes.count ?? 0, "/admin/knowledge"]] as const).map(([label, value, href]) => (
-                <li key={label} className="border-t"><Link href={href} className="flex min-h-11 items-center justify-between gap-3 hover:text-[#1e46b8]"><span>{label}</span><span className="font-semibold tabular-nums">{value}</span></Link></li>
+                <li key={label} className="border-t"><Link href={href} className="flex min-h-11 items-center justify-between gap-3 hover:text-brand-ink"><span>{label}</span><span className="font-semibold tabular-nums">{value}</span></Link></li>
               ))}
             </ul>
           </section>
 
           {next && (
-            <section className="flex flex-col gap-3 rounded-xl border bg-white px-5 py-4">
+            <section className="flex flex-col gap-3 rounded-xl border bg-surface px-5 py-4">
               <div className="flex items-baseline justify-between gap-3">
                 <h2 className="font-semibold">Setup</h2>
                 <span className="a-muted text-[0.85rem]">{doneCount} of {steps.length} done</span>
               </div>
-              <div role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={doneCount} aria-label="Setup progress" className="h-1.5 overflow-hidden rounded-full bg-[#e6ecfb]">
-                <span className="grow-x block h-full rounded-full bg-[#1e46b8]" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+              <div role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={doneCount} aria-label="Setup progress" className="h-1.5 overflow-hidden rounded-full bg-brand-soft">
+                <span className="grow-x block h-full rounded-full bg-brand" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
               </div>
               <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                 <span className="flex min-w-[10rem] flex-1 flex-col"><span className="font-medium">{next.title}</span><span className="a-muted text-[0.85rem]">{next.body}</span></span>

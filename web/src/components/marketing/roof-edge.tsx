@@ -2,7 +2,7 @@
  * Seams between landing-page sections, taken from the logo (a house shaped like a chat bubble).
  * `RoofEdge` sits directly above a section and gives it a shallow roof peak, with an optional thin
  * line echoing the roofline and the logo's three dots under the peak. `TailEdge` sits directly below a section and gives it the bubble's
- * tail, aligned to the page's left content edge. Both rise into place when scrolled into view.
+ * tail, aligned to the page's left content edge. Colours may be CSS variables (they are set as styles, not SVG attributes). Both rise into place when scrolled into view.
  */
 
 const H = 68; // px, height of the roof seam
@@ -21,13 +21,13 @@ export function RoofEdge({ color, line, dots, invert, ground, className = "" }: 
       className={`sky-edge pointer-events-none relative z-[1] overflow-hidden leading-[0] ${invert ? "-mt-px" : "-mb-px"} ${className}`}>
       <svg width="100%" height={H} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" className="block">
         <g className={`sky-rise ${invert ? "tail-rise" : ""}`}>
-          <polygon points={shape} fill={color} />
+          <polygon points={shape} style={{ fill: color }} />
         </g>
       </svg>
       {/* The echo line is its own layer so it can be wiped in from the peak outward. */}
       {line && (
         <svg width="100%" height={H} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" className="roof-line absolute inset-0">
-          <polyline points={echo} fill="none" stroke={line} strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+          <polyline points={echo} fill="none" style={{ stroke: line }} strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
         </svg>
       )}
       {/* The logo's three dots, tucked inside the peak. Real elements, so they stay round at any width. */}
@@ -45,7 +45,7 @@ export function TailEdge({ color, className = "" }: { color: string; className?:
     <div aria-hidden data-reveal className={`sky-edge pointer-events-none relative z-[1] -mt-px leading-[0] ${className}`}>
       <div className="mx-auto max-w-[1240px] px-6">
         <svg width="56" height="38" viewBox="0 0 56 38" className="block">
-          <g className="sky-rise tail-rise"><path d="M0 0H56L9 38Z" fill={color} /></g>
+          <g className="sky-rise tail-rise"><path d="M0 0H56L9 38Z" style={{ fill: color }} /></g>
         </svg>
       </div>
     </div>

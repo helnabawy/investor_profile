@@ -20,14 +20,25 @@ colors:
   sidebar: "color-mix(in srgb, var(--foreground) 86%, var(--accent))"
   sidebar-fg: "var(--background)"
   sidebar-mark: "color-mix(in srgb, var(--primary) 80%, var(--sidebar-fg))"
-  admin-teal: "#0f766e"
-  admin-teal-deep: "#115e59"
-  admin-focus: "#14b8a6"
-  admin-ink: "#0f172a"
-  admin-label: "#334155"
-  admin-muted: "#64748b"
-  admin-line: "#e2e8f0"
-  admin-field-line: "#cbd5e1"
+  platform-canvas: "#ffffff"
+  platform-sunken: "#f4f5f7"
+  platform-surface: "#ffffff"
+  platform-ink: "#0f1728"
+  platform-ink-2: "#3d4658"
+  platform-ink-3: "#4a5466"
+  platform-quiet: "#5a6475"
+  platform-line: "#dfe3ea"
+  platform-line-input: "#b4bcc9"
+  platform-brand: "#1e46b8"
+  platform-brand-hover: "#17368f"
+  platform-brand-soft: "#e6ecfb"
+  platform-inverse: "#0f1728"
+  platform-dark-canvas: "#0b1018"
+  platform-dark-surface: "#141b27"
+  platform-dark-ink: "#e8ecf3"
+  platform-dark-line: "#263041"
+  platform-dark-brand: "#3f66e3"
+  platform-dark-brand-ink: "#94adf8"
 typography:
   display:
     fontFamily: "var(--font-heading)"
@@ -187,17 +198,17 @@ components:
     textColor: "{colors.foreground}"
     rounded: "{rounded.base}"
     padding: "20px"
-  admin-button-primary:
-    backgroundColor: "{colors.admin-teal}"
+  platform-button-primary:
+    backgroundColor: "{colors.platform-brand}"
     textColor: "#ffffff"
     typography: "{typography.admin}"
     rounded: "{rounded.admin}"
-    padding: "9px 16px"
-  admin-button-primary-hover:
-    backgroundColor: "{colors.admin-teal-deep}"
-  admin-card:
-    backgroundColor: "#ffffff"
-    textColor: "{colors.admin-ink}"
+    padding: "9px 17px"
+  platform-button-primary-hover:
+    backgroundColor: "{colors.platform-brand-hover}"
+  platform-card:
+    backgroundColor: "{colors.platform-surface}"
+    textColor: "{colors.platform-ink}"
     rounded: "{rounded.admin-card}"
     padding: "24px"
 ---
@@ -210,7 +221,7 @@ components:
 
 Every tenant site is one advisor's private room, not a listings portal. In the Lounge layout the conversation is the homepage: a floating sidebar holds the room together, a blurred and theme-tinted photograph sets the light, and the advisor's face, name and composer sit in the middle of it. The visual system has no fixed palette. It is a set of **token roles** (background, foreground, card, muted, muted-foreground, border, primary, primary-foreground, accent, heading font, body font, radius) that each tenant fills, either from a named preset or by overriding single roles. Everything else is derived from those roles with `color-mix()`, so any preset lands coherently.
 
-Two layouts share the tokens. **Lounge** (default for new sites per PRODUCT.md) is the sidebar shell with a chat-first home, a numbered story About and a contact lounge. **Classic** is the incumbent top nav with long scrolling sections. The **Admin** dashboard is a third, separate surface with its own fixed teal-on-slate design that never reads tenant tokens.
+Two layouts share the tokens. **Lounge** (default for new sites per PRODUCT.md) is the sidebar shell with a chat-first home, a numbered story About and a contact lounge. **Classic** is the incumbent top nav with long scrolling sections. The **platform** (landing page, sign-in and the admin dashboard) is a separate surface with its own blue-on-slate token system, in light and dark, that never reads tenant tokens.
 
 The frontmatter values for the tenant roles are the **Luxury Gold** preset, which is also the fallback preset when a tenant has none. Rounded values are resolved against Luxury Gold's base radius (2px); in code they are offsets from the tenant's `--radius`.
 
@@ -257,15 +268,27 @@ The palette is a role contract filled per tenant; the presets below are the name
 | body font | Cormorant Garamond | Inter | Manrope | Outfit |
 | radius | 0.125rem | 0.75rem | 0rem | 0.5rem |
 
-### Admin (fixed, separate surface)
-Teal on slate: `{colors.admin-teal}` for primary actions (hover `{colors.admin-teal-deep}`), `{colors.admin-focus}` for focus rings, `{colors.admin-ink}` text, `{colors.admin-label}` field labels, `{colors.admin-muted}` hints, `{colors.admin-line}` / `{colors.admin-field-line}` borders, white cards. Danger is red-700 text on red-200 border.
+### Platform (landing, sign-in, admin): fixed, separate, light and dark
+The platform never reads tenant tokens and tenant sites never read platform tokens. Its colours are semantic roles defined once in `globals.css` ("Platform tokens") as `--c-*` variables, exposed to Tailwind as utilities (`bg-surface`, `text-ink`, `border-line`, `bg-brand`, …). Components use roles, never hex.
 
-### Named Rules
-**The Tokens-In Rule.** Tenant-facing colour comes from the nine role tokens or a `color-mix()` of them. A new surface that needs a colour derives it; it never introduces a literal hex, except night ink on photographic ground.
+| Role | Use | Light | Dark |
+|---|---|---|---|
+| canvas | page ground | #ffffff | #0b1018 |
+| sunken | alternate sections, admin ground | #f4f5f7 | #0e141d |
+| subtle | quiet fills, segmented controls | #fafbfc | #111824 |
+| surface | cards, inputs, bars, menus | #ffffff | #141b27 |
+| wash / wash-soft / hover | selected nav, row hover, control hover | #eef0f3 / #f7f8fa / #f4f5f7 | #1c2533 / #171f2c / #1a2230 |
+| ink → ink-2 → ink-3 → quiet → faint | headings → nav → body → secondary → hints and icons | #0f1728 → #3d4658 → #4a5466 → #5a6475 → #6a7385 | #e8ecf3 → #c3cad6 → #a7afbe → #959dad → #808a9a |
+| line-soft < line < line-strong < line-input < line-bold | hairlines → default → chips/tabs → fields → field hover | #eceff4 … #8a93a3 | #1c2432 … #5d6a82 |
+| brand | fills: primary buttons, active tab, focus rings | #1e46b8 | #3f66e3 |
+| brand-ink / brand-strong | link and accent text / text on brand-soft | #1e46b8 / #16348c | #94adf8 / #bccbfb |
+| brand-soft / brand-tint / brand-line | selected washes / faint washes / blue borders | #e6ecfb / #f1f5fe / #b9c8f2 | #1b2752 / #141d36 / #34498f |
+| inverse (+ inverse-line) | the navy panel: steps band, featured plan, avatars | #0f1728 | #18213a, edged #3a54a8 |
+| success / warning / danger | status text, each with -soft ground, -line border, -strong or -fill | greens, ambers, reds | lifted for 4.5:1 on dark |
 
-**The Inverted Sidebar Rule.** The Lounge sidebar is foreground mixed 14% toward accent, with background as its text. On a dark preset it is a pale panel; on a light preset it is a dark one. Its CTA inverts again (sidebar-fg ground, sidebar text).
+**Theme choice.** System by default (`prefers-color-scheme`); a stored choice (`localStorage` key `ep-theme`) sets `data-theme` on `<html>` before first paint, so there is no flash. The landing bar, the sign-in pages and the admin mobile bar carry a one-tap sun/moon button; the admin sidebar carries System / Light / Dark. Switching eases colours over 0.3s; loading never animates.
 
-**The Night Ground Rule.** Anything sitting on a photograph is on night ink with lounge-text type, whatever the preset. Never set theme foreground on a photo.
+**Stays fixed in both themes.** Anything that depicts a tenant's site (the landing hero mock and Lounge thumbnail, the template thumbnails, the "How buyers see it" project card, colour-preset swatches and the live theme preview) and the dark preview toolbar. The inverse panel's own content (light text on navy) is also fixed.
 
 ## Typography
 
@@ -354,8 +377,8 @@ Corners follow the tenant radius and step up by fixed offsets: controls at the b
 ### Concierge Thread (signature)
 Assistant bubbles are 66% night ink glass with a hairline; user bubbles are solid accent with night-ink text; links in accent. The lobby-to-conversation transition shares `layoutId` between the lobby and bar avatar/title over 0.6s on the house easing. On every page load each room's photograph settles into focus (scale 1.16 to 1.06, blur 16px to 5px, brightness 0.38 to 0.62 over 1.6s on cubic-bezier(0.16, 1, 0.3, 1)); only the photograph moves, never the content. Story photographs sweep in from the right as they scroll into view (scroll-driven mask, desktop only, skipped where unsupported). All motion respects reduced-motion.
 
-### Admin
-System sans; `.a-card` white with slate hairline at 14px radius and 24px padding; `.a-btn` 8px radius, 0.875rem/500, primary teal, ghost white with slate border, danger red; `.field` grids a 500-weight label, control and 0.78rem hint; focus is a 2px teal outline.
+### Platform
+Geist; `.a-card` on surface with a line hairline at 12px radius and 24px padding; `.a-btn` 8px radius, 0.95rem/500, 44px tall, primary on brand, ghost on surface with a line-input border, danger on danger-soft; `.field` grids a 500-weight label, control and 0.82rem quiet hint; focus is a 2px brand outline. Every colour is a platform role, so each component works in light and dark without a variant.
 
 ## Do's and Don'ts
 
@@ -370,6 +393,7 @@ System sans; `.a-card` white with slate hairline at 14px radius and 24px padding
 ### Don't:
 - **Don't** place glass chips or the glass composer on the theme ground; they belong to the backdrop.
 - **Don't** set theme foreground text directly on a photograph.
-- **Don't** let admin teal or slate leak into tenant sites, or tenant tokens into `/admin`.
+- **Don't** let platform roles leak into tenant sites, or tenant tokens into the landing page or `/admin`.
+- **Don't** write a hex colour in a platform component; add or reuse a role in "Platform tokens" with both a light and a dark value.
 - **Don't** hard-code a brand colour, font or copy for a tenant surface; everything is per-tenant.
 - **Don't** carry the classic `.eyebrow` uppercase kicker into Lounge or new surfaces; Lounge titles stand without kickers.

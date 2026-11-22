@@ -28,7 +28,7 @@ export function AdminNav({ mobile, newLeads = 0 }: { mobile?: boolean; newLeads?
   const path = usePathname();
   const active = (href: string) => (href === "/admin" ? path === href : path.startsWith(href));
   const badge = (href: string) => href === "/admin/leads" && newLeads > 0
-    ? <span className="ml-auto rounded-full bg-[#1e46b8] px-2 py-px text-[0.8rem] font-semibold text-white">{newLeads} new</span>
+    ? <span className="ml-auto rounded-full bg-brand px-2 py-px text-[0.8rem] font-semibold text-white">{newLeads} new</span>
     : null;
   if (mobile) {
     return (
@@ -45,7 +45,7 @@ export function AdminNav({ mobile, newLeads = 0 }: { mobile?: boolean; newLeads?
     <nav aria-label="Admin" className="flex flex-col gap-0.5 px-2.5 pb-3">
       {GROUPS.map((g) => (
         <div key={g.title} className="flex flex-col gap-0.5">
-          <p className="px-3 pb-1.5 pt-[18px] text-[0.8rem] font-medium text-[#6a7385]">{g.title}</p>
+          <p className="px-3 pb-1.5 pt-[18px] text-[0.8rem] font-medium text-faint">{g.title}</p>
           {g.items.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} aria-current={active(href) ? "page" : undefined} className="a-nav">
               <Icon size={18} strokeWidth={1.7} aria-hidden /> {label}{badge(href)}

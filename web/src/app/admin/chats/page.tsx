@@ -27,8 +27,8 @@ export default async function ChatsPage({ searchParams }: { searchParams: Promis
         <p className="a-card a-muted text-center">No conversations yet. They appear here as soon as a visitor talks to the concierge.</p>
       ) : (
         <div className="flex flex-wrap items-start gap-6">
-          <nav aria-label="Conversations" className="stagger min-w-0 flex-[1_1_320px] overflow-hidden rounded-xl border bg-white">
-            <p className="a-muted px-4 py-3.5 text-sm"><span className="font-semibold text-[#0f1728]">{sessions.length}</span> latest conversations</p>
+          <nav aria-label="Conversations" className="stagger min-w-0 flex-[1_1_320px] overflow-hidden rounded-xl border bg-surface">
+            <p className="a-muted px-4 py-3.5 text-sm"><span className="font-semibold text-ink">{sessions.length}</span> latest conversations</p>
             {sessions.map((s) => {
               const lead = leadFor.get(s.id);
               return (

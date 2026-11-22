@@ -35,7 +35,110 @@
   --radius-theme: var(--radius);
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);
+
+  /* Platform roles (landing, sign-in, admin): text-ink, bg-surface, border-line, … See "Platform tokens". */
+  --color-canvas: var(--c-canvas);
+  --color-sunken: var(--c-sunken);
+  --color-subtle: var(--c-subtle);
+  --color-surface: var(--c-surface);
+  --color-wash: var(--c-wash);
+  --color-wash-soft: var(--c-wash-soft);
+  --color-hover: var(--c-hover);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+  --color-quiet: var(--c-quiet);
+  --color-faint: var(--c-faint);
+  --color-line: var(--c-line);
+  --color-line-soft: var(--c-line-soft);
+  --color-line-strong: var(--c-line-strong);
+  --color-line-input: var(--c-line-input);
+  --color-line-bold: var(--c-line-bold);
+  --color-brand: var(--c-brand);
+  --color-brand-hover: var(--c-brand-hover);
+  --color-brand-ink: var(--c-brand-ink);
+  --color-brand-strong: var(--c-brand-strong);
+  --color-brand-soft: var(--c-brand-soft);
+  --color-brand-tint: var(--c-brand-tint);
+  --color-brand-line: var(--c-brand-line);
+  --color-inverse: var(--c-inverse);
+  --color-inverse-hover: var(--c-inverse-hover);
+  --color-inverse-line: var(--c-inverse-line);
+  --color-success: var(--c-success);
+  --color-success-strong: var(--c-success-strong);
+  --color-success-fill: var(--c-success-fill);
+  --color-success-soft: var(--c-success-soft);
+  --color-success-line: var(--c-success-line);
+  --color-warning: var(--c-warning);
+  --color-warning-strong: var(--c-warning-strong);
+  --color-warning-fill: var(--c-warning-fill);
+  --color-warning-soft: var(--c-warning-soft);
+  --color-warning-line: var(--c-warning-line);
+  --color-danger: var(--c-danger);
+  --color-danger-soft: var(--c-danger-soft);
+  --color-danger-line: var(--c-danger-line);
 }
+
+/* ───────── Platform tokens (landing, sign-in, admin) ─────────
+   One semantic role per job, light and dark. Components use roles, never hex. Tenant sites never read
+   these and never go dark: the dark set applies only inside .platform and .admin.
+   Ground:  canvas (page) < sunken (alternate sections, admin ground) < subtle < surface (cards, inputs, bars)
+   Text:    ink (headings) > ink-2 (nav, strong body) > ink-3 (body) > quiet (secondary) > faint (hints, icons)
+   Lines:   line-soft < line (default hairline) < line-strong (chips, tabs) < line-input (fields) < line-bold (hover)
+   Brand:   brand (fills) · brand-ink (text, links) · brand-strong (text on brand-soft) · brand-soft / brand-tint (washes) · brand-line
+   Inverse: the navy panel; stays dark in both themes (raised a step in dark), its content is fixed light-on-navy.
+   Status:  success / warning / danger, each with -soft ground, -line border and a -strong or -fill step. */
+:root {
+  --c-canvas: #ffffff; --c-sunken: #f4f5f7; --c-subtle: #fafbfc; --c-surface: #ffffff;
+  --c-wash: #eef0f3; --c-wash-soft: #f7f8fa; --c-hover: #f4f5f7;
+  --c-ink: #0f1728; --c-ink-2: #3d4658; --c-ink-3: #4a5466; --c-quiet: #5a6475; --c-faint: #6a7385;
+  --c-line-soft: #eceff4; --c-line: #dfe3ea; --c-line-strong: #c9cfda; --c-line-input: #b4bcc9; --c-line-bold: #8a93a3;
+  --c-brand: #1e46b8; --c-brand-hover: #17368f; --c-brand-ink: #1e46b8; --c-brand-strong: #16348c;
+  --c-brand-soft: #e6ecfb; --c-brand-tint: #f1f5fe; --c-brand-line: #b9c8f2; --c-brand-dot: #8ea2ea; --c-on-brand: #ffffff;
+  --c-inverse: #0f1728; --c-inverse-hover: #1e293b; --c-inverse-line: #0f1728;
+  --c-success: #136c3f; --c-success-strong: #0f3d25; --c-success-fill: #1a7f4b; --c-success-soft: #eef8f2; --c-success-line: #b7e0c6;
+  --c-warning: #6b4200; --c-warning-strong: #4d3000; --c-warning-fill: #b26a00; --c-warning-soft: #fdf8ea; --c-warning-line: #ebcb85;
+  --c-danger: #b42318; --c-danger-soft: #fef3f2; --c-danger-line: #f3b8b2;
+  /* rgb triplets for shadows, glows and the hero skyline */
+  --c-brand-rgb: 30 70 184; --c-shadow-rgb: 15 23 40; --c-sky-ink: rgb(15 23 40 / 0.2);
+}
+/* Dark: a blue-black night office. Grounds step up in lightness as they come forward; brand fills
+   lighten enough to keep white labels at 5:1, brand text lightens further for links on dark ground. */
+:root[data-theme="dark"] :is(.platform, .admin) {
+  color-scheme: dark;
+  --c-canvas: #0b1018; --c-sunken: #0e141d; --c-subtle: #111824; --c-surface: #141b27;
+  --c-wash: #1c2533; --c-wash-soft: #171f2c; --c-hover: #1a2230;
+  --c-ink: #e8ecf3; --c-ink-2: #c3cad6; --c-ink-3: #a7afbe; --c-quiet: #959dad; --c-faint: #808a9a;
+  --c-line-soft: #1c2432; --c-line: #263041; --c-line-strong: #344055; --c-line-input: #3d4a62; --c-line-bold: #5d6a82;
+  --c-brand: #3f66e3; --c-brand-hover: #5a7cec; --c-brand-ink: #94adf8; --c-brand-strong: #bccbfb;
+  --c-brand-soft: #1b2752; --c-brand-tint: #141d36; --c-brand-line: #34498f; --c-brand-dot: #6f8ef0; --c-on-brand: #ffffff;
+  --c-inverse: #18213a; --c-inverse-hover: #212c48; --c-inverse-line: #3a54a8;
+  --c-success: #6fd3a0; --c-success-strong: #a8e9c6; --c-success-fill: #2f9e66; --c-success-soft: #0f2a1d; --c-success-line: #21523a;
+  --c-warning: #f0c36d; --c-warning-strong: #f8dda4; --c-warning-fill: #d48d1f; --c-warning-soft: #2a2010; --c-warning-line: #5c4618;
+  --c-danger: #f58b80; --c-danger-soft: #2d1515; --c-danger-line: #6e2b26;
+  --c-brand-rgb: 111 142 240; --c-shadow-rgb: 0 0 0; --c-sky-ink: rgb(200 212 240 / 0.13);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) :is(.platform, .admin) {
+    color-scheme: dark;
+    --c-canvas: #0b1018; --c-sunken: #0e141d; --c-subtle: #111824; --c-surface: #141b27;
+    --c-wash: #1c2533; --c-wash-soft: #171f2c; --c-hover: #1a2230;
+    --c-ink: #e8ecf3; --c-ink-2: #c3cad6; --c-ink-3: #a7afbe; --c-quiet: #959dad; --c-faint: #808a9a;
+    --c-line-soft: #1c2432; --c-line: #263041; --c-line-strong: #344055; --c-line-input: #3d4a62; --c-line-bold: #5d6a82;
+    --c-brand: #3f66e3; --c-brand-hover: #5a7cec; --c-brand-ink: #94adf8; --c-brand-strong: #bccbfb;
+    --c-brand-soft: #1b2752; --c-brand-tint: #141d36; --c-brand-line: #34498f; --c-brand-dot: #6f8ef0; --c-on-brand: #ffffff;
+    --c-inverse: #18213a; --c-inverse-hover: #212c48; --c-inverse-line: #3a54a8;
+    --c-success: #6fd3a0; --c-success-strong: #a8e9c6; --c-success-fill: #2f9e66; --c-success-soft: #0f2a1d; --c-success-line: #21523a;
+    --c-warning: #f0c36d; --c-warning-strong: #f8dda4; --c-warning-fill: #d48d1f; --c-warning-soft: #2a2010; --c-warning-line: #5c4618;
+    --c-danger: #f58b80; --c-danger-soft: #2d1515; --c-danger-line: #6e2b26;
+    --c-brand-rgb: 111 142 240; --c-shadow-rgb: 0 0 0; --c-sky-ink: rgb(200 212 240 / 0.13);
+}
+}
+/* The page behind platform surfaces (overscroll, short pages) matches their ground. */
+body:has(> :is(.platform, .admin)) { background: var(--c-canvas); }
+:root[data-theme="dark"] body:has(> :is(.platform, .admin)) { background: #0b1018; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body:has(> :is(.platform, .admin)) { background: #0b1018; } }
+
 
 html {
   scroll-behavior: smooth;
@@ -138,35 +241,57 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 /* ───────── Admin dashboard (fixed design, independent of tenant themes) ───────── */
 /* Calm, high-contrast UI: one blue accent, 44px touch targets, white cards on a soft grey ground. */
 /* Shared by the landing page, sign-in and the admin: Geist, one blue, slate ink, 8px controls, 12px panels. */
-.admin, .platform { font-family: var(--font-platform), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #0f1728; font-size: 15px; line-height: 1.5; }
-.admin ::selection, .platform ::selection { background: #1e46b8; color: #fff; }
+.admin, .platform { font-family: var(--font-platform), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--c-ink); font-size: 15px; line-height: 1.5; }
+.admin ::selection, .platform ::selection { background: var(--c-brand); color: var(--c-on-brand); }
 .admin :is(h1, h2, h3, h4), .platform :is(h1, h2, h3, h4) { font-family: inherit; }
 .admin :is(h1, h2, h3) { letter-spacing: -0.015em; }
-.admin * { border-color: #dfe3ea; }
+.admin * { border-color: var(--c-line); }
 .field { display: grid; gap: 0.375rem; font-size: 0.95rem; }
-.field > span { font-weight: 500; color: #0f1728; }
-.field small { color: #5a6475; font-size: 0.82rem; }
+.field > span { font-weight: 500; color: var(--c-ink); }
+.field small { color: var(--c-quiet); font-size: 0.82rem; }
 .field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]), .field textarea, .field select, .a-input {
-  width: 100%; border: 1px solid #b4bcc9; border-radius: 0.5rem; padding: 0.6rem 0.8rem; min-height: 2.75rem; background: #fff; color: #0f1728; font-size: 0.95rem;
+  width: 100%; border: 1px solid var(--c-line-input); border-radius: 0.5rem; padding: 0.6rem 0.8rem; min-height: 2.75rem; background: var(--c-surface); color: var(--c-ink); font-size: 0.95rem;
 }
 .field textarea { min-height: 0; }
-.field input::placeholder, .field textarea::placeholder, .a-input::placeholder { color: #6a7385; }
-.field input:focus, .field textarea:focus, .field select:focus, .a-input:focus { outline: 2px solid #1e46b8; outline-offset: 0; border-color: #1e46b8; }
-.admin input[type="checkbox"], .admin input[type="radio"], .admin input[type="range"] { accent-color: #1e46b8; }
+.field input::placeholder, .field textarea::placeholder, .a-input::placeholder { color: var(--c-faint); }
+.field input:focus, .field textarea:focus, .field select:focus, .a-input:focus { outline: 2px solid var(--c-brand); outline-offset: 0; border-color: var(--c-brand); }
+.admin input[type="checkbox"], .admin input[type="radio"], .admin input[type="range"] { accent-color: var(--c-brand); }
 .a-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 0.5rem; padding: 0.55rem 1.05rem; min-height: 2.75rem; font-size: 0.95rem; font-weight: 500; transition: background 0.15s; cursor: pointer; white-space: nowrap; }
 .a-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.a-btn:focus-visible { outline: 2px solid #1e46b8; outline-offset: 2px; }
-.a-btn-primary { background: #1e46b8; color: #fff; }
-.a-btn-primary:hover { background: #17368f; }
-.a-btn-ghost { border: 1px solid #b4bcc9; background: #fff; color: #0f1728; }
-.a-btn-ghost:hover { background: #f4f5f7; }
+.a-btn:focus-visible { outline: 2px solid var(--c-brand); outline-offset: 2px; }
+.a-btn-primary { background: var(--c-brand); color: var(--c-on-brand); }
+.a-btn-primary:hover { background: var(--c-brand-hover); }
+.a-btn-ghost { border: 1px solid var(--c-line-input); background: var(--c-surface); color: var(--c-ink); }
+.a-btn-ghost:hover { background: var(--c-hover); }
+
+/* Theme switch. The icon button shows the moon in light and the sun in dark, chosen in CSS. */
+@layer components {
+.theme-icon-btn { display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 0.5rem; color: var(--c-ink-2); transition: background 0.15s, color 0.15s; }
+.theme-icon-btn:hover { background: var(--c-wash); color: var(--c-ink); }
+.theme-icon-btn:focus-visible { outline: 2px solid var(--c-brand); outline-offset: 2px; }
+.theme-icon-btn svg { grid-area: 1 / 1; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s; }
+.theme-icon-btn [data-show="dark"] { opacity: 0; transform: rotate(-60deg) scale(0.6); }
+:root[data-theme="dark"] .theme-icon-btn [data-show="dark"] { opacity: 1; transform: none; }
+:root[data-theme="dark"] .theme-icon-btn [data-show="light"] { opacity: 0; transform: rotate(60deg) scale(0.6); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-btn [data-show="dark"] { opacity: 1; transform: none; }
+  :root:not([data-theme="light"]) .theme-icon-btn [data-show="light"] { opacity: 0; transform: rotate(60deg) scale(0.6); }
+}
+.theme-seg { display: inline-flex; padding: 2px; gap: 2px; border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-subtle); }
+.theme-seg button { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 999px; color: var(--c-faint); transition: background 0.15s, color 0.15s; }
+.theme-seg button:hover { color: var(--c-ink); }
+.theme-seg button[aria-checked="true"] { background: var(--c-surface); color: var(--c-ink); box-shadow: 0 1px 2px rgb(var(--c-shadow-rgb) / 0.12), 0 0 0 1px var(--c-line); }
+.theme-seg button:focus-visible { outline: 2px solid var(--c-brand); outline-offset: 1px; }
+}
+/* Colour changes between themes ease instead of snapping; only when switching, never on load. */
+:root.theme-switching :is(.platform, .admin), :root.theme-switching :is(.platform, .admin) * { transition: background-color 0.3s, border-color 0.3s, color 0.3s, fill 0.3s !important; }
 
 /* Landing app bar: below 1024px the links fold into a menu panel under the bar. */
 /* In a layer so Tailwind's responsive display utilities (lg:hidden) still win over these. */
 @layer components {
-.landing-menu-btn { position: relative; display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 0.5rem; color: #0f1728; transition: background 0.15s; }
-.landing-menu-btn:hover { background: #f4f5f7; }
-.landing-menu-btn:focus-visible { outline: 2px solid #1e46b8; outline-offset: 2px; }
+.landing-menu-btn { position: relative; display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 0.5rem; color: var(--c-ink); transition: background 0.15s; }
+.landing-menu-btn:hover { background: var(--c-hover); }
+.landing-menu-btn:focus-visible { outline: 2px solid var(--c-brand); outline-offset: 2px; }
 .landing-menu-icon { grid-area: 1 / 1; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s; }
 .landing-menu-btn[aria-expanded="true"] [data-icon="open"], .landing-menu-btn[aria-expanded="false"] [data-icon="close"] { opacity: 0; transform: rotate(-90deg) scale(0.6); }
 .landing-menu { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -178,30 +303,30 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
   .landing-menu-item { transform: none; }
 }
 }
-.a-btn-danger { color: #b42318; border: 1px solid #f3b8b2; background: #fff; }
-.a-btn-danger:hover { background: #fef3f2; }
+.a-btn-danger { color: var(--c-danger); border: 1px solid var(--c-danger-line); background: var(--c-surface); }
+.a-btn-danger:hover { background: var(--c-danger-soft); }
 .a-btn-sm { min-height: 2.75rem; padding: 0.4rem 0.85rem; font-size: 0.9rem; }
-.a-card { background: #fff; border: 1px solid #dfe3ea; border-radius: 0.75rem; padding: 1.5rem; }
-.a-muted { color: #5a6475; }
+.a-card { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: 0.75rem; padding: 1.5rem; }
+.a-muted { color: var(--c-quiet); }
 .a-pill { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.1rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
-.a-pill-blue { background: #e6ecfb; color: #16348c; }
-.a-pill-amber { background: #fdf1d7; color: #6b4200; }
-.a-pill-green { background: #e0f3e7; color: #136c3f; }
-.a-pill-grey { background: #eef0f3; color: #3d4658; }
-.a-link { color: #1e46b8; font-weight: 500; text-underline-offset: 3px; }
-.a-link:hover { color: #17368f; text-decoration: underline; }
+.a-pill-blue { background: var(--c-brand-soft); color: var(--c-brand-strong); }
+.a-pill-amber { background: var(--c-warning-soft); color: var(--c-warning); }
+.a-pill-green { background: var(--c-success-soft); color: var(--c-success); }
+.a-pill-grey { background: var(--c-wash); color: var(--c-ink-2); }
+.a-link { color: var(--c-brand); font-weight: 500; text-underline-offset: 3px; }
+.a-link:hover { color: var(--c-brand-hover); text-decoration: underline; }
 .a-row { transition: background-color 0.15s; }
-.a-row:hover { background: #f7f8fa; }
-.a-row[aria-current="true"] { background: #f1f5fe; box-shadow: inset 3px 0 0 #1e46b8; }
-.a-tab { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.75rem; padding: 0 1rem; border: 1px solid #c9cfda; border-radius: 999px; background: #fff; color: #0f1728; font-size: 0.95rem; font-weight: 500; }
-.a-tab:hover { background: #f4f5f7; }
-.a-tab[aria-current="page"] { border-color: #1e46b8; background: #1e46b8; color: #fff; }
+.a-row:hover { background: var(--c-wash-soft); }
+.a-row[aria-current="true"] { background: var(--c-brand-tint); box-shadow: inset 3px 0 0 var(--c-brand); }
+.a-tab { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.75rem; padding: 0 1rem; border: 1px solid var(--c-line-strong); border-radius: 999px; background: var(--c-surface); color: var(--c-ink); font-size: 0.95rem; font-weight: 500; }
+.a-tab:hover { background: var(--c-hover); }
+.a-tab[aria-current="page"] { border-color: var(--c-brand); background: var(--c-brand); color: var(--c-on-brand); }
 .a-tab span { opacity: 0.75; font-variant-numeric: tabular-nums; }
-.a-nav { display: flex; align-items: center; gap: 0.7rem; min-height: 2.5rem; padding: 0 0.75rem; border-radius: 0.45rem; color: #3d4658; font-size: 0.95rem; font-weight: 500; transition: background-color 0.15s, color 0.15s; }
-.a-nav svg { flex: none; color: #6a7385; }
-.a-nav:hover { background: #eceef2; color: #0f1728; }
-.a-nav[aria-current="page"] { background: #e6ecfb; color: #16348c; }
-.a-nav[aria-current="page"] svg { color: #1e46b8; }
+.a-nav { display: flex; align-items: center; gap: 0.7rem; min-height: 2.5rem; padding: 0 0.75rem; border-radius: 0.45rem; color: var(--c-ink-2); font-size: 0.95rem; font-weight: 500; transition: background-color 0.15s, color 0.15s; }
+.a-nav svg { flex: none; color: var(--c-faint); }
+.a-nav:hover { background: var(--c-wash); color: var(--c-ink); }
+.a-nav[aria-current="page"] { background: var(--c-brand-soft); color: var(--c-brand-strong); }
+.a-nav[aria-current="page"] svg { color: var(--c-brand); }
 
 /* ───────── Horizon, Ledger, Atelier and Foyer templates ─────────
    One shell and shared pieces (.t-*), all from tenant tokens, so any colour preset works.
@@ -413,14 +538,14 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 :is(a, button).c-card:hover, a.a-card:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -20px rgb(0 0 0 / 0.35); }
 :is(a, button).c-card:active, a.a-card:active { transform: translateY(0); }
 :is(a, button).c-card:focus-visible, .c-chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-a.a-card:focus-visible { outline: 2px solid #1e46b8; outline-offset: 2px; }
+a.a-card:focus-visible { outline: 2px solid var(--c-brand); outline-offset: 2px; }
 .c-chip { transition: border-color 0.2s, color 0.2s, transform 0.12s; }
 .c-chip:active { transform: scale(0.97); }
 
 .input { transition: border-color 0.15s, box-shadow 0.15s; }
 .input:hover { border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); }
 .field input, .field textarea, .field select, .a-input { transition: border-color 0.15s; }
-.field input:hover, .field textarea:hover, .field select:hover, .a-input:hover { border-color: #7f8a9c; }
+.field input:hover, .field textarea:hover, .field select:hover, .a-input:hover { border-color: var(--c-line-bold); }
 
 /* Header links: an underline that draws in on hover and stays on the current page. */
 .nav-link { position: relative; }
@@ -449,7 +574,7 @@ details.faq-item[open]::details-content { block-size: auto; }
 @keyframes p-settle { from { opacity: 0.4; transform: scale(1.07); } }
 @keyframes p-pop { from { opacity: 0; transform: translateY(10px) scale(0.96); } }
 @keyframes p-gone { to { opacity: 0; visibility: hidden; } }
-@keyframes p-ring { 0% { box-shadow: 0 0 0 0 rgb(30 70 184 / 0.35), 0 24px 48px -28px rgb(30 70 184 / 0.55); } 100% { box-shadow: 0 0 0 14px rgb(30 70 184 / 0), 0 24px 48px -28px rgb(30 70 184 / 0.55); } }
+@keyframes p-ring { 0% { box-shadow: 0 0 0 0 rgb(var(--c-brand-rgb) / 0.35), 0 24px 48px -28px rgb(var(--c-brand-rgb) / 0.55); } 100% { box-shadow: 0 0 0 14px rgb(var(--c-brand-rgb) / 0), 0 24px 48px -28px rgb(var(--c-brand-rgb) / 0.55); } }
 .p-in { animation: p-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: var(--d, 0s); }
 .p-photo { animation: p-settle 1.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .p-pop { animation: p-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: var(--d, 0s); }
@@ -462,7 +587,7 @@ details.faq-item[open]::details-content { block-size: auto; }
 @keyframes h-mark { from { background-size: 0% 0.085em; } }
 .h-word { display: inline-block; animation: h-word 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(0.08s + var(--i, 0) * 0.06s); }
 .h-mark {
-  background: linear-gradient(#1e46b8, #1e46b8) no-repeat 0 96% / 100% 0.085em; padding-bottom: 0.06em;
+  background: linear-gradient(var(--c-brand), var(--c-brand)) no-repeat 0 96% / 100% 0.085em; padding-bottom: 0.06em;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
   animation: h-mark 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.95s both;
 }
@@ -483,8 +608,8 @@ details.faq-item[open]::details-content { block-size: auto; }
 .js-reveal .sky-edge:not(.is-in) .roof-dots span { transform: scale(0); opacity: 0; }
 
 /* "Live in three steps": one dot per step, lit in order as its row arrives. */
-.step-dot { width: 9px; height: 9px; flex: none; border-radius: 999px; background: #8ea2ea; box-shadow: 0 0 0 4px rgb(142 162 234 / 0.18); transition: background-color 0.5s, box-shadow 0.6s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); transition-delay: calc(var(--d, 0s) + 0.35s); }
-.js-reveal [data-reveal]:not(.is-in) .step-dot { background: transparent; box-shadow: 0 0 0 1.5px rgb(142 162 234 / 0.55); transform: scale(0.6); }
+.step-dot { width: 9px; height: 9px; flex: none; border-radius: 999px; background: var(--c-brand-dot); box-shadow: 0 0 0 4px rgb(var(--c-brand-rgb) / 0.18); transition: background-color 0.5s, box-shadow 0.6s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); transition-delay: calc(var(--d, 0s) + 0.35s); }
+.js-reveal [data-reveal]:not(.is-in) .step-dot { background: transparent; box-shadow: 0 0 0 1.5px rgb(var(--c-brand-rgb) / 0.55); transform: scale(0.6); }
 
 /* Template carousel: the centred card is in focus; its neighbours sit back until chosen. */
 .carousel-track { scrollbar-width: none; scroll-behavior: smooth; }
@@ -493,7 +618,7 @@ details.faq-item[open]::details-content { block-size: auto; }
 .carousel-card:not([aria-current]) { transform: scale(0.93); opacity: 0.5; }
 .carousel-card:not([aria-current]):hover { opacity: 0.8; }
 .carousel-frame { transition: box-shadow 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-.carousel-card[aria-current] .carousel-frame { box-shadow: 0 30px 56px -34px rgb(15 23 40 / 0.5); }
+.carousel-card[aria-current] .carousel-frame { box-shadow: 0 30px 56px -34px rgb(var(--c-shadow-rgb) / 0.5); }
 .carousel-text { transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
 .carousel-card:not([aria-current]) .carousel-text { opacity: 0; }
 @keyframes carousel-fill { from { width: 0; } to { width: 100%; } }
@@ -501,7 +626,7 @@ details.faq-item[open]::details-content { block-size: auto; }
 
 /* Frames and plan cards lift a little under the pointer. */
 .p-lift { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
-.p-lift:hover { transform: translateY(-4px); box-shadow: 0 28px 50px -30px rgb(15 23 40 / 0.45); }
+.p-lift:hover { transform: translateY(-4px); box-shadow: 0 28px 50px -30px rgb(var(--c-shadow-rgb) / 0.45); }
 
 /* Admin: each screen settles in; list rows follow in a short stagger. */
 .page-enter { animation: p-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -511,7 +636,7 @@ details.faq-item[open]::details-content { block-size: auto; }
 .stagger > :nth-child(6) { animation-delay: 200ms; } .stagger > :nth-child(7) { animation-delay: 240ms; }
 .stagger > :nth-child(n + 8) { animation-delay: 280ms; }
 .admin .a-card, .admin .a-tab, .admin .a-pill { transition: border-color 0.2s, background-color 0.2s, box-shadow 0.25s, color 0.2s; }
-.admin a.a-row:active { background: #eef2fd; }
+.admin a.a-row:active { background: var(--c-brand-tint); }
 .admin details > summary ~ * { animation: p-rise 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-2px); } }
 .typing span { display: inline-block; width: 5px; height: 5px; border-radius: 999px; background: currentColor; animation: typing 1.2s infinite; }

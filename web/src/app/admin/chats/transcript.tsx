@@ -10,7 +10,7 @@ export function Transcript({ title, meta, assistant, messages, lead, className =
   className?: string;
 }) {
   return (
-    <section aria-label="Transcript" className={`flex min-w-0 flex-col overflow-hidden rounded-xl border bg-white ${className}`}>
+    <section aria-label="Transcript" className={`flex min-w-0 flex-col overflow-hidden rounded-xl border bg-surface ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 border-b px-5 py-4">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold">{title}</h2>
@@ -18,13 +18,13 @@ export function Transcript({ title, meta, assistant, messages, lead, className =
         </div>
         {lead && <Link href={`/admin/leads?id=${lead.id}`} className="a-btn a-btn-primary">Open lead{lead.name ? `: ${lead.name}` : ""}</Link>}
       </div>
-      <div className="flex flex-col gap-3 bg-[#fafbfc] p-5">
+      <div className="flex flex-col gap-3 bg-subtle p-5">
         {messages.map((m, i) => {
           const user = m.role === "user";
           return (
             <div key={i} className={`flex max-w-[80%] flex-col gap-1 ${user ? "items-end self-end" : "items-start self-start"}`}>
               <span className="a-muted text-[0.8rem]">{user ? "Visitor" : assistant}</span>
-              <p className={`whitespace-pre-wrap px-3.5 py-2.5 text-[0.95rem] ${user ? "rounded-[12px_4px_12px_12px] bg-[#1e46b8] text-white" : "rounded-[4px_12px_12px_12px] border bg-white"}`}>{m.content}</p>
+              <p className={`whitespace-pre-wrap px-3.5 py-2.5 text-[0.95rem] ${user ? "rounded-[12px_4px_12px_12px] bg-brand text-white" : "rounded-[4px_12px_12px_12px] border bg-surface"}`}>{m.content}</p>
             </div>
           );
         })}

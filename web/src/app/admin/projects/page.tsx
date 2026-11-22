@@ -39,9 +39,9 @@ export default async function ProjectsAdmin({ searchParams }: { searchParams: Pr
         ))}
       </nav>
 
-      <div className="overflow-x-auto rounded-xl border bg-white">
+      <div className="overflow-x-auto rounded-xl border bg-surface">
         <div className="stagger min-w-[880px]">
-          <div aria-hidden className={`grid ${COLS} gap-4 px-5 py-3 text-[0.85rem] font-medium text-[#5a6475]`}>
+          <div aria-hidden className={`grid ${COLS} gap-4 px-5 py-3 text-[0.85rem] font-medium text-quiet`}>
             <span>Project</span><span>Status</span><span>Price from</span><span>Handover</span><span>Payment plan</span><span>On site</span><span />
           </div>
           {projects.map((p) => {
@@ -54,19 +54,19 @@ export default async function ProjectsAdmin({ searchParams }: { searchParams: Pr
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.images[0]} alt="" className="h-[54px] w-[72px] shrink-0 rounded-md border object-cover" />
                   ) : (
-                    <span className="flex h-[54px] w-[72px] shrink-0 items-center justify-center rounded-md border border-[#ebcb85] bg-[#fdf1d7] text-center text-xs font-medium text-[#6b4200]">No photo</span>
+                    <span className="flex h-[54px] w-[72px] shrink-0 items-center justify-center rounded-md border border-warning-line bg-warning-soft text-center text-xs font-medium text-warning">No photo</span>
                   )}
                   <span className="flex min-w-0 flex-col leading-snug">
                     <span className="truncate font-semibold">{p.title}</span>
-                    <span className={`truncate text-[0.85rem] ${p.images[0] ? "a-muted" : "text-[#6b4200]"}`}>{p.images[0] ? meta : `${meta ? `${meta} · ` : ""}Add a photo`}</span>
+                    <span className={`truncate text-[0.85rem] ${p.images[0] ? "a-muted" : "text-warning"}`}>{p.images[0] ? meta : `${meta ? `${meta} · ` : ""}Add a photo`}</span>
                   </span>
                 </span>
                 <span><span className={`a-pill ${cls}`}>{label}</span></span>
                 <span className="tabular-nums">{p.price_from ? formatFullPrice(p.price_from, p.currency) : "—"}</span>
                 <span className="text-[0.95rem]">{p.handover ?? "—"}</span>
-                <span className="truncate text-[0.95rem] text-[#3d4658]">{p.payment_plan ?? "—"}</span>
-                <span className={`text-[0.9rem] font-medium ${p.published ? "text-[#136c3f]" : "text-[#5a6475]"}`}>{p.published ? "Published" : "Hidden"}</span>
-                <ChevronRight size={18} className="text-[#6a7385]" aria-hidden />
+                <span className="truncate text-[0.95rem] text-ink-2">{p.payment_plan ?? "—"}</span>
+                <span className={`text-[0.9rem] font-medium ${p.published ? "text-success" : "text-quiet"}`}>{p.published ? "Published" : "Hidden"}</span>
+                <ChevronRight size={18} className="text-faint" aria-hidden />
               </Link>
             );
           })}

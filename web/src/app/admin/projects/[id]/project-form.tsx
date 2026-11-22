@@ -100,14 +100,14 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
                   <div key={src + i} className="group relative h-[108px] w-[148px] overflow-hidden rounded-lg border">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="h-full w-full object-cover" />
-                    {i === 0 && <span className="absolute left-1.5 top-1.5 rounded-full bg-[#0f1728] px-2 py-px text-xs font-medium text-white">Cover</span>}
+                    {i === 0 && <span className="absolute left-1.5 top-1.5 rounded-full bg-inverse px-2 py-px text-xs font-medium text-white">Cover</span>}
                     <div className="absolute inset-x-1.5 bottom-1.5 flex justify-end gap-1">
-                      {i > 0 && <button type="button" className="rounded-md bg-white/95 px-2 py-1 text-xs font-medium shadow" onClick={() => setImages([src, ...images.filter((_, j) => j !== i)])}>Make cover</button>}
-                      <button type="button" className="rounded-md bg-white/95 p-1 shadow" onClick={() => setImages(images.filter((_, j) => j !== i))} aria-label="Remove photo"><X size={14} aria-hidden /></button>
+                      {i > 0 && <button type="button" className="rounded-md bg-surface/95 px-2 py-1 text-xs font-medium shadow" onClick={() => setImages([src, ...images.filter((_, j) => j !== i)])}>Make cover</button>}
+                      <button type="button" className="rounded-md bg-surface/95 p-1 shadow" onClick={() => setImages(images.filter((_, j) => j !== i))} aria-label="Remove photo"><X size={14} aria-hidden /></button>
                     </div>
                   </div>
                 ))}
-                <div className="flex min-h-[108px] flex-[1_1_200px] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-[#8a93a3] bg-[#fafbfc] p-3 text-center">
+                <div className="flex min-h-[108px] flex-[1_1_200px] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-line-bold bg-subtle p-3 text-center">
                   <UploadButton tenantId={tenantId} multiple label="Upload photos" onUploaded={(u) => setImages([...images, ...u])} />
                   <span className="a-muted text-[0.82rem]">JPG or PNG, up to 8 MB each.</span>
                 </div>
@@ -123,7 +123,7 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
             </Card>
 
             <Card title="Brochure">
-              {!brochure && <p className="rounded-lg border border-[#ebcb85] bg-[#fdf8ea] px-4 py-3 text-sm text-[#4d3000]">Buyers often ask the concierge for a brochure. Add a PDF and it can share the link.</p>}
+              {!brochure && <p className="rounded-lg border border-warning-line bg-warning-soft px-4 py-3 text-sm text-warning-strong">Buyers often ask the concierge for a brochure. Add a PDF and it can share the link.</p>}
               <div className="field"><span>Brochure (PDF)</span>
                 <div className="flex flex-wrap gap-2">
                   <input name="brochure_url" className="a-input min-w-0 flex-1" value={brochure} onChange={(e) => setBrochure(e.target.value)} placeholder="https://…" />
@@ -137,12 +137,12 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
             <section className="a-card flex flex-col gap-3.5 !p-5">
               <h2 className="font-semibold">How buyers see it</h2>
               <div className="overflow-hidden rounded border border-[#dad6ca] bg-white">
-                <div className="relative h-[170px] bg-[#eef0f3]">
+                <div className="relative h-[170px] bg-wash">
                   {images[0]
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={images[0]} alt="" className="h-full w-full object-cover" />
                     : <span className="a-muted flex h-full items-center justify-center text-sm">No cover photo yet</span>}
-                  <span className="absolute left-3 top-3 rounded-sm bg-white px-2.5 py-1 text-xs font-semibold">{STATUS_LABEL[v.status as keyof typeof STATUS_LABEL] ?? "Off-plan"}</span>
+                  <span className="absolute left-3 top-3 rounded-sm bg-surface px-2.5 py-1 text-xs font-semibold">{STATUS_LABEL[v.status as keyof typeof STATUS_LABEL] ?? "Off-plan"}</span>
                 </div>
                 <div className="flex flex-col gap-2.5 px-4 pb-4 pt-3.5">
                   <div>
@@ -162,8 +162,8 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
               <p className="a-muted text-sm">{done} of {checks.length} details filled in.</p>
               <ul className="mt-2">
                 {checks.map(([label, ok]) => (
-                  <li key={label} className={`flex items-center gap-2.5 border-t border-[#eef0f3] py-2.5 text-[0.95rem] ${ok ? "" : "text-[#6b4200]"}`}>
-                    {ok ? <Check size={18} strokeWidth={2.2} className="text-[#1a7f4b]" aria-hidden /> : <CircleAlert size={18} className="text-[#b26a00]" aria-hidden />}
+                  <li key={label} className={`flex items-center gap-2.5 border-t border-line-soft py-2.5 text-[0.95rem] ${ok ? "" : "text-warning"}`}>
+                    {ok ? <Check size={18} strokeWidth={2.2} className="text-success" aria-hidden /> : <CircleAlert size={18} className="text-warning-fill" aria-hidden />}
                     {label}{!ok && <span className="sr-only"> (missing)</span>}
                   </li>
                 ))}

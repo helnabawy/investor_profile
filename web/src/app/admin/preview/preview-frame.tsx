@@ -57,34 +57,34 @@ export function PreviewFrame({ siteName, origin, token, pages, changes }: {
       </header>
 
       <div className="flex min-h-0 flex-1 flex-wrap gap-5 overflow-auto p-5">
-        <aside className="flex w-full flex-col gap-4 self-start rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 lg:w-80">
+        <aside className="flex w-full flex-col gap-4 self-start rounded-2xl border border-line bg-surface p-6 text-ink lg:w-80">
           <div>
             <h1 className="text-lg font-semibold">Unpublished changes</h1>
-            <p className="mt-0.5 text-sm text-slate-600">Buyers still see your current site until you publish.</p>
+            <p className="mt-0.5 text-sm text-ink-3">Buyers still see your current site until you publish.</p>
           </div>
           {count ? (
             <ul className="flex flex-col gap-2.5">
               {changes.map((c) => (
-                <li key={c.label} className="rounded-xl border border-slate-200 px-4 py-3">
-                  <p className="text-xs text-slate-500">{c.label}</p>
+                <li key={c.label} className="rounded-xl border border-line px-4 py-3">
+                  <p className="text-xs text-quiet">{c.label}</p>
                   <p className="font-semibold">{c.detail}</p>
-                  <Link href={c.href} className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 hover:text-blue-900">Change</Link>
+                  <Link href={c.href} className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-ink hover:text-brand-strong">Change</Link>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-600">This draft matches your live site.</p>
+            <p className="text-sm text-ink-3">This draft matches your live site.</p>
           )}
         </aside>
 
         <section aria-label={`Preview of ${siteName}`} className="flex min-h-[640px] min-w-0 flex-1 justify-center">
-          <div className="flex w-full flex-col overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-xl transition-[max-width] duration-300"
+          <div className="flex w-full flex-col overflow-hidden rounded-2xl border border-line-strong bg-surface shadow-xl transition-[max-width] duration-300"
             style={{ maxWidth: device === "phone" ? 390 : "100%" }}>
-            <div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-3 py-2">
-              <span aria-hidden className="flex gap-1.5">{[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-slate-300" />)}</span>
-              <span className="min-w-0 flex-1 truncate rounded-md border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">{siteName} · preview{path === "/" ? "" : ` · ${path}`}</span>
+            <div className="flex items-center gap-3 border-b border-line bg-subtle px-3 py-2">
+              <span aria-hidden className="flex gap-1.5">{[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-line-strong" />)}</span>
+              <span className="min-w-0 flex-1 truncate rounded-md border border-line bg-surface px-3 py-1 text-xs text-ink-3">{siteName} · preview{path === "/" ? "" : ` · ${path}`}</span>
             </div>
-            <iframe key={path} src={`${origin}/api/preview?token=${encodeURIComponent(token)}&path=${encodeURIComponent(path)}`} title={`${siteName} preview`} className="min-h-0 w-full flex-1 bg-white" />
+            <iframe key={path} src={`${origin}/api/preview?token=${encodeURIComponent(token)}&path=${encodeURIComponent(path)}`} title={`${siteName} preview`} className="min-h-0 w-full flex-1 bg-surface" />
           </div>
         </section>
       </div>

@@ -9,7 +9,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <AuthShell title="Sign in to your dashboard" subtitle="Manage your site, projects, chatbot and leads.">
       {error === "no-site" && (
-        <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">This account isn&apos;t linked to the site yet. Ask the site owner to run the setup script.</p>
+        <p className="mb-4 rounded-lg bg-warning-soft p-3 text-sm text-warning">This account isn&apos;t linked to the site yet. Ask the site owner to run the setup script.</p>
       )}
       <LoginForm allowSignup={isMulti} />
     </AuthShell>

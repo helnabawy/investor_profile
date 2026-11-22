@@ -67,16 +67,16 @@ export function AiForm({ config, providers, tenantName, sources }: { config: AiC
           <details className="a-card group !py-0">
             <summary className="flex min-h-[64px] cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
               <span><span className="block font-semibold">Model</span><span className="a-muted text-sm">{providerLabel}</span></span>
-              <ChevronDown size={20} className="text-[#3d4658] transition-transform duration-300 group-open:rotate-180" aria-hidden />
+              <ChevronDown size={20} className="text-ink-2 transition-transform duration-300 group-open:rotate-180" aria-hidden />
             </summary>
             <div className="flex flex-col gap-4 pb-6">
               <div className="grid gap-2 sm:grid-cols-2">
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors has-[:checked]:border-[#1e46b8] has-[:checked]:bg-[#f1f5fe]">
+                <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors has-[:checked]:border-brand has-[:checked]:bg-brand-tint">
                   <input type="radio" name="provider" value="auto" checked={provider === "auto"} onChange={() => setProvider("auto")} className="mt-1" />
                   <span><span className="text-sm font-medium">Automatic</span><span className="a-muted block text-[0.82rem]">Cheapest available model, with automatic fallback.</span></span>
                 </label>
                 {providers.map((p) => (
-                  <label key={p.id} className={`flex items-start gap-3 rounded-lg border p-3 transition-colors has-[:checked]:border-[#1e46b8] has-[:checked]:bg-[#f1f5fe] ${p.configured ? "cursor-pointer" : "opacity-55"}`}>
+                  <label key={p.id} className={`flex items-start gap-3 rounded-lg border p-3 transition-colors has-[:checked]:border-brand has-[:checked]:bg-brand-tint ${p.configured ? "cursor-pointer" : "opacity-55"}`}>
                     <input type="radio" name="provider" value={p.id} disabled={!p.configured} checked={provider === p.id} onChange={() => setProvider(p.id)} className="mt-1" />
                     <span><span className="text-sm font-medium">{p.label}</span><span className="a-muted block text-[0.82rem]">{p.note}{!p.configured && " · not configured on server"}</span></span>
                   </label>
@@ -91,26 +91,26 @@ export function AiForm({ config, providers, tenantName, sources }: { config: AiC
         </div>
 
         <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-6 lg:sticky lg:top-6">
-          <section aria-label="Greeting preview" className="overflow-hidden rounded-xl border bg-white">
+          <section aria-label="Greeting preview" className="overflow-hidden rounded-xl border bg-surface">
             <div className="border-b px-5 py-4"><h2 className="font-semibold">What buyers see first</h2><p className="a-muted text-sm">Updates as you type.</p></div>
-            <div className={`flex flex-col gap-3 bg-[#fafbfc] p-5 transition-opacity ${enabled ? "" : "opacity-50"}`}>
-              <p className="text-[0.82rem] font-medium text-[#5a6475]">{name || "Concierge"}</p>
-              <p className="-mt-1.5 max-w-[92%] self-start whitespace-pre-line rounded-[4px_12px_12px_12px] border bg-white px-3.5 py-2.5 text-[0.95rem]">{greeting || "Welcome! How can I help you find the right property?"}</p>
+            <div className={`flex flex-col gap-3 bg-subtle p-5 transition-opacity ${enabled ? "" : "opacity-50"}`}>
+              <p className="text-[0.82rem] font-medium text-quiet">{name || "Concierge"}</p>
+              <p className="-mt-1.5 max-w-[92%] self-start whitespace-pre-line rounded-[4px_12px_12px_12px] border bg-surface px-3.5 py-2.5 text-[0.95rem]">{greeting || "Welcome! How can I help you find the right property?"}</p>
               {chipList.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  {chipList.map((c) => <span key={c} className="rounded-full border border-[#c9cfda] bg-white px-3 py-1.5 text-[0.85rem] text-[#3d4658]">{c}</span>)}
+                  {chipList.map((c) => <span key={c} className="rounded-full border border-line-strong bg-surface px-3 py-1.5 text-[0.85rem] text-ink-2">{c}</span>)}
                 </div>
               )}
-              {!enabled && <p className="text-sm font-medium text-[#6b4200]">The concierge is off, so buyers won&apos;t see this.</p>}
+              {!enabled && <p className="text-sm font-medium text-warning">The concierge is off, so buyers won&apos;t see this.</p>}
             </div>
           </section>
 
-          <section className="rounded-xl border bg-white px-5 pt-4">
+          <section className="rounded-xl border bg-surface px-5 pt-4">
             <h2 className="font-semibold">What it can answer from</h2>
             <p className="a-muted text-sm">It never answers from anything else.</p>
             <ul className="mt-2.5 text-[0.95rem]">
               {([["Published projects", sources.projects, "/admin/projects"], ["FAQs", sources.faqs, "/admin/knowledge"], ["Knowledge notes", sources.notes, "/admin/knowledge"]] as const).map(([label, n, href]) => (
-                <li key={label} className="border-t"><Link href={href} className="flex min-h-11 items-center justify-between gap-3 hover:text-[#1e46b8]"><span>{label}</span><span className="font-semibold tabular-nums">{n}</span></Link></li>
+                <li key={label} className="border-t"><Link href={href} className="flex min-h-11 items-center justify-between gap-3 hover:text-brand-ink"><span>{label}</span><span className="font-semibold tabular-nums">{n}</span></Link></li>
               ))}
             </ul>
           </section>

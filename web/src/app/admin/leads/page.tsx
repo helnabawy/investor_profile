@@ -39,9 +39,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
               </Link>
             ))}
           </nav>
-          <div className="overflow-x-auto rounded-xl border bg-white">
+          <div className="overflow-x-auto rounded-xl border bg-surface">
             <div className="stagger min-w-[760px]">
-              <div aria-hidden className={`grid ${COLS} gap-4 px-5 py-3 text-[0.85rem] font-medium text-[#5a6475]`}>
+              <div aria-hidden className={`grid ${COLS} gap-4 px-5 py-3 text-[0.85rem] font-medium text-quiet`}>
                 <span>Buyer</span><span>Interest</span><span>Budget</span><span>Source</span><span>Received</span><span>Status</span>
               </div>
               {leads.map((l) => {
@@ -50,9 +50,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                   <Link key={l.id} href={href({ status, id: l.id })} scroll={false} aria-current={l.id === cur?.id ? "true" : undefined}
                     className={`a-row grid ${COLS} min-h-16 items-center gap-4 border-t px-5 py-2.5`}>
                     <span className="flex min-w-0 flex-col leading-snug"><span className="truncate font-semibold">{l.name ?? "Anonymous"}</span><span className="a-muted truncate text-[0.85rem]">{l.email ?? l.phone ?? ""}</span></span>
-                    <span className="truncate text-[0.95rem] text-[#3d4658]">{l.interest ?? l.message ?? "—"}</span>
+                    <span className="truncate text-[0.95rem] text-ink-2">{l.interest ?? l.message ?? "—"}</span>
                     <span className="truncate text-[0.95rem] tabular-nums">{l.budget ?? "—"}</span>
-                    <span className="text-[0.9rem] text-[#3d4658]">{l.source === "chat" ? "Concierge" : "Form"}</span>
+                    <span className="text-[0.9rem] text-ink-2">{l.source === "chat" ? "Concierge" : "Form"}</span>
                     <span className="a-muted text-[0.9rem]">{timeAgo(l.created_at)}</span>
                     <span><span className={`a-pill ${cls}`}>{label}</span></span>
                   </Link>
@@ -64,7 +64,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         </section>
 
         {cur && (
-          <aside key={cur.id} aria-label="Selected lead" className="p-pop flex min-w-0 flex-[1_1_320px] flex-col rounded-xl border bg-white">
+          <aside key={cur.id} aria-label="Selected lead" className="p-pop flex min-w-0 flex-[1_1_320px] flex-col rounded-xl border bg-surface">
             <div className="flex flex-col gap-3.5 px-5 pb-4 pt-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -81,13 +81,13 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
             </div>
             <dl className="border-t px-5 py-1 text-[0.95rem]">
               {([["Email", cur.email], ["Phone", cur.phone], ["Interest", cur.interest], ["Budget", cur.budget]] as const).filter(([, v]) => v).map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-4 border-t border-[#eef0f3] py-2.5 first:border-0"><dt className="a-muted">{k}</dt><dd className="min-w-0 text-right [overflow-wrap:anywhere]">{v}</dd></div>
+                <div key={k} className="flex justify-between gap-4 border-t border-line-soft py-2.5 first:border-0"><dt className="a-muted">{k}</dt><dd className="min-w-0 text-right [overflow-wrap:anywhere]">{v}</dd></div>
               ))}
             </dl>
             {(cur.message || cur.session_id) && (
               <div className="flex flex-col gap-2 border-t px-5 py-4">
                 <h3 className="text-[0.95rem] font-semibold">What they asked</h3>
-                {cur.message && <p className="whitespace-pre-line text-[0.95rem] text-[#3d4658]">{cur.message}</p>}
+                {cur.message && <p className="whitespace-pre-line text-[0.95rem] text-ink-2">{cur.message}</p>}
                 {cur.session_id && <Link href={`/admin/chats/${cur.session_id}`} className="a-link inline-flex min-h-11 items-center self-start text-[0.95rem]">Read the concierge transcript</Link>}
               </div>
             )}

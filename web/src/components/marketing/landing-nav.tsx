@@ -3,8 +3,9 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
-const LINK = "text-[0.95rem] font-medium text-[#3d4658] hover:text-[#0f1728]";
+const LINK = "text-[0.95rem] font-medium text-ink-2 hover:text-ink";
 
 /**
  * The landing page's app bar. From 1024px the links sit inline; below that they fold into a menu
@@ -30,13 +31,14 @@ export function LandingNav({ demoUrl }: { demoUrl: string }) {
   }, [open]);
 
   return (
-    <header className="relative z-[2] bg-white">
+    <header className="relative z-[2] bg-surface">
       <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-x-8 px-6 py-3.5">
         <Logo />
         <nav aria-label="Main" className="hidden items-center gap-x-7 lg:flex">
           {links.map(([href, label]) => <a key={label} href={href} className={`py-3 ${LINK}`}>{label}</a>)}
         </nav>
-        <div className="flex items-center gap-x-3 sm:gap-x-5">
+        <div className="flex items-center gap-x-2 sm:gap-x-4">
+          <ThemeToggle />
           <Link href="/login" className={`hidden py-3 lg:inline ${LINK}`}>Sign in</Link>
           {/* Wrapped: .a-btn sets its own display, which would override a hidden class on the link. */}
           <span className="max-sm:hidden"><Link href="/signup" className="a-btn a-btn-primary">Create your site</Link></span>
@@ -58,9 +60,9 @@ export function LandingNav({ demoUrl }: { demoUrl: string }) {
       <div id={panelId} data-open={open} className="landing-menu lg:hidden" inert={!open}>
         <div className="min-h-0 overflow-hidden">
           <nav aria-label="Main" className="mx-auto max-w-[1240px] px-6 pb-5">
-            <ul className="border-t border-[#eceff4]">
+            <ul className="border-t border-line-soft">
               {links.map(([href, label], i) => (
-                <li key={label} style={{ "--i": i } as React.CSSProperties} className="landing-menu-item border-b border-[#eceff4]">
+                <li key={label} style={{ "--i": i } as React.CSSProperties} className="landing-menu-item border-b border-line-soft">
                   <a href={href} onClick={() => setOpen(false)} className={`flex min-h-12 items-center ${LINK} text-[1rem]`}>{label}</a>
                 </li>
               ))}

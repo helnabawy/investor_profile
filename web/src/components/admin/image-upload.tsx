@@ -33,7 +33,7 @@ export function UploadButton({ tenantId, onUploaded, multiple, label = "Upload",
         catch (x) { setErr((x as Error).message); }
         finally { setBusy(false); e.target.value = ""; }
       }} />
-      {err && <span className="text-xs text-red-600">{err}</span>}
+      {err && <span className="text-xs text-danger">{err}</span>}
     </span>
   );
 }
