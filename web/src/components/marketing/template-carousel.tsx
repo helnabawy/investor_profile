@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import { TemplateThumb } from "@/components/template-thumb";
 import type { Template } from "@/lib/templates";
@@ -16,7 +16,9 @@ const EVERY = 4500; // ms each template stays in focus
  */
 export function TemplateCarousel({ templates }: { templates: Pick<Template, "id" | "name" | "tags" | "description">[] }) {
   const track = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
+  // Open on the second template, so there is a neighbour on both sides and the row reads as browsable.
+  const start = Math.min(1, templates.length - 1);
+  const [active, setActive] = useState(start);
   const [playing, setPlaying] = useState(true);
   const [held, setHeld] = useState(false); // pointer or focus is inside
   const [seen, setSeen] = useState(false); // carousel is on screen
@@ -29,6 +31,13 @@ export function TemplateCarousel({ templates }: { templates: Pick<Template, "id"
     const card = el.children[((i % n) + n) % n] as HTMLElement;
     el.scrollTo({ left: card.offsetLeft - (el.clientWidth - card.clientWidth) / 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, [templates.length]);
+
+  // Centre the starting card before the first paint, without animating.
+  useLayoutEffect(() => {
+    const el = track.current;
+    const card = el?.children[start] as HTMLElement | undefined;
+    if (el && card) el.scrollLeft = card.offsetLeft - (el.clientWidth - card.clientWidth) / 2;
+  }, [start]);
 
   // The card nearest the centre of the track is the one in focus.
   useEffect(() => {
