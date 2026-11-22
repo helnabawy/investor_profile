@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { env, subdomainUrl } from "@/lib/env";
-import { TemplateThumb } from "@/components/template-thumb";
+import { TemplateCarousel } from "@/components/marketing/template-carousel";
 import { TEMPLATES } from "@/lib/templates";
 import { PLANS as LIMITS } from "@/lib/plans";
 import { platformFont } from "@/lib/fonts";
@@ -25,9 +25,9 @@ const STEPS = [
 const perDay = (n: number) => `${n.toLocaleString("en")} concierge messages a day`;
 const PLANS = [
   { name: LIMITS.free.name, price: "Free", per: "", desc: "Try it with your listings", cta: "Start free", href: "/signup",
-    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "Both templates", "EstateProfile badge in the footer"] },
+    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "All templates", "EstateProfile badge in the footer"] },
   { name: LIMITS.solo.name, price: "AED 199", per: " a month", desc: "For independent agents", cta: "Start free, upgrade later", href: "/signup", highlight: true,
-    items: ["Your own domain", "Unlimited projects", perDay(LIMITS.solo.dailyChat), "Both templates", "No badge"] },
+    items: ["Your own domain", "Unlimited projects", perDay(LIMITS.solo.dailyChat), "All templates", "No badge"] },
   { name: LIMITS.team.name, price: "Contact us", per: "", desc: "For brokerages", cta: "Start free, upgrade later", href: "/signup",
     items: ["Everything in Solo", perDay(LIMITS.team.dailyChat), "Managed setup on your domain", "Accounts for several agents (coming soon)"] },
 ];
@@ -196,24 +196,13 @@ export default function Landing() {
       </section>
 
       <TailEdge color="#0f1728" />
-      <section id="templates" className="mx-auto flex max-w-[1240px] scroll-mt-4 flex-col gap-12 px-6 pb-14 pt-14 md:pb-16 md:pt-16">
-        <div data-reveal className="flex flex-col gap-3.5">
+      <section id="templates" className="flex scroll-mt-4 flex-col gap-9 overflow-hidden pb-14 pt-14 md:pb-16 md:pt-16">
+        <div data-reveal className="mx-auto flex w-full max-w-[1240px] flex-col gap-3.5 px-6">
           <h2 className={H2}>Start from a template</h2>
           <p className={`${LEAD} max-w-[60ch]`}>Each one sets the layout of your whole site. Switch any time and preview the change on your own site before buyers see it.</p>
         </div>
-        <div className="flex flex-wrap gap-x-9 gap-y-10">
-          {TEMPLATES.map((t, i) => (
-            <article key={t.id} data-reveal style={D(i * 0.12)} className="flex min-w-0 flex-[1_1_380px] flex-col gap-5">
-              <div className={`p-lift ${FRAME}`}><TemplateThumb kind={t.id} className="" /></div>
-              <div className="flex flex-col gap-2.5">
-                <h3 className="text-2xl font-semibold tracking-[-0.02em]">{t.name}</h3>
-                <ul aria-label="Tags" className="flex flex-wrap gap-1.5">
-                  {t.tags.map((tag) => <li key={tag} className="rounded-full border border-[#c9cfda] px-3 py-0.5 text-[0.85rem] text-[#3d4658]">{tag}</li>)}
-                </ul>
-                <p className={`${LEAD} max-w-[52ch]`}>{t.description}</p>
-              </div>
-            </article>
-          ))}
+        <div data-reveal style={D(0.1)}>
+          <TemplateCarousel templates={TEMPLATES.map(({ id, name, tags, description }) => ({ id, name, tags, description }))} />
         </div>
       </section>
 
