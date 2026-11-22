@@ -70,7 +70,7 @@ export async function saveSite(_: ActionResult | null, f: FormData): Promise<Act
   }).eq("id", tenant.id);
   if (error) return { ok: false, error: error.message };
 
-  // Keep the hosting provider in sync (no-op unless VERCEL_* env vars are set).
+  // Keep the hosting provider in sync (no-op unless Cloudflare or Vercel env vars are set; see lib/domains.ts).
   const added = domains.filter((d) => !tenant.domains.includes(d));
   const removed = tenant.domains.filter((d) => !domains.includes(d));
   await Promise.all([...added.map(addDomainToHosting), ...removed.map(removeDomainFromHosting)]).catch((e) =>

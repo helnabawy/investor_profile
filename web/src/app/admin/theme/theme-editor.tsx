@@ -44,37 +44,37 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
         </div>
       </PageTitle>
 
-      {justPublished && !state && <p role="status" className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-900">Published. Buyers now see your new look.</p>}
-      {hasDraft && !state && <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">You have unpublished changes. They are loaded below; buyers still see your live site.</p>}
+      {justPublished && !state && <p role="status" className="rise rounded-lg border border-[#b7e0c6] bg-[#eef8f2] px-4 py-3 text-sm font-medium text-[#0f3d25]">Published. Buyers now see your new look.</p>}
+      {hasDraft && !state && <p className="rounded-lg border border-[#ebcb85] bg-[#fdf8ea] px-4 py-3 text-sm text-[#4d3000]">You have unpublished changes. They are loaded below; buyers still see your live site.</p>}
       <FormMessage state={state} />
 
       <section className="a-card" aria-labelledby="tpl-h">
-        <h2 id="tpl-h" className="text-lg font-bold">Template</h2>
-        <p className="mt-1 text-sm text-slate-600">A template sets the layout of every page. Your projects, text and leads stay the same when you switch.</p>
+        <h2 id="tpl-h" className="text-[1.05rem] font-semibold">Template</h2>
+        <p className="a-muted mt-0.5 text-sm">A template sets the layout of every page. Your projects, text and leads stay the same when you switch.</p>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           {galleryTemplates().map((tpl) => {
             const on = current.id === tpl.id;
             return (
-              <article key={tpl.id} className={`flex flex-col overflow-hidden rounded-2xl border bg-white transition-shadow hover:shadow-[0_16px_30px_-20px_rgb(0_0_0/0.35)] ${on ? "border-2 border-[#1e46b8]" : ""}`}>
+              <article key={tpl.id} className={`flex flex-col overflow-hidden rounded-xl border bg-white transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_-20px_rgb(0_0_0/0.35)] ${on ? "border-[#1e46b8] shadow-[0_0_0_1px_#1e46b8]" : ""}`}>
                 <div className="relative">
                   <TemplateThumb kind={tpl.id} />
                   <span className="absolute left-3 top-3 flex gap-1.5">
                     {tpl.tier === "premium"
-                      ? <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-amber-200"><Crown size={13} aria-hidden /> Premium</span>
-                      : <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-800">Free</span>}
-                    {on && <span className="rounded-full bg-[#1e46b8] px-3 py-1 text-xs font-semibold text-white">Selected</span>}
+                      ? <span className="inline-flex items-center gap-1.5 a-pill bg-[#0f1728] text-[#f5d58a]"><Crown size={13} aria-hidden /> Premium</span>
+                      : <span className="a-pill a-pill-green">Free</span>}
+                    {on && <span className="a-pill bg-[#1e46b8] text-white">Selected</span>}
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col gap-3 p-5">
-                  <h3 className="text-lg font-bold">{tpl.name}</h3>
+                  <h3 className="text-[1.05rem] font-semibold">{tpl.name}</h3>
                   <ul aria-label="Tags" className="flex flex-wrap gap-1.5">
-                    {tpl.tags.map((tag) => <li key={tag} className="rounded-md border border-slate-300 px-2.5 py-0.5 text-xs font-medium text-slate-700">{tag}</li>)}
+                    {tpl.tags.map((tag) => <li key={tag} className="rounded-full border border-[#c9cfda] px-2.5 py-0.5 text-[0.82rem] text-[#3d4658]">{tag}</li>)}
                   </ul>
-                  <p className="text-sm text-slate-600">{tpl.description}</p>
+                  <p className="a-muted text-sm">{tpl.description}</p>
                   <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
-                    {tpl.price && <span className="mr-auto font-bold">{tpl.price}</span>}
+                    {tpl.price && <span className="mr-auto font-semibold">{tpl.price}</span>}
                     {on
-                      ? <span className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-blue-800"><Check size={16} aria-hidden /> In this draft</span>
+                      ? <span className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[#16348c]"><Check size={16} aria-hidden /> In this draft</span>
                       : <button type="button" className="a-btn a-btn-primary" onClick={() => pickTemplate(tpl)}>Use this template</button>}
                   </div>
                 </div>
@@ -82,42 +82,42 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
             );
           })}
         </div>
-        <p className="mt-4 text-sm text-slate-600">Switching template also applies its matching colours. You can change them below.</p>
+        <p className="a-muted mt-4 text-sm">Switching template also applies its matching colours. You can change them below.</p>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-6">
           <section className="a-card">
-            <h2 className="text-lg font-bold">Colours</h2>
+            <h2 className="text-[1.05rem] font-semibold">Colours</h2>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {(Object.entries(PRESETS) as [PresetId, (typeof PRESETS)[PresetId]][]).map(([id, p]) => {
                 const on = (cfg.preset ?? "luxury-gold") === id;
                 return (
                   <button key={id} type="button" aria-pressed={on} onClick={() => { setCfg({ ...brand(cfg), layout: cfg.layout, preset: id }); setState(null); }}
-                    className={`overflow-hidden rounded-xl border text-left ${on ? "border-2 border-[#1e46b8]" : "hover:border-slate-400"}`}>
+                    className={`overflow-hidden rounded-lg border text-left transition-[border-color,box-shadow] duration-200 ${on ? "border-[#1e46b8] shadow-[0_0_0_1px_#1e46b8]" : "hover:border-[#8a93a3]"}`}>
                     <span className="flex h-14 items-end gap-1.5 p-2.5" style={{ background: p.tokens.background }}>
                       <span className="h-3 w-7 rounded" style={{ background: p.tokens.primary }} />
                       <span className="h-3 w-11 rounded" style={{ background: p.tokens.muted }} />
                     </span>
-                    <span className="block px-3 py-2 text-sm font-semibold">{p.label}</span>
+                    <span className="block px-3 py-2 text-sm font-medium">{p.label}</span>
                   </button>
                 );
               })}
             </div>
-            <p className="mt-3 text-sm text-slate-600">Choosing colours resets any custom colours and fonts below.</p>
+            <p className="a-muted mt-3 text-sm">Choosing colours resets any custom colours and fonts below.</p>
           </section>
 
           {current.id === "lounge" && (
             <section className="a-card grid gap-4">
-              <h2 className="text-lg font-bold">Lounge photos</h2>
+              <h2 className="text-[1.05rem] font-semibold">Lounge photos</h2>
               <ImageField tenantId={tenantId} label="Your portrait (round avatar above the chat)" value={cfg.portraitUrl ?? ""} onChange={(v) => set({ portraitUrl: v })} />
               <ImageField tenantId={tenantId} label="Backdrop photo (blurred and toned behind the chat and page headers)" value={cfg.backdropUrl ?? ""} onChange={(v) => set({ backdropUrl: v })} />
-              <p className="text-sm text-slate-600">Portraits work best as a square head-and-shoulders crop. Quick-question buttons are set under AI concierge.</p>
+              <p className="a-muted text-sm">Portraits work best as a square head-and-shoulders crop. Quick-question buttons are set under AI concierge.</p>
             </section>
           )}
 
           <section className="a-card grid gap-4">
-            <h2 className="text-lg font-bold">Brand</h2>
+            <h2 className="text-[1.05rem] font-semibold">Brand</h2>
             <ImageField tenantId={tenantId} label="Logo (shown instead of your name)" value={cfg.logoUrl ?? ""} onChange={(v) => set({ logoUrl: v })} />
             <ImageField tenantId={tenantId} label="Favicon" value={cfg.faviconUrl ?? ""} onChange={(v) => set({ faviconUrl: v })} />
             <div className="grid gap-4 sm:grid-cols-2">
@@ -127,15 +127,15 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
           </section>
 
           <details className="a-card group">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-lg font-bold">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-[1.05rem] font-semibold">
               Advanced: custom colours and fonts
-              <span aria-hidden className="text-blue-700 transition group-open:rotate-45">+</span>
+              <span aria-hidden className="text-[#1e46b8] transition-transform duration-300 group-open:rotate-45">+</span>
             </summary>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {COLORS.map(([key, label]) => (
                 <label key={key} className="field"><span>{label}</span>
                   <div className="flex items-center gap-2">
-                    <input type="color" value={t[key]} onChange={(e) => set({ [key]: e.target.value })} className="h-11 w-12 cursor-pointer rounded border" aria-label={`${label} colour picker`} />
+                    <input type="color" value={t[key]} onChange={(e) => set({ [key]: e.target.value })} className="h-11 w-12 shrink-0 cursor-pointer rounded-lg border" aria-label={`${label} colour picker`} />
                     <input className="a-input" value={t[key]} onChange={(e) => set({ [key]: e.target.value })} />
                   </div>
                 </label>
@@ -156,8 +156,8 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
         </div>
 
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <p className="mb-2 text-sm font-semibold text-slate-700">Quick look</p>
-          <div className="overflow-hidden border shadow-sm" style={{ background: t.background, color: t.foreground, borderRadius: t.radius, fontFamily: `"${t.bodyFont}"` }}>
+          <p className="mb-2 text-sm font-semibold">Quick look <span className="a-muted font-normal">updates as you change things</span></p>
+          <div className="overflow-hidden border shadow-[0_18px_40px_-28px_rgb(15_23_40/0.45)] transition-colors duration-300" style={{ background: t.background, color: t.foreground, borderRadius: t.radius, fontFamily: `"${t.bodyFont}"` }}>
             <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: t.border, background: t.card }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               {cfg.logoUrl ? <img src={cfg.logoUrl} alt="" className="h-6" /> : <span className="font-bold" style={{ fontFamily: `"${t.headingFont}"` }}>{name}</span>}
@@ -173,7 +173,7 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
               </div>
             </div>
           </div>
-          <p className="mt-2 text-sm text-slate-600">For the full picture, use <strong>Preview on my site</strong>.</p>
+          <p className="a-muted mt-2 text-sm">For the full picture, use <strong>Preview on my site</strong>.</p>
         </div>
       </div>
     </div>

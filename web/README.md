@@ -59,6 +59,8 @@ pnpm test:e2e    # browser flow: login, edit settings/theme/pages/projects, sign
 
 Quick reference: `pnpm build:dev` / `pnpm start:dev` use `.env.dev.local`, and `pnpm build:prod` / `pnpm start:prod` use `.env.prod.local` (templates: `.env.dev.example`, `.env.prod.example`). On Vercel, keep the build command as `pnpm build` and set the variables per environment.
 
+**SaaS on your own VPS behind Cloudflare**: see **[docs/DEPLOYMENT-VPS.md](docs/DEPLOYMENT-VPS.md)**. One server runs the app and a slim self-hosted Supabase with Docker Compose (`docker-compose.prod.yml`); a Cloudflare Tunnel provides DNS, SSL and the CDN. It covers the tunnel, secrets, the first admin, email, tenants' custom domains (Cloudflare for SaaS), backups and updates.
+
 **Self-hosted client**
 - Create the client's Supabase project and run `supabase db push`. Seed data is not applied to remote projects.
 - Build the image:

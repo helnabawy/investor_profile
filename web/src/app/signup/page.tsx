@@ -20,17 +20,17 @@ export default async function SignupPage() {
       title="Create your site"
       subtitle={user ? "A few details and one choice. You can change everything later." : "Start with your email. It takes about a minute."}
       aside={
-        <div className="flex flex-col gap-6">
-          <h2 className="text-xl font-bold">What happens next</h2>
-          <ol className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 border-t pt-7">
+          <h2 className="text-lg font-semibold">What happens next</h2>
+          <ol className="flex flex-col gap-4">
             {NEXT.map(([title, body], i) => (
-              <li key={title} className="flex gap-4">
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-bold ${i === 0 ? "bg-[#1e46b8] text-white" : "bg-blue-50 text-blue-900"}`}>{i + 1}</span>
-                <span><span className="block font-semibold">{title}</span><span className="block text-[0.95rem] text-slate-600">{body}</span></span>
+              <li key={title} className="flex gap-3.5">
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${i === 0 ? "bg-[#1e46b8] text-white" : "bg-[#e6ecfb] text-[#16348c]"}`}>{i + 1}</span>
+                <span><span className="block font-medium">{title}</span><span className="a-muted block text-[0.95rem]">{body}</span></span>
               </li>
             ))}
           </ol>
-          <a href={subdomainUrl("demo")} className="inline-flex min-h-11 items-center font-semibold text-blue-700 hover:text-blue-900">See what a finished site looks like</a>
+          <a href={subdomainUrl("demo")} className="a-link inline-flex min-h-11 items-center self-start">See what a finished site looks like</a>
         </div>
       }
     >

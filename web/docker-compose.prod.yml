@@ -1,0 +1,193 @@
+# Whole platform on one server: the Next.js app, a slim self-hosted Supabase
+# (Postgres, Auth, REST API, Storage, gateway) and a Cloudflare Tunnel.
+# Guide: docs/DEPLOYMENT-VPS.md.  Settings: deploy/.env (template: deploy/.env.example).
+#
+#   docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d --build
+#
+# No ports are published. Visitors arrive through the tunnel, which reaches `app` and `kong`
+# over the private Docker network.
+name: estateprofile
+
+x-restart: &restart
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  db:
+    <<: *restart
+    image: public.ecr.aws/supabase/postgres:17.11.0.011
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in deploy/.env}
+      JWT_EXP: 3600
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./deploy/db/roles.sql:/etc/postgresql.schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -h 127.0.0.1 -p 5432"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  auth:
+    <<: *restart
+    image: public.ecr.aws/supabase/gotrue:v2.197.0
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${SUPABASE_PUBLIC_URL:?set SUPABASE_PUBLIC_URL in deploy/.env}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgresql://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres
+      GOTRUE_SITE_URL: https://${ROOT_DOMAIN:?set ROOT_DOMAIN in deploy/.env}
+      GOTRUE_URI_ALLOW_LIST: https://${ROOT_DOMAIN}/**,https://*.${ROOT_DOMAIN}/**
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_PASSWORD_MIN_LENGTH: 6
+      # true = new accounts need no confirmation email. Set AUTH_AUTOCONFIRM=false once SMTP works.
+      GOTRUE_MAILER_AUTOCONFIRM: ${AUTH_AUTOCONFIRM:-true}
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+      GOTRUE_SMTP_HOST: ${SMTP_HOST:-}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT:-465}
+      GOTRUE_SMTP_USER: ${SMTP_USER:-}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS:-}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_FROM_EMAIL:-}
+      GOTRUE_SMTP_SENDER_NAME: ${SMTP_FROM_NAME:-EstateProfile}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:9999/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rest:
+    <<: *restart
+    image: public.ecr.aws/supabase/postgrest:v16.5
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGRST_DB_URI: postgresql://authenticator:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public,graphql_public
+      PGRST_DB_EXTRA_SEARCH_PATH: public,extensions
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_DB_MAX_ROWS: 1000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+
+  storage:
+    <<: *restart
+    image: public.ecr.aws/supabase/storage-api:v1.88.0
+    depends_on:
+      db: { condition: service_healthy }
+      rest: { condition: service_started }
+    environment:
+      ANON_KEY: ${ANON_KEY:?set ANON_KEY in deploy/.env}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY:?set SERVICE_ROLE_KEY in deploy/.env}
+      AUTH_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/postgres
+      POSTGREST_URL: http://rest:3000
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /mnt
+      FILE_SIZE_LIMIT: 52428800 # 50 MB, same as supabase/config.toml
+      TENANT_ID: stub
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "false"
+    volumes:
+      - storage-data:/mnt
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:5000/status"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  kong:
+    <<: *restart
+    image: public.ecr.aws/supabase/kong:2.8.1
+    depends_on:
+      auth: { condition: service_healthy }
+      storage: { condition: service_healthy }
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors
+      KONG_NGINX_WORKER_PROCESSES: 1
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./deploy/kong.yml:/home/kong/kong.yml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "kong health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot: applies new files from supabase/migrations/, then exits. Runs on every `up`.
+  migrate:
+    image: public.ecr.aws/supabase/postgres:17.11.0.011
+    restart: "no"
+    depends_on:
+      auth: { condition: service_healthy }
+      storage: { condition: service_healthy }
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./supabase/migrations:/migrations:ro
+      - ./deploy/migrate.sh:/migrate.sh:ro
+    entrypoint: ["sh", "/migrate.sh"]
+
+  app:
+    <<: *restart
+    build:
+      context: .
+      args:
+        # NEXT_PUBLIC_* values are compiled into the build: rebuild after changing them.
+        NEXT_PUBLIC_SUPABASE_URL: ${SUPABASE_PUBLIC_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+        NEXT_PUBLIC_ROOT_DOMAIN: ${ROOT_DOMAIN}
+        NEXT_PUBLIC_PLATFORM_URL: https://${ROOT_DOMAIN}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      kong: { condition: service_healthy }
+    environment:
+      DEPLOY_MODE: ${DEPLOY_MODE:-multi}
+      TENANT_SLUG: ${TENANT_SLUG:-demo}
+      # Server-side calls stay on the Docker network instead of going out through Cloudflare.
+      SUPABASE_INTERNAL_URL: http://kong:8000
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      PREVIEW_SECRET: ${PREVIEW_SECRET:-}
+      # Cloudflare puts the visitor's real address here; used for rate limiting.
+      TRUSTED_IP_HEADER: cf-connecting-ip
+      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      LEADS_FROM_EMAIL: ${LEADS_FROM_EMAIL:-}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
+      CLOUDFLARE_ZONE_ID: ${CLOUDFLARE_ZONE_ID:-}
+      CUSTOM_DOMAIN_CNAME: ${CUSTOM_DOMAIN_CNAME:-}
+
+  cloudflared:
+    <<: *restart
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    depends_on:
+      app: { condition: service_started }
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+
+volumes:
+  db-data:
+  storage-data:
