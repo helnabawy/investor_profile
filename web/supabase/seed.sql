@@ -3,7 +3,7 @@
 
 insert into public.tenants (id, slug, name, tagline, theme, ai_config, contact, nav) values
 ('11111111-1111-1111-1111-111111111111', 'demo', 'Aurelia Estates', 'Private real estate advisory · Dubai',
- '{"preset":"calm-green","layout":"classic","backdropUrl":"https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=2400&q=80","ctaLabel":"Book a consultation","ctaHref":"/contact"}',
+ '{"preset":"calm-green","layout":"lounge","backdropUrl":"https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=2400&q=80","ctaLabel":"Book a consultation","ctaHref":"/contact"}',
  '{"provider":"auto","assistantName":"Aurelia Concierge","suggestions":["Dubai market overview","Best areas to invest","ROI & rental yields","Mortgage options","Buying costs & fees","Off-plan vs ready"],"greeting":"Welcome to Aurelia Estates. I can help you explore off-plan and ready properties, compare payment plans, or arrange a private viewing. What are you looking for?","instructions":"You represent Aurelia Estates, a boutique advisory for investors buying in Dubai. Be warm, concise and discreet. Always try to understand budget, preferred area, bedrooms and timeline, then recommend matching projects from the inventory. Offer to arrange a call once the visitor shows interest.","temperature":0.4}',
  '{"email":"hello@aurelia.example","phone":"+971 50 000 0000","whatsapp":"971500000000","address":"Business Bay, Dubai, UAE","hours":"Mon–Sat, 9:00–19:00"}',
  '[{"label":"Home","href":"/"},{"label":"About","href":"/about"},{"label":"Projects","href":"/projects"},{"label":"Contact","href":"/contact"}]'
