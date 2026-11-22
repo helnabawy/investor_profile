@@ -40,7 +40,9 @@
     ".next-vercel-check/types/**/*.ts",
     ".next-vercel-check/dev/types/**/*.ts",
     ".next-check/types/**/*.ts",
-    ".next-check/dev/types/**/*.ts"
+    ".next-check/dev/types/**/*.ts",
+    "x/types/**/*.ts",
+    "x/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

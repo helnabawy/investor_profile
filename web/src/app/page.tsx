@@ -7,6 +7,8 @@ import { TEMPLATES } from "@/lib/templates";
 import { PLANS as LIMITS } from "@/lib/plans";
 import { platformFont } from "@/lib/fonts";
 import { RevealOnScroll } from "@/components/motion/reveal";
+import { Skyline } from "@/components/marketing/skyline";
+import { RoofEdge, TailEdge } from "@/components/marketing/roof-edge";
 
 export const metadata = { icons: { icon: "/logo-mark.svg" } };
 
@@ -43,6 +45,14 @@ function Bubble({ who, children, className = "", style }: { who: "buyer" | "bot"
     : <p style={style} className={`max-w-[92%] self-start rounded-[4px_12px_12px_12px] border border-[#dfe3ea] bg-[#fafbfc] px-3.5 py-2.5 text-[0.95rem] ${className}`}>{children}</p>;
 }
 
+/** Headline words that rise in one after another; `from` continues the stagger across spans. */
+function HeadlineWords({ text, from }: { text: string; from: number }) {
+  const words = text.split(" ");
+  return <>{words.map((w, i) => (
+    <span key={i}><span className="h-word" style={{ "--i": from + i } as React.CSSProperties}>{w}</span>{i < words.length - 1 && " "}</span>
+  ))}</>;
+}
+
 /** Three dots where the concierge's answer is about to appear. */
 function Typing({ d, until, className = "" }: { d: number; until: number; className?: string }) {
   return (
@@ -75,11 +85,16 @@ export default function Landing() {
       </header>
 
       {/* Hero: the claim, then the product doing it — a buyer's question becoming a lead. */}
-      <section className="overflow-hidden border-b border-[#dfe3ea] bg-[#f4f5f7]">
-        <div className="mx-auto flex max-w-[1240px] flex-col gap-14 px-6 pt-16 md:pt-20">
+      <section className="relative overflow-hidden border-b border-[#dfe3ea] bg-[#f4f5f7]">
+        <Skyline />
+        <div className="relative mx-auto flex max-w-[1240px] flex-col gap-14 px-6 pt-16 md:pt-20">
           <div className="flex flex-wrap items-end justify-between gap-x-16 gap-y-7">
-            <h1 style={D(0.05)} className="p-in min-w-0 max-w-[17ch] flex-[1.5_1_420px] text-balance text-[clamp(2.4rem,5.2vw,4.5rem)] font-semibold leading-[1.02] tracking-[-0.035em]">A professional property website with an AI concierge, live in minutes.</h1>
-            <div style={D(0.2)} className="p-in flex min-w-0 flex-[1_1_340px] flex-col gap-5">
+            <h1 data-skyline-avoid className="min-w-0 max-w-[17ch] flex-[1.5_1_420px] text-balance text-[clamp(2.4rem,5.2vw,4.5rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
+              <HeadlineWords from={0} text="A professional property website with an" />{" "}
+              <span className="text-[#1e46b8]"><HeadlineWords from={6} text="AI concierge," /></span>{" "}
+              <span className="h-mark"><HeadlineWords from={8} text="live in minutes." /></span>
+            </h1>
+            <div data-skyline-avoid style={D(0.2)} className="p-in flex min-w-0 flex-[1_1_340px] flex-col gap-5">
               <p className="text-[1.15rem] text-[#3d4658]">Show your portfolio clearly, answer buyers instantly, and turn every conversation into a lead. No web team needed.</p>
               <div className="flex flex-wrap gap-2.5">
                 <Link href="/signup" className="a-btn a-btn-primary !min-h-[52px] !px-6 !text-[1.05rem]">Start free <ArrowRight size={18} aria-hidden /></Link>
@@ -89,7 +104,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-end gap-5">
+          <div data-skyline-base className="flex flex-wrap items-end gap-5">
             <div style={D(0.35)} className={`p-in ${FRAME} min-w-0 flex-[2.2_1_480px] rounded-b-none border-b-0 shadow-[0_24px_48px_-32px_rgb(15_23_40/0.45)]`}>
               <div className="flex items-center gap-2.5 border-b border-[#dfe3ea] bg-[#fafbfc] px-3.5 py-2.5">
                 <span aria-hidden className="flex gap-[5px]">{[0, 1, 2].map((i) => <span key={i} className="h-[9px] w-[9px] rounded-full bg-[#d0d5dd]" />)}</span>
@@ -128,7 +143,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="features" className="mx-auto flex max-w-[1240px] scroll-mt-4 flex-col gap-12 px-6 py-24 md:py-28">
+      <section id="features" className="mx-auto flex max-w-[1240px] scroll-mt-4 flex-col gap-12 px-6 pb-14 pt-24 md:pb-16 md:pt-28">
         <div data-reveal className="flex flex-col gap-3.5">
           <h2 className={`${H2} max-w-[18ch]`}>Three things, working together</h2>
           <p className={`${LEAD} max-w-[60ch]`}>One sign-up gives you a public site, an assistant that knows your inventory, and one place where every enquiry lands.</p>
@@ -165,13 +180,14 @@ export default function Landing() {
         </div>
       </section>
 
+      <RoofEdge color="#0f1728" line="#1e46b8" dots="#8ea2ea" />
       <section id="how" className="scroll-mt-4 bg-[#0f1728] text-white">
         <div className="mx-auto flex max-w-[1240px] flex-wrap gap-x-20 gap-y-12 px-6 py-24 md:py-28">
           <h2 data-reveal className={`${H2} min-w-0 max-w-[10ch] flex-[1_1_280px]`}>Live in three steps</h2>
           <ol className="flex min-w-0 flex-[2_1_480px] flex-col">
             {STEPS.map(([title, body], i) => (
               <li key={title} data-reveal style={D(0.08 + i * 0.12)} className="flex flex-wrap gap-x-8 gap-y-1.5 border-t border-white/20 py-6 last:border-b">
-                <span className="flex-[0_0_72px] pt-1 text-[0.95rem] font-medium text-[#a9b8e8]">Step {i + 1}</span>
+                <span className="flex flex-[0_0_88px] items-center gap-2.5 self-start pt-1 text-[0.95rem] font-medium text-[#a9b8e8]"><span aria-hidden className="step-dot" />Step {i + 1}</span>
                 <span className="flex min-w-0 flex-[1_1_320px] flex-col gap-1"><span className="text-[1.35rem] font-semibold tracking-[-0.015em]">{title}</span><span className="max-w-[56ch] text-[#c9cfdd]">{body}</span></span>
               </li>
             ))}
@@ -179,7 +195,8 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="templates" className="mx-auto flex max-w-[1240px] scroll-mt-4 flex-col gap-12 px-6 py-24 md:py-28">
+      <TailEdge color="#0f1728" />
+      <section id="templates" className="mx-auto flex max-w-[1240px] scroll-mt-4 flex-col gap-12 px-6 pb-14 pt-14 md:pb-16 md:pt-16">
         <div data-reveal className="flex flex-col gap-3.5">
           <h2 className={H2}>Start from a template</h2>
           <p className={`${LEAD} max-w-[60ch]`}>Each one sets the layout of your whole site. Switch any time and preview the change on your own site before buyers see it.</p>
@@ -200,8 +217,9 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="pricing" className="scroll-mt-4 border-t border-[#dfe3ea] bg-[#f4f5f7]">
-        <div className="mx-auto flex max-w-[1240px] flex-col gap-11 px-6 py-24 md:py-28">
+      <RoofEdge color="#f4f5f7" line="#dfe3ea" />
+      <section id="pricing" className="scroll-mt-4 bg-[#f4f5f7]">
+        <div className="mx-auto flex max-w-[1240px] flex-col gap-11 px-6 pb-14 pt-16 md:pb-16 md:pt-20">
           <div data-reveal className="flex flex-col gap-3.5">
             <h2 className={H2}>Simple pricing</h2>
             <p className={LEAD}>Start free on our address. Move to your own domain when you are ready.</p>
@@ -224,6 +242,7 @@ export default function Landing() {
         </div>
       </section>
 
+      <RoofEdge invert color="#f4f5f7" ground="#1e46b8" line="#9fb1e6" dots="#1e46b8" />
       <section className="bg-[#1e46b8] text-white">
         <div className="mx-auto flex max-w-[1240px] flex-wrap items-end justify-between gap-x-16 gap-y-8 px-6 py-20 md:py-24">
           <div data-reveal className="flex min-w-0 flex-[1_1_420px] flex-col gap-3.5">
