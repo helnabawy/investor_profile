@@ -16,13 +16,14 @@ export type ThemeTokens = {
   radius: string; // e.g. "0.25rem"
 };
 
-export type SiteLayout = "classic" | "lounge";
+export const SITE_LAYOUTS = ["classic", "lounge", "horizon", "ledger", "atelier", "foyer"] as const;
+export type SiteLayout = (typeof SITE_LAYOUTS)[number];
 
 export type ThemeConfig = Partial<ThemeTokens> & {
   preset?: PresetId;
   logoUrl?: string;
   faviconUrl?: string;
-  /** "classic" = top nav + scrolling sections; "lounge" = sidebar shell + chat-first home. */
+  /** Which template lays the site out; see src/lib/templates.ts. Unknown values fall back to "classic". */
   layout?: SiteLayout;
   /** Lounge: advisor portrait shown as the avatar on the chat home. */
   portraitUrl?: string;
@@ -34,7 +35,7 @@ export type ThemeConfig = Partial<ThemeTokens> & {
 };
 
 export function siteLayout(config: ThemeConfig | null | undefined): SiteLayout {
-  return config?.layout === "classic" ? "classic" : config?.layout === "lounge" ? "lounge" : "classic";
+  return (SITE_LAYOUTS as readonly string[]).includes(config?.layout ?? "") ? (config!.layout as SiteLayout) : "classic";
 }
 
 export const FONTS = [

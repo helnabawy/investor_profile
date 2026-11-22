@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { env, subdomainUrl } from "@/lib/env";
-import { TemplateThumb } from "@/components/template-thumb";
+import { TemplateCarousel } from "@/components/marketing/template-carousel";
 import { TEMPLATES } from "@/lib/templates";
 import { PLANS as LIMITS } from "@/lib/plans";
 import { platformFont } from "@/lib/fonts";
@@ -25,9 +25,9 @@ const STEPS = [
 const perDay = (n: number) => `${n.toLocaleString("en")} concierge messages a day`;
 const PLANS = [
   { name: LIMITS.free.name, price: "Free", per: "", desc: "Try it with your listings", cta: "Start free", href: "/signup",
-    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "Both templates", "EstateProfile badge in the footer"] },
+    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "All templates", "EstateProfile badge in the footer"] },
   { name: LIMITS.solo.name, price: "AED 199", per: " a month", desc: "For independent agents", cta: "Start free, upgrade later", href: "/signup", highlight: true,
-    items: ["Your own domain", "Unlimited projects", perDay(LIMITS.solo.dailyChat), "Both templates", "No badge"] },
+    items: ["Your own domain", "Unlimited projects", perDay(LIMITS.solo.dailyChat), "All templates", "No badge"] },
   { name: LIMITS.team.name, price: "Contact us", per: "", desc: "For brokerages", cta: "Start free, upgrade later", href: "/signup",
     items: ["Everything in Solo", perDay(LIMITS.team.dailyChat), "Managed setup on your domain", "Accounts for several agents (coming soon)"] },
 ];
@@ -84,18 +84,21 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero: the claim, then the product doing it — a buyer's question becoming a lead. */}
-      <section className="relative overflow-hidden border-b border-[#dfe3ea] bg-[#f4f5f7]">
+      {/* Hero: the claim and the action on the left, the product doing it on the right. */}
+      <section className="relative overflow-hidden bg-[linear-gradient(to_bottom,#f4f5f7_0%,#f4f5f7_62%,#ffffff_100%)]">
         <Skyline />
-        <div className="relative mx-auto flex max-w-[1240px] flex-col gap-14 px-6 pt-16 md:pt-20">
-          <div className="flex flex-wrap items-end justify-between gap-x-16 gap-y-7">
-            <h1 data-skyline-avoid className="min-w-0 max-w-[17ch] flex-[1.5_1_420px] text-balance text-[clamp(2.4rem,5.2vw,4.5rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
+        {/* The skyline stands on the bottom edge of the hero. */}
+        <div data-skyline-base aria-hidden className="absolute inset-x-0 bottom-14 h-0" />
+        <div className="relative mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-14 gap-y-12 px-6 pb-16 pt-14 md:pb-20 md:pt-20">
+          {/* Left: the claim and the action. */}
+          <div data-skyline-avoid className="flex min-w-0 flex-[1_1_440px] flex-col gap-7">
+            <h1 data-skyline-avoid className="max-w-[15ch] text-balance text-[clamp(2.4rem,4.6vw,4.1rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
               <HeadlineWords from={0} text="A professional property website with an" />{" "}
               <span className="text-[#1e46b8]"><HeadlineWords from={6} text="AI concierge," /></span>{" "}
               <span className="h-mark"><HeadlineWords from={8} text="live in minutes." /></span>
             </h1>
-            <div data-skyline-avoid style={D(0.2)} className="p-in flex min-w-0 flex-[1_1_340px] flex-col gap-5">
-              <p className="text-[1.15rem] text-[#3d4658]">Show your portfolio clearly, answer buyers instantly, and turn every conversation into a lead. No web team needed.</p>
+            <div style={D(0.2)} className="p-in flex flex-col gap-5">
+              <p className="max-w-[46ch] text-[1.15rem] text-[#3d4658]">Show your portfolio clearly, answer buyers instantly, and turn every conversation into a lead. No web team needed.</p>
               <div className="flex flex-wrap gap-2.5">
                 <Link href="/signup" className="a-btn a-btn-primary !min-h-[52px] !px-6 !text-[1.05rem]">Start free <ArrowRight size={18} aria-hidden /></Link>
                 <a href={demo} className="a-btn a-btn-ghost !min-h-[52px] !px-6 !text-[1.05rem]">See a live demo</a>
@@ -104,18 +107,19 @@ export default function Landing() {
             </div>
           </div>
 
-          <div data-skyline-base className="flex flex-wrap items-end gap-5">
-            <div style={D(0.35)} className={`p-in ${FRAME} min-w-0 flex-[2.2_1_480px] rounded-b-none border-b-0 shadow-[0_24px_48px_-32px_rgb(15_23_40/0.45)]`}>
+          {/* Right: the product doing it — an agent's site, the concierge answering, the lead that results. */}
+          <div className="flex min-w-0 flex-[1.15_1_480px] flex-col">
+            <div style={D(0.35)} className={`p-in ${FRAME} shadow-[0_30px_60px_-36px_rgb(15_23_40/0.55)]`}>
               <div className="flex items-center gap-2.5 border-b border-[#dfe3ea] bg-[#fafbfc] px-3.5 py-2.5">
                 <span aria-hidden className="flex gap-[5px]">{[0, 1, 2].map((i) => <span key={i} className="h-[9px] w-[9px] rounded-full bg-[#d0d5dd]" />)}</span>
                 <span className="flex-1 truncate rounded-md bg-[#eef0f3] px-3 py-0.5 text-[0.8rem] text-[#3d4658]">aurelia.{env.rootDomain}</span>
               </div>
-              <div className="relative flex min-h-[340px] flex-col justify-end overflow-hidden bg-[#10221b] text-[#f6f4ef] md:min-h-[420px]">
+              <div className="relative flex min-h-[300px] flex-col justify-end overflow-hidden bg-[#10221b] text-[#f6f4ef] md:min-h-[400px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={IMG("1512453979798-5ea266f8880c", 1800)} alt="Example agent site with a Dubai skyline behind a headline and a question box" className="p-photo absolute inset-0 h-full w-full object-cover object-[center_40%]" />
                 <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgb(10_22_17/0.5)_0%,rgb(10_22_17/0.3)_35%,rgb(10_22_17/0.92)_100%)]" />
-                <div className="relative flex flex-col gap-3.5 px-6 pb-8 pt-16 md:px-10 md:pb-10">
-                  <p className="max-w-[19ch] text-balance font-[Georgia,serif] text-[clamp(1.5rem,3vw,2.5rem)] leading-[1.08]">Invest in Dubai property with clear numbers and one advisor you can reach.</p>
+                <div className="relative flex flex-col gap-3.5 px-6 pb-24 pt-14 md:px-9 md:pb-28">
+                  <p className="max-w-[19ch] text-balance font-[Georgia,serif] text-[clamp(1.4rem,2.3vw,2.1rem)] leading-[1.08]">Invest in Dubai property with clear numbers and one advisor you can reach.</p>
                   <div className="flex max-w-[460px] gap-1.5 rounded-[3px] bg-[#f6f4ef] p-1.5">
                     <span className="min-w-0 flex-1 truncate px-2.5 py-2 text-[0.85rem] text-[#12241d]">What can I buy for AED 1.5M with a payment plan?</span>
                     <span className="rounded-[2px] bg-[#1e4d3b] px-4 py-2 text-[0.85rem] font-semibold">Ask</span>
@@ -123,8 +127,8 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-            <div aria-hidden className="flex min-w-0 flex-[1_1_300px] flex-col gap-4 pb-7">
-              <div style={D(0.55)} className={`p-pop ${FRAME} flex flex-col gap-2.5 px-4 py-4 shadow-[0_24px_48px_-32px_rgb(15_23_40/0.45)]`}>
+            <div aria-hidden className="relative z-[1] -mt-20 flex flex-wrap items-start gap-4 px-4 md:px-6">
+              <div style={D(0.55)} className={`p-pop ${FRAME} flex min-w-0 flex-[1.2_1_250px] flex-col gap-2.5 px-4 py-4 shadow-[0_24px_48px_-28px_rgb(15_23_40/0.5)]`}>
                 <p className="text-[0.82rem] font-medium text-[#5a6475]">Aurelia Concierge</p>
                 <Bubble who="buyer" className="p-pop" style={D(0.8)}>What can I buy for AED 1.5M with a payment plan?</Bubble>
                 <div className="grid">
@@ -132,13 +136,13 @@ export default function Landing() {
                   <Bubble who="bot" className="p-pop col-start-1 row-start-1" style={D(1.95)}>Marina Vista Residences starts from AED 1.45M on a 60/40 plan. Shall I connect you with the advisor?</Bubble>
                 </div>
               </div>
-              <div style={D(2.55)} className={`p-lead ${FRAME} flex flex-col gap-2 border-[#b9c8f2] px-4 py-4 shadow-[0_24px_48px_-28px_rgb(30_70_184/0.55)]`}>
+              <div style={D(2.55)} className={`p-lead ${FRAME} mt-10 flex min-w-0 flex-[1_1_220px] flex-col gap-2 border-[#b9c8f2] px-4 py-4 shadow-[0_24px_48px_-28px_rgb(30_70_184/0.55)]`}>
                 <div className="flex items-center justify-between gap-3"><span className="font-semibold">New lead</span><span className="a-pill a-pill-blue">Concierge</span></div>
                 <p className="text-[0.95rem] text-[#3d4658]">2-bedroom in Dubai Marina · Budget AED 1.5M · full conversation attached</p>
                 <span className="self-start rounded-lg bg-[#1e46b8] px-3.5 py-2 text-sm font-medium text-white">Reply on WhatsApp</span>
               </div>
-              <p style={D(2.9)} className="p-in text-[0.85rem] text-[#5a6475]">Example with a fictional agent and sample data.</p>
             </div>
+            <p style={D(2.9)} className="p-in mt-4 px-4 text-[0.85rem] text-[#5a6475] md:px-6">Example with a fictional agent and sample data.</p>
           </div>
         </div>
       </section>
@@ -196,24 +200,13 @@ export default function Landing() {
       </section>
 
       <TailEdge color="#0f1728" />
-      <section id="templates" className="mx-auto flex max-w-[1240px] scroll-mt-4 flex-col gap-12 px-6 pb-14 pt-14 md:pb-16 md:pt-16">
-        <div data-reveal className="flex flex-col gap-3.5">
+      <section id="templates" className="flex scroll-mt-4 flex-col gap-9 overflow-hidden pb-14 pt-14 md:pb-16 md:pt-16">
+        <div data-reveal className="mx-auto flex w-full max-w-[1240px] flex-col gap-3.5 px-6">
           <h2 className={H2}>Start from a template</h2>
           <p className={`${LEAD} max-w-[60ch]`}>Each one sets the layout of your whole site. Switch any time and preview the change on your own site before buyers see it.</p>
         </div>
-        <div className="flex flex-wrap gap-x-9 gap-y-10">
-          {TEMPLATES.map((t, i) => (
-            <article key={t.id} data-reveal style={D(i * 0.12)} className="flex min-w-0 flex-[1_1_380px] flex-col gap-5">
-              <div className={`p-lift ${FRAME}`}><TemplateThumb kind={t.id} className="" /></div>
-              <div className="flex flex-col gap-2.5">
-                <h3 className="text-2xl font-semibold tracking-[-0.02em]">{t.name}</h3>
-                <ul aria-label="Tags" className="flex flex-wrap gap-1.5">
-                  {t.tags.map((tag) => <li key={tag} className="rounded-full border border-[#c9cfda] px-3 py-0.5 text-[0.85rem] text-[#3d4658]">{tag}</li>)}
-                </ul>
-                <p className={`${LEAD} max-w-[52ch]`}>{t.description}</p>
-              </div>
-            </article>
-          ))}
+        <div data-reveal style={D(0.1)}>
+          <TemplateCarousel templates={TEMPLATES.map(({ id, name, tags, description }) => ({ id, name, tags, description }))} />
         </div>
       </section>
 

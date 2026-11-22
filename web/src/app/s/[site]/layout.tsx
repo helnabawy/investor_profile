@@ -7,6 +7,8 @@ import { NotOnHome } from "@/components/lounge/not-on-home";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { ChatWidget } from "@/components/site/chat";
+import { TemplateHeader } from "@/components/templates/header";
+import { TemplateFooter } from "@/components/templates/footer";
 
 type Props = { children: React.ReactNode; params: Promise<{ site: string }> };
 
@@ -60,6 +62,30 @@ export default async function TenantLayout({ children, params }: Props) {
           <main>{children}</main>
           <NotOnHome><LoungeFooter tenant={tenant} poweredBy={tenantPlan(tenant).badge} /></NotOnHome>
         </div>
+        {chat}
+      </div>
+    );
+  }
+
+  if (layout !== "classic") {
+    // Horizon, Ledger, Atelier and Foyer share one shell; `.tpl-<name>` scopes each one's shapes.
+    // Foyer's home page is a single screen, so its header and footer appear on inner pages only.
+    const footer = <TemplateFooter name={tenant.name} tagline={tenant.tagline} contact={tenant.contact ?? {}} nav={tenant.nav ?? []} poweredBy={tenantPlan(tenant).badge} />;
+    return (
+      <div className={`tpl tpl-${layout} min-h-screen bg-background`}>
+        {head}
+        <TemplateHeader
+          kind={layout}
+          hideOnHome={layout === "foyer"}
+          name={tenant.name}
+          tagline={tenant.tagline}
+          logoUrl={tenant.theme?.logoUrl}
+          nav={tenant.nav ?? []}
+          phone={tenant.contact?.phone}
+          cta={{ label: tenant.theme?.ctaLabel || "Book a consultation", href: tenant.theme?.ctaHref || "/contact" }}
+        />
+        <main>{children}</main>
+        {layout === "foyer" ? <NotOnHome>{footer}</NotOnHome> : footer}
         {chat}
       </div>
     );

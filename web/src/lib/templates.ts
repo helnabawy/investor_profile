@@ -33,6 +33,38 @@ export const TEMPLATES: Template[] = [
     tags: ["Dark", "Chat-first", "Side navigation"],
     preset: "luxury-gold",
   },
+  {
+    id: "horizon",
+    name: "Horizon",
+    tier: "free",
+    description: "Airy and image-led. A centred headline and question box, one wide photo, then your featured projects as cards.",
+    tags: ["Light", "Image-led", "Rounded"],
+    preset: "calm-green",
+  },
+  {
+    id: "ledger",
+    name: "Ledger",
+    tier: "free",
+    description: "Numbers first, no big photo. Your portfolio is a table with price, handover, payment plan and yield side by side.",
+    tags: ["Light", "Table of projects", "Square"],
+    preset: "classic-navy",
+  },
+  {
+    id: "atelier",
+    name: "Atelier",
+    tier: "free",
+    description: "Editorial and unhurried. A serif headline beside a tall photo, then one project per row with a large image.",
+    tags: ["Warm", "Editorial", "Large photos"],
+    preset: "desert-sand",
+  },
+  {
+    id: "foyer",
+    name: "Foyer",
+    tier: "free",
+    description: "Your whole home page on one screen, with nothing to scroll on a laptop. Projects, questions and contact sit in one panel.",
+    tags: ["One screen", "Minimal", "Tabbed panel"],
+    preset: "minimal",
+  },
   // Premium templates go here with tier: "premium" and a price. They need their own layout
   // (a new SiteLayout value rendered in src/app/s/[site]/layout.tsx) before they can be listed.
 ];

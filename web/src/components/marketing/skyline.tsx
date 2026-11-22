@@ -162,7 +162,13 @@ export function Skyline() {
       ref={ref}
       aria-hidden
       className="pointer-events-none absolute inset-0 h-full w-full"
-      style={{ maskImage: "linear-gradient(to right, rgb(0 0 0 / 0.4), #000 55%)", WebkitMaskImage: "linear-gradient(to right, rgb(0 0 0 / 0.4), #000 55%)" }}
+      // Two masks, intersected: calmer on the headline side, and fading out toward the section below.
+      style={{
+        maskImage: "linear-gradient(to right, rgb(0 0 0 / 0.4), #000 55%), linear-gradient(to bottom, #000 66%, transparent 97%)",
+        WebkitMaskImage: "linear-gradient(to right, rgb(0 0 0 / 0.4), #000 55%), linear-gradient(to bottom, #000 66%, transparent 97%)",
+        maskComposite: "intersect",
+        WebkitMaskComposite: "source-in",
+      }}
     />
   );
 }

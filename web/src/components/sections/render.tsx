@@ -10,6 +10,7 @@ import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";
 import { statusLabel, yieldFigure } from "../site/project-card";
 import { siteLayout, type SiteLayout } from "@/lib/theme";
 import { Backdrop } from "../lounge/backdrop";
+import { templateSection } from "../templates/sections";
 
 type P = Record<string, unknown>;
 const str = (v: unknown) => (typeof v === "string" ? v : "");
@@ -50,6 +51,9 @@ function AccentTitle({ title, accent, as: Tag = "h1", className = "" }: { title:
 
 async function SectionView({ s, tenant, layout, index, next }: { s: Section; tenant: Tenant; layout: SiteLayout; index: number; next?: string }) {
   const p = s.props as P;
+  // Horizon, Ledger and Atelier draw their own versions of the main home-page sections.
+  const own = await templateSection(s, tenant, layout);
+  if (own !== undefined) return own;
   switch (s.type) {
     case "page-header": {
       const tall = index === 0 && !["project-grid", "featured-projects"].includes(next ?? "");
@@ -502,7 +506,10 @@ const SELF_PADDED = new Set(["hero", "page-header"]);
 export function RenderSections({ sections, tenant }: { sections: Section[]; tenant: Tenant }) {
   const layout = siteLayout(tenant.theme);
   const first = sections[0]?.type ?? "";
-  const padTop = !SELF_PADDED.has(first) && !(layout === "lounge" && first === "contact");
+  // The new templates' header is always solid, so every page clears it; Classic and Lounge let a
+  // photo hero run underneath theirs.
+  const ownShell = layout !== "classic" && layout !== "lounge";
+  const padTop = ownShell || (!SELF_PADDED.has(first) && !(layout === "lounge" && first === "contact"));
   return (
     <>
       {padTop && <div className={layout === "lounge" ? "h-16 lg:h-4" : "h-20"} />}

@@ -1,4 +1,5 @@
 import { newSection, type Section } from "../sections/registry";
+import { siteLayout, type SiteLayout } from "../theme";
 
 /** Default content for a brand-new site so it looks complete on day one. */
 export function starterPages(name: string): { slug: string; title: string; sort: number; sections: Section[] }[] {
@@ -51,7 +52,7 @@ export const STARTER_NAV = [
 export function starterTheme(template: string, preset: string) {
   return {
     preset,
-    layout: template === "lounge" ? "lounge" : "classic",
+    layout: siteLayout({ layout: template as SiteLayout }),
     backdropUrl: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=2400&q=80",
     ctaLabel: "Book a consultation",
     ctaHref: "/contact",
