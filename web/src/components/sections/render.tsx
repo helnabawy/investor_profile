@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/site/link";
 import type { Section } from "@/lib/sections/registry";
 import type { Tenant } from "@/lib/types";
 import { getFaqs, getProjects } from "@/lib/tenant";

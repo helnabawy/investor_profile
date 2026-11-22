@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/types";
 import { ProjectCard } from "../site/project-card";
 import { apiUrl } from "@/lib/api-base";
+import { siteHref, useSiteBase } from "../site/link";
 
 export function Reveal({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   // Server HTML can't know the visitor's setting, so the first paint is hidden either way; with
@@ -65,8 +66,9 @@ export function ConciergeAsk({ placeholder, suggestions, note }: { placeholder: 
 
 /** A link that opens the concierge when its href is "#chat"; a normal link otherwise. */
 export function ChatAwareLink({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
+  const base = useSiteBase();
   if (href === "#chat") return <button type="button" className={`text-left ${className ?? ""}`} onClick={() => askConcierge()}>{children}</button>;
-  return <a href={href} className={className}>{children}</a>;
+  return <a href={siteHref(base, href)} className={className}>{children}</a>;
 }
 
 function Select({ value, onChange, label, options, id }: { value: string; onChange: (v: string) => void; label: string; options: [string, string][]; id: string }) {

@@ -11,13 +11,16 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
   const path = url.searchParams.get("path") ?? "/";
-  const site = (await headers()).get("x-site");
+  const h = await headers();
+  const site = h.get("x-site");
+  const base = h.get("x-site-base") ?? ""; // "/s/<slug>" when the site is served under a path
   const tenant = site ? await getTenantBySite(site) : null;
   const tenantId = verifyPreviewToken(token);
   if (!tenant || !tenantId || tenant.id !== tenantId) return new Response("Preview link expired. Open the preview again from your dashboard.", { status: 401 });
 
   // Only same-site paths: never an absolute or protocol-relative URL (open redirect).
-  const target = path.startsWith("/") && !path.startsWith("//") && !path.includes("\\") ? path : "/";
+  const safe = path.startsWith("/") && !path.startsWith("//") && !path.includes("\\") ? path : "/";
+  const target = base ? (safe === "/" ? base : base + safe) : safe;
   // Relative Location: stays on whatever host the browser used (req.url's origin can differ behind proxies).
   const res = new NextResponse(null, { status: 307, headers: { Location: target } });
   res.cookies.set(PREVIEW_COOKIE, token!, {

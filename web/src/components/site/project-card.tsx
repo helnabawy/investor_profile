@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/site/link";
 import type { Project } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 

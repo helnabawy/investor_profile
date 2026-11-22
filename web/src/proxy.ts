@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { authCookieName, supabaseServerUrl } from "@/lib/env";
+import { authCookieName, pathRouting, supabaseServerUrl } from "@/lib/env";
 
 // Paths that are never tenant pages (app-level routes).
 const APP_PATHS = ["/admin", "/api", "/login", "/signup", "/auth"];
@@ -26,7 +26,24 @@ function siteForHost(rawHost: string): string | null {
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isAppPath = APP_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
-  const site = siteForHost(req.headers.get("host") ?? ROOT);
+  const hostSite = siteForHost(req.headers.get("host") ?? ROOT);
+
+  // Path routing (root domain is a *.vercel.app address, which cannot have subdomains):
+  //   /s/<slug>/…      a tenant's pages, served as they are, with links kept under /s/<slug>
+  //   /s/<slug>/api/…  that tenant's chat, contact form and preview, handled as /api/… for the site
+  const viaPath = pathRouting && !hostSite ? pathname.match(/^\/s\/([a-z0-9-]+)(\/.*)?$/) : null;
+  if (viaPath) {
+    const [, slug, rest = ""] = viaPath;
+    const headers = withSite(req, slug, `/s/${slug}`);
+    if (rest === "/api" || rest.startsWith("/api/")) {
+      const url = req.nextUrl.clone();
+      url.pathname = rest;
+      return NextResponse.rewrite(url, { request: { headers } });
+    }
+    return NextResponse.next({ request: { headers } });
+  }
+
+  const site = hostSite;
   const headers = withSite(req, site);
 
   if (isAppPath) {
@@ -46,10 +63,12 @@ export async function proxy(req: NextRequest) {
 }
 
 /** Passes the resolved site to route handlers / server components. */
-function withSite(req: NextRequest, site: string | null) {
+function withSite(req: NextRequest, site: string | null, base?: string) {
   const headers = new Headers(req.headers);
   headers.delete("x-site"); // never trust a client-supplied value
+  headers.delete("x-site-base");
   if (site) headers.set("x-site", site);
+  if (base) headers.set("x-site-base", base); // path under which the site is served, when not at a host's root
   return headers;
 }
 

@@ -1,8 +1,8 @@
 "use client";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { useSitePathname } from "@/components/site/link";
+import Link from "@/components/site/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MessageCircle, Send, X, Sparkles, Loader2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/format";
@@ -21,7 +21,7 @@ export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: 
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const clearQuestion = useCallback(() => setQuestion(""), []);
-  const pathname = usePathname();
+  const pathname = useSitePathname();
   useEffect(() => {
     // An "open-chat" CustomEvent may carry { question } to send straight away (e.g. the hero ask box).
     const onOpen = (e: Event) => {

@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/site/link";
+import { useSitePathname } from "@/components/site/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import type { NavItem } from "@/lib/types";
@@ -26,7 +26,7 @@ type Props = {
  */
 export function TemplateHeader({ kind, name, tagline, logoUrl, nav, phone, cta, hideOnHome }: Props) {
   const [open, setOpen] = useState(false);
-  const path = usePathname();
+  const path = useSitePathname();
   if (hideOnHome && path === "/") return null;
   const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
   const twoLine = (kind === "ledger" || kind === "foyer") && tagline;

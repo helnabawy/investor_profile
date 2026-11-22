@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/site/link";
+import { useSitePathname } from "@/components/site/link";
 import { useEffect, useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import type { NavItem } from "@/lib/types";
@@ -14,7 +14,7 @@ const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2)
 export function SiteHeader({ name, logoUrl, nav, phone, cta }: Props) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const path = usePathname();
+  const path = useSitePathname();
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();

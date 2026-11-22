@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { requireTenant, tenantPlan } from "@/lib/tenant";
 import { googleFontsHref, resolveTheme, siteLayout, themeCss } from "@/lib/theme";
 import { LoungeSidebar } from "@/components/lounge/sidebar";
@@ -7,6 +8,7 @@ import { NotOnHome } from "@/components/lounge/not-on-home";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { ChatWidget } from "@/components/site/chat";
+import { SiteBaseProvider } from "@/components/site/link";
 import { TemplateHeader } from "@/components/templates/header";
 import { TemplateFooter } from "@/components/templates/footer";
 
@@ -21,7 +23,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function TenantLayout({ children, params }: Props) {
+export default async function TenantLayout(props: Props) {
+  // "/s/<slug>" when the site is served under a path (see the proxy), "" on its own host.
+  const base = (await headers()).get("x-site-base") ?? "";
+  return <SiteBaseProvider base={base}><TenantShell {...props} /></SiteBaseProvider>;
+}
+
+async function TenantShell({ children, params }: Props) {
   const tenant = await requireTenant((await params).site);
   const theme = resolveTheme(tenant.theme);
   const fonts = googleFontsHref(theme);

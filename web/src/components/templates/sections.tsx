@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/site/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import type { Section } from "@/lib/sections/registry";
 import type { Project, Tenant } from "@/lib/types";

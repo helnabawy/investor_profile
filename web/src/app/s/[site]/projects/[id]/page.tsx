@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/site/link";
 import { notFound } from "next/navigation";
 import { requireTenant, getProject } from "@/lib/tenant";
 import { formatFullPrice, whatsappLink } from "@/lib/format";

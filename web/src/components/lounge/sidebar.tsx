@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/site/link";
+import { useSitePathname } from "@/components/site/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Building2, CircleUserRound, House, LogIn, Mail, Menu, MessagesSquare, FileText, X } from "lucide-react";
@@ -29,7 +29,7 @@ function Monogram({ name }: { name: string }) {
 }
 
 function Panel({ name, logoUrl, nav, cta, onNavigate }: Props & { onNavigate?: () => void }) {
-  const path = usePathname() ?? "/";
+  const path = useSitePathname() ?? "/";
   const items = nav.some((n) => n.href === "/") ? nav : [{ label: "Home", href: "/" }, ...nav];
   const active = (href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(href + "/"));
   const CtaIcon = /^https?:/.test(cta.href) ? MessagesSquare : LogIn;
@@ -77,7 +77,7 @@ function Panel({ name, logoUrl, nav, cta, onNavigate }: Props & { onNavigate?: (
 
 export function LoungeSidebar(props: Props) {
   const [open, setOpen] = useState(false);
-  const path = usePathname();
+  const path = useSitePathname();
   useEffect(() => setOpen(false), [path]); // eslint-disable-line react-hooks/set-state-in-effect -- close drawer on navigation
   useEffect(() => {
     if (!open) return;

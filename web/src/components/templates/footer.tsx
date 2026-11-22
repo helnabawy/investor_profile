@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/site/link";
 import type { Contact, NavItem } from "@/lib/types";
 
 /** Compact footer shared by the Horizon, Ledger, Atelier and Foyer templates. */

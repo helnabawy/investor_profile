@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/site/link";
 import type { Contact, NavItem } from "@/lib/types";
 
 export function SiteFooter({ name, tagline, contact, nav, poweredBy }: { name: string; tagline: string | null; contact: Contact; nav: NavItem[]; poweredBy: boolean }) {

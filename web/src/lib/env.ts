@@ -34,7 +34,13 @@ export const isMulti = env.mode === "multi";
 /** http for local dev hosts (localhost, *.localhost), https everywhere else. */
 export const rootProtocol = /^(localhost|[^/]*\.localhost)(:\d+)?$/.test(env.rootDomain) ? "http" : "https";
 
-/** Public URL of a tenant's platform subdomain, e.g. https://demo.example.com. */
+/**
+ * *.vercel.app addresses cannot have subdomains of their own (no wildcard DNS or certificate), so with
+ * one as the root domain each tenant is served under a path instead: https://x.vercel.app/s/demo.
+ */
+export const pathRouting = env.rootDomain.endsWith(".vercel.app");
+
+/** Public URL of a tenant's platform address, e.g. https://demo.example.com (or …/s/demo, see above). */
 export function subdomainUrl(slug: string) {
-  return `${rootProtocol}://${slug}.${env.rootDomain}`;
+  return pathRouting ? `${rootProtocol}://${env.rootDomain}/s/${slug}` : `${rootProtocol}://${slug}.${env.rootDomain}`;
 }

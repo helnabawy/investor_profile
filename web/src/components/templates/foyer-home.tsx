@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import Link from "@/components/site/link";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import type { Contact, Faq, NavItem, Project } from "@/lib/types";
