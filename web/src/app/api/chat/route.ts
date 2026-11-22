@@ -94,8 +94,9 @@ export async function POST(req: Request) {
     messages: history,
     tools: chatTools(db, tenant, sessionId),
     stopWhen: isStepCount(4),
-    // Free tiers answer 429 with a long retry-after; waiting it out silently outlasts the function.
-    maxRetries: 1,
+    // With a fallback, an overloaded model is skipped rather than retried (a retry of a 503 "high demand"
+    // can take ~10s and usually fails again). A single model gets one retry.
+    maxRetries: models.length > 1 ? 0 : 1,
     // A stuck first model is skipped after 12s by fallbackModel, so allow time for the next one.
     timeout: { firstChunkMs: 28_000, totalMs: 45_000 },
     temperature: tenant.ai_config?.temperature ?? 0.4,
