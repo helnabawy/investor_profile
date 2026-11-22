@@ -160,6 +160,24 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 .a-btn-primary:hover { background: #17368f; }
 .a-btn-ghost { border: 1px solid #b4bcc9; background: #fff; color: #0f1728; }
 .a-btn-ghost:hover { background: #f4f5f7; }
+
+/* Landing app bar: below 1024px the links fold into a menu panel under the bar. */
+/* In a layer so Tailwind's responsive display utilities (lg:hidden) still win over these. */
+@layer components {
+.landing-menu-btn { position: relative; display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 0.5rem; color: #0f1728; transition: background 0.15s; }
+.landing-menu-btn:hover { background: #f4f5f7; }
+.landing-menu-btn:focus-visible { outline: 2px solid #1e46b8; outline-offset: 2px; }
+.landing-menu-icon { grid-area: 1 / 1; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s; }
+.landing-menu-btn[aria-expanded="true"] [data-icon="open"], .landing-menu-btn[aria-expanded="false"] [data-icon="close"] { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+.landing-menu { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.landing-menu[data-open="true"] { grid-template-rows: 1fr; }
+.landing-menu-item { opacity: 0; transform: translateY(-6px); transition: opacity 0.2s, transform 0.2s; }
+.landing-menu[data-open="true"] .landing-menu-item { opacity: 1; transform: none; transition-duration: 0.35s; transition-delay: calc(0.05s + var(--i, 0) * 0.035s); }
+@media (prefers-reduced-motion: reduce) {
+  .landing-menu, .landing-menu-item, .landing-menu-icon { transition: none; }
+  .landing-menu-item { transform: none; }
+}
+}
 .a-btn-danger { color: #b42318; border: 1px solid #f3b8b2; background: #fff; }
 .a-btn-danger:hover { background: #fef3f2; }
 .a-btn-sm { min-height: 2.75rem; padding: 0.4rem 0.85rem; font-size: 0.9rem; }

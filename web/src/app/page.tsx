@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { Logo } from "@/components/brand/logo";
 import { env, subdomainUrl } from "@/lib/env";
 import { TemplateCarousel } from "@/components/marketing/template-carousel";
 import { TEMPLATES } from "@/lib/templates";
@@ -9,6 +8,7 @@ import { platformFont } from "@/lib/fonts";
 import { RevealOnScroll } from "@/components/motion/reveal";
 import { Skyline } from "@/components/marketing/skyline";
 import { RoofEdge, TailEdge } from "@/components/marketing/roof-edge";
+import { LandingNav } from "@/components/marketing/landing-nav";
 
 export const metadata = { icons: { icon: "/logo-mark.svg" } };
 
@@ -68,28 +68,16 @@ export default function Landing() {
   return (
     <div className={`platform ${platformFont.variable} min-h-screen bg-white`}>
       <RevealOnScroll />
-      <header className="border-b border-[#dfe3ea] bg-white">
-        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-x-8 gap-y-2 px-6 py-3.5">
-          <Logo />
-          <nav aria-label="Main" className="flex flex-wrap items-center gap-x-7">
-            {[["#features", "What you get"], ["#how", "How it works"], ["#templates", "Templates"], ["#pricing", "Pricing"]].map(([href, label]) => (
-              <a key={href} href={href} className="py-3 text-[0.95rem] font-medium text-[#3d4658] hover:text-[#0f1728]">{label}</a>
-            ))}
-            <a href={demo} className="py-3 text-[0.95rem] font-medium text-[#3d4658] hover:text-[#0f1728]">Live demo</a>
-          </nav>
-          <div className="flex items-center gap-x-5">
-            <Link href="/login" className="py-3 text-[0.95rem] font-medium text-[#3d4658] hover:text-[#0f1728]">Sign in</Link>
-            <Link href="/signup" className="a-btn a-btn-primary">Create your site</Link>
-          </div>
-        </div>
-      </header>
+      <LandingNav demoUrl={demo} />
+      {/* The app bar's bottom edge is the logo's roof, hanging into the hero and drawn in on load. */}
+      <RoofEdge invert color="#ffffff" ground="#f4f5f7" line="#dfe3ea" dots="#1e46b8" className="app-roof" />
 
       {/* Hero: the claim and the action on the left, the product doing it on the right. */}
       <section className="relative overflow-hidden bg-[linear-gradient(to_bottom,#f4f5f7_0%,#f4f5f7_62%,#ffffff_100%)]">
         <Skyline />
         {/* The skyline stands on the bottom edge of the hero. */}
         <div data-skyline-base aria-hidden className="absolute inset-x-0 bottom-14 h-0" />
-        <div className="relative mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-14 gap-y-12 px-6 pb-16 pt-14 md:pb-20 md:pt-20">
+        <div className="relative mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-14 gap-y-12 px-6 pb-16 pt-4 md:pb-20 md:pt-8">
           {/* Left: the claim and the action. */}
           <div data-skyline-avoid className="flex min-w-0 flex-[1_1_440px] flex-col gap-7">
             <h1 data-skyline-avoid className="max-w-[15ch] text-balance text-[clamp(2.4rem,4.6vw,4.1rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
