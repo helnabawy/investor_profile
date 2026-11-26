@@ -41,7 +41,10 @@ export async function proxy(req: NextRequest) {
   //   /s/<slug>/…      a tenant's pages, served as they are, with links kept under /s/<slug>
   //   /s/<slug>/ar/…   the same pages in Arabic (/en/… in English when Arabic is the site default)
   //   /s/<slug>/api/…  that tenant's chat, contact form and preview, handled as /api/… for the site
-  const viaPath = pathRouting && !hostSite ? pathname.match(/^\/s\/([a-z0-9-]+)(\/.*)?$/) : null;
+  // A *.vercel.app host keeps serving /s/<slug> after the platform moves to a real domain, so links
+  // shared before the move still open.
+  const onVercelHost = (req.headers.get("host") ?? "").toLowerCase().endsWith(".vercel.app");
+  const viaPath = (pathRouting || onVercelHost) && !hostSite ? pathname.match(/^\/s\/([a-z0-9-]+)(\/.*)?$/) : null;
   if (viaPath) {
     const [, slug, rest0 = ""] = viaPath;
     const [locale, rest] = splitLocale(rest0 || "/");
