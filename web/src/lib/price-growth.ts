@@ -9,6 +9,7 @@ export type GrowthUnit = {
   psfBefore?: number | null;
   psfNow?: number | null;
   paid?: number | null;  // what a buyer has paid so far on the launch price
+  available?: number | null; // units of this type for sale now; 0 = sold out, null = not said
 };
 
 export type PriceGrowth = {
@@ -21,6 +22,7 @@ export type PriceGrowth = {
 
 const amount = z.coerce.number().finite().positive();
 const optAmount = z.preprocess((v) => (v === "" || v == null ? null : v), amount.nullable()).catch(null);
+const optCount = z.preprocess((v) => (v === "" || v == null ? null : v), z.coerce.number().int().min(0).max(100000).nullable()).catch(null);
 const optText = (max: number) => z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null), z.string().nullable());
 
 const schema = z.object({
@@ -39,6 +41,7 @@ const unitSchema = z.object({
   psfBefore: optAmount,
   psfNow: optAmount,
   paid: optAmount,
+  available: optCount,
 });
 
 /** Validates admin input. Rows without a name and both prices are dropped; no rows means no section. */
@@ -65,6 +68,18 @@ export function parseAmount(input: string): number | null {
   else digits = digits.replace(/[.,]/g, "");
   const n = Number(digits) * mult;
   return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : null;
+}
+
+/** Whole number of units, 0 allowed: "12", "12 units". Null when empty or not a number. */
+export function parseCount(input: string): number | null {
+  const d = input.replace(/[^\d]/g, "");
+  return d ? Number(d) : null;
+}
+
+/** "4 available" / "Sold out" / null when the agent has not said. */
+export function availabilityLabel(n: number | null | undefined) {
+  if (n == null) return null;
+  return n === 0 ? "Sold out" : `${n.toLocaleString("en-US")} available`;
 }
 
 export type GrowthRow = GrowthUnit & {
@@ -95,6 +110,7 @@ export function growthSummary(g: PriceGrowth | null, currency: string) {
   const rows = growthRows(g);
   const parts = rows.map((r) =>
     `${r.unit} ${currency} ${r.before.toLocaleString("en-US")} → ${r.now.toLocaleString("en-US")} (${pct(r.growth)}` +
-    (r.paidReturn != null ? `, ${pct(r.paidReturn)} on ${currency} ${r.paid!.toLocaleString("en-US")} paid` : "") + ")");
+    (r.paidReturn != null ? `, ${pct(r.paidReturn)} on ${currency} ${r.paid!.toLocaleString("en-US")} paid` : "") +
+    (r.available != null ? `, ${r.available === 0 ? "sold out" : `${r.available} units for sale`}` : "") + ")");
   return `price growth since ${g.beforeLabel || "launch"}${g.label ? ` (${g.label})` : ""}: ${parts.join("; ")}`;
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { TrendingUp } from "lucide-react";
-import { growthRows, pct, type GrowthRow, type PriceGrowth } from "@/lib/price-growth";
+import { availabilityLabel, growthRows, pct, type GrowthRow, type PriceGrowth } from "@/lib/price-growth";
 import { formatPrice } from "@/lib/format";
 
 const full = (n: number) => n.toLocaleString("en-US");
@@ -59,6 +59,9 @@ export function PriceGrowthSection({ growth, currency }: { growth: PriceGrowth; 
 
   const best = paidRows.reduce<GrowthRow | null>((a, r) => (!a || r.paidReturn! > a.paidReturn! ? r : a), null);
   const rising = rows.every((r) => r.growth > 0);
+  const stockRows = rows.filter((r) => r.available != null);
+  const inStock = stockRows.reduce((n, r) => n + r.available!, 0);
+  const soldOut = stockRows.filter((r) => r.available === 0).map((r) => r.unit);
 
   return (
     <section aria-labelledby="growth-title" className="c-card flex flex-col gap-7 p-5 sm:p-7">
@@ -84,6 +87,10 @@ export function PriceGrowthSection({ growth, currency }: { growth: PriceGrowth; 
         {psfRows.length > 0 && (
           <Tile label={`${currency} per sq ft ${now.toLowerCase()}`} value={range(psfRows.map((r) => r.psfNow!), full)}
             sub={`${range(psfRows.map((r) => r.psfBefore!), full)} at ${before.toLowerCase()}`} />
+        )}
+        {stockRows.length > 0 && (
+          <Tile label="Units for sale now" value={inStock ? full(inStock) : "Sold out"}
+            sub={soldOut.length && inStock ? `${soldOut.join(", ")} sold out` : `Across ${stockRows.length} unit types`} />
         )}
       </dl>
 
@@ -127,6 +134,7 @@ export function PriceGrowthSection({ growth, currency }: { growth: PriceGrowth; 
                 <th scope="col" className="py-2 pr-3 text-right font-medium">{now}</th>
                 <th scope="col" className="py-2 pr-3 text-right font-medium">Gain</th>
                 {psfRows.length > 0 && <th scope="col" className="py-2 pr-3 text-right font-medium">Per sq ft</th>}
+                {stockRows.length > 0 && <th scope="col" className="py-2 pr-3 text-right font-medium">For sale</th>}
                 {paidRows.length > 0 && <th scope="col" className="py-2 text-right font-medium">On paid</th>}
               </tr>
             </thead>
@@ -139,6 +147,7 @@ export function PriceGrowthSection({ growth, currency }: { growth: PriceGrowth; 
                   <td className="py-2 pr-3 text-right">{full(r.now)}</td>
                   <td className="py-2 pr-3 text-right">{full(r.gain)} <span className="text-muted-foreground">({pct(r.growth)})</span></td>
                   {psfRows.length > 0 && <td className="py-2 pr-3 text-right">{r.psfBefore && r.psfNow ? `${full(r.psfBefore)} → ${full(r.psfNow)}` : "—"}</td>}
+                  {stockRows.length > 0 && <td className="py-2 pr-3 text-right">{r.available == null ? "—" : r.available === 0 ? "Sold out" : full(r.available)}</td>}
                   {paidRows.length > 0 && <td className="py-2 text-right">{r.paid ? <>{pct(r.paidReturn!)} <span className="text-muted-foreground">of {full(r.paid)}</span></> : "—"}</td>}
                 </tr>
               ))}
@@ -191,10 +200,16 @@ function Dumbbell({ rows, metric, currency, before, now }: { rows: GrowthRow[]; 
           const delta = (b(r) - a(r)) / a(r);
           return (
             <li key={r.unit} tabIndex={0} className="pg-row group" style={{ "--i": i } as React.CSSProperties}
-              aria-label={`${r.unit}: ${before} ${money(a(r))}, ${now} ${money(b(r))}, ${pct(delta)}`}>
+              aria-label={`${r.unit}: ${before} ${money(a(r))}, ${now} ${money(b(r))}, ${pct(delta)}${r.available != null ? `, ${availabilityLabel(r.available)}` : ""}`}>
               <span className="pg-label">
                 <span className="font-medium">{r.unit}</span>
                 {r.size && <span className="block text-[0.8rem] text-muted-foreground">{r.size}{/\d$/.test(r.size) ? " m²" : ""}</span>}
+                {r.available != null && (
+                  <span className={`mt-1 inline-flex items-center gap-1.5 text-[0.8rem] font-medium ${r.available ? "text-foreground" : "text-muted-foreground"}`}>
+                    {r.available > 0 && <span className="pg-key pg-now !h-1.5 !w-1.5 rounded-full" aria-hidden />}
+                    {availabilityLabel(r.available)}
+                  </span>
+                )}
               </span>
               <span className="pg-track" aria-hidden>
                 {t.map((v) => <span key={v} className="pg-grid" style={{ left: `${x(v)}%` }} />)}
