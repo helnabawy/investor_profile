@@ -35,7 +35,13 @@ export function SignupForm({ signedIn, rootDomain }: { signedIn: boolean; rootDo
     setBusy(true);
     setError("");
     const f = new FormData(e.currentTarget);
-    const { data, error } = await supabaseBrowser().auth.signUp({ email: String(f.get("email")), password: String(f.get("password")) });
+    const { data, error } = await supabaseBrowser().auth.signUp({
+      email: String(f.get("email")),
+      password: String(f.get("password")),
+      // The confirmation link returns to this site's sign-in page, not the project's Site URL.
+      // Supabase only honours it when the address is in Auth → URL Configuration → Redirect URLs.
+      options: { emailRedirectTo: `${window.location.origin}/login` },
+    });
     setBusy(false);
     if (error) return setError(error.message);
     if (!data.session) return setStep("verify"); // email confirmation enabled
