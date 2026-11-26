@@ -7,6 +7,7 @@ import { ForSaleTag, statusLabel, yieldFigure } from "@/components/site/project-
 import { ContactForm, OpenChatButton } from "@/components/sections/client";
 import { PriceGrowthSection } from "@/components/site/price-growth";
 import { ArrowLeft, Check, FileDown, MapPin } from "lucide-react";
+import { siteT } from "@/lib/i18n/server";
 
 type Props = { params: Promise<{ site: string; id: string }> };
 
@@ -30,37 +31,39 @@ export default async function ProjectPage({ params }: Props) {
   const tenant = await requireTenant(site);
   const p = await getProject(tenant.id, id);
   if (!p) notFound();
+  const { t, locale } = await siteT();
+  const c = t.card, pj = t.project;
 
   const yld = yieldFigure(p.roi);
   const facts: [string, string | null, boolean?][] = [
-    ["Bedrooms", p.bedrooms && `${p.bedrooms} BR`],
-    ["Handover", p.status === "ready" ? "Ready to move" : p.handover],
-    [yld ? "Expected gross yield" : "Strategy", yld ?? p.roi, true],
-    ["Property type", p.property_type],
+    [pj.bedrooms, p.bedrooms],
+    [c.handover, p.status === "ready" ? c.readyToMove : p.handover],
+    [yld ? c.expectedYield : c.strategy, yld ?? p.roi, true],
+    [pj.propertyType, p.property_type],
   ];
   const split = planSplit(p.payment_plan);
-  const wa = whatsappLink(tenant.contact?.whatsapp, `Hi, I'm interested in ${p.title}. Could you share more details?`);
+  const wa = whatsappLink(tenant.contact?.whatsapp, pj.waInterest(p.title));
   const tel = tenant.contact?.phone;
   const [cover, ...rest] = p.images;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-7 px-5 pb-20 pt-24 lg:pt-28">
-      <Link href="/projects" className="inline-flex min-h-11 items-center gap-2 self-start font-medium text-primary hover:underline"><ArrowLeft size={18} aria-hidden /> All projects</Link>
+      <Link href="/projects" className="inline-flex min-h-11 items-center gap-2 self-start font-medium text-primary hover:underline"><ArrowLeft size={18} className="rtl:-scale-x-100" aria-hidden /> {pj.allProjects}</Link>
 
       <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
         <div className="flex min-w-0 flex-col gap-2.5">
           <span className="flex flex-wrap gap-2">
-            <span className="c-badge c-tile">{statusLabel(p.status)}</span>
-            {p.for_sale && <ForSaleTag />}
+            <span className="c-badge c-tile">{statusLabel(p.status, locale)}</span>
+            {p.for_sale && <ForSaleTag locale={locale} />}
           </span>
           <h1 className="text-balance text-[clamp(1.9rem,3.4vw,2.75rem)] font-bold leading-[1.1]">{p.title}</h1>
           <p className="flex items-center gap-2 text-[1.06rem] text-muted-foreground">
-            <MapPin size={18} aria-hidden /> {[[p.area, p.city].filter(Boolean).join(", "), p.developer && `by ${p.developer}`].filter(Boolean).join(" · ")}
+            <MapPin size={18} aria-hidden /> {[[p.area, p.city].filter(Boolean).join(locale === "ar" ? "، " : ", "), p.developer && pj.byDeveloper(p.developer)].filter(Boolean).join(" · ")}
           </p>
         </div>
         <div className="flex flex-col">
-          <span className="c-label">Starting from</span>
-          <span className="c-figure text-[2rem] leading-tight">{formatFullPrice(p.price_from, p.currency)}</span>
+          <span className="c-label">{pj.startingFrom}</span>
+          <span className="c-figure text-[2rem] leading-tight">{formatFullPrice(p.price_from, p.currency, locale)}</span>
         </div>
       </div>
 
@@ -77,7 +80,7 @@ export default async function ProjectPage({ params }: Props) {
 
       <div className="flex flex-wrap items-start gap-x-10 gap-y-8">
         <div className="flex min-w-0 flex-[999_1_34rem] flex-col gap-6">
-          <dl aria-label="Key facts" className="c-card grid grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))] gap-x-6 px-6 py-2">
+          <dl aria-label={pj.keyFacts} className="c-card grid grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))] gap-x-6 px-6 py-2">
             {facts.filter(([, v]) => v).map(([k, v, accent]) => (
               <div key={k} className="flex flex-col gap-0.5 py-4">
                 <dt className="c-label">{k}</dt>
@@ -88,7 +91,7 @@ export default async function ProjectPage({ params }: Props) {
 
           {p.description && (
             <section className="c-card flex flex-col gap-3 p-7">
-              <h2 className="text-[1.35rem] font-bold">Overview</h2>
+              <h2 className="text-[1.35rem] font-bold">{pj.overview}</h2>
               <p className="whitespace-pre-line text-[1.06rem] leading-relaxed text-muted-foreground">{p.description}</p>
             </section>
           )}
@@ -98,12 +101,12 @@ export default async function ProjectPage({ params }: Props) {
           {p.payment_plan && (
             <section className="c-card flex flex-col gap-4 p-7">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-[1.35rem] font-bold">Payment plan</h2>
-                {split && <span className="c-figure text-primary">{split[0]} / {split[1]}</span>}
+                <h2 className="text-[1.35rem] font-bold">{c.paymentPlan}</h2>
+                {split && <span className="c-figure text-primary" dir="ltr">{split[0]} / {split[1]}</span>}
               </div>
               {split ? (
                 <>
-                  <div role="img" aria-label={`${split[0]} percent before handover, ${split[1]} percent on handover`} className="flex h-3.5 gap-[3px] overflow-hidden rounded-full">
+                  <div role="img" aria-label={pj.planAria(split[0], split[1])} className="flex h-3.5 gap-[3px] overflow-hidden rounded-full">
                     <span className="bg-primary" style={{ flex: split[0] }} />
                     <span className="bg-[color-mix(in_srgb,var(--primary)_40%,var(--card))]" style={{ flex: split[1] }} />
                   </div>
@@ -112,13 +115,13 @@ export default async function ProjectPage({ params }: Props) {
               ) : (
                 <p className="text-[1.06rem] text-muted-foreground">{p.payment_plan}</p>
               )}
-              <p className="border-t pt-4 text-sm text-muted-foreground">Ask for the full cost sheet for any unit: price, fees and service charges.</p>
+              <p className="border-t pt-4 text-sm text-muted-foreground">{pj.costSheet}</p>
             </section>
           )}
 
           {p.amenities.length > 0 && (
             <section className="c-card flex flex-col gap-4 p-7">
-              <h2 className="text-[1.35rem] font-bold">Amenities</h2>
+              <h2 className="text-[1.35rem] font-bold">{pj.amenities}</h2>
               <ul className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
                 {p.amenities.map((a) => <li key={a} className="flex items-center gap-2.5"><Check size={19} className="shrink-0 text-primary" aria-hidden />{a}</li>)}
               </ul>
@@ -137,17 +140,17 @@ export default async function ProjectPage({ params }: Props) {
 
         <aside className="flex min-w-0 flex-[1_1_21rem] flex-col gap-4 lg:sticky lg:top-24">
           <div className="c-card p-7 shadow-[0_12px_32px_rgb(0_0_0/0.07)]">
-            <h2 className="text-[1.35rem] font-bold">Enquire about this project</h2>
-            <p className="mb-5 mt-1 text-[0.95rem] text-muted-foreground">Get availability, floor plans and the full cost sheet.</p>
+            <h2 className="text-[1.35rem] font-bold">{pj.enquire}</h2>
+            <p className="mb-5 mt-1 text-[0.95rem] text-muted-foreground">{pj.enquireSub}</p>
             <ContactForm interest={p.title} />
           </div>
           {(wa || tel || p.brochure_url || tenant.ai_config?.enabled !== false) && (
             <div className="flex flex-col gap-3 rounded-[calc(var(--radius)+4px)] bg-muted p-6">
-              <p className="font-heading text-lg font-bold">Prefer to talk now?</p>
-              {wa && <a href={wa} target="_blank" rel="noreferrer" className="btn btn-light">Chat on WhatsApp</a>}
-              {tel && <a href={`tel:${tel.replace(/\s/g, "")}`} className="btn btn-light">Call {tel}</a>}
-              {p.brochure_url && <a href={p.brochure_url} target="_blank" rel="noreferrer" className="btn btn-light"><FileDown size={17} aria-hidden /> Download brochure</a>}
-              {tenant.ai_config?.enabled !== false && <OpenChatButton label="Ask the concierge about this project" variant="light" />}
+              <p className="font-heading text-lg font-bold">{pj.talkNow}</p>
+              {wa && <a href={wa} target="_blank" rel="noreferrer" className="btn btn-light">{t.common.chatOnWhatsApp}</a>}
+              {tel && <a href={`tel:${tel.replace(/\s/g, "")}`} className="btn btn-light">{t.common.call} <bdi dir="ltr">{tel}</bdi></a>}
+              {p.brochure_url && <a href={p.brochure_url} target="_blank" rel="noreferrer" className="btn btn-light"><FileDown size={17} aria-hidden /> {pj.brochure}</a>}
+              {tenant.ai_config?.enabled !== false && <OpenChatButton label={pj.askAboutProject} variant="light" />}
             </div>
           )}
         </aside>

@@ -1,15 +1,19 @@
 import { AuthShell } from "@/components/admin/auth-shell";
 import { LoginForm } from "./login-form";
 import { isMulti } from "@/lib/env";
+import { adminT } from "@/lib/i18n/admin-server";
 
-export const metadata = { title: "Sign in", icons: { icon: "/logo-mark.svg" } };
+export async function generateMetadata() {
+  return { title: (await adminT()).t.auth.signInMeta, icons: { icon: "/logo-mark.svg" } };
+}
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
+  const a = (await adminT()).t.auth;
   return (
-    <AuthShell title="Sign in to your dashboard" subtitle="Manage your site, projects, chatbot and leads.">
+    <AuthShell title={a.signInTitle} subtitle={a.signInSubtitle}>
       {error === "no-site" && (
-        <p className="mb-4 rounded-lg bg-warning-soft p-3 text-sm text-warning">This account isn&apos;t linked to the site yet. Ask the site owner to run the setup script.</p>
+        <p className="mb-4 rounded-lg bg-warning-soft p-3 text-sm text-warning">{a.noSite}</p>
       )}
       <LoginForm allowSignup={isMulti} />
     </AuthShell>

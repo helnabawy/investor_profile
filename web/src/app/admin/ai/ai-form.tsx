@@ -5,6 +5,8 @@ import { ChevronDown } from "lucide-react";
 import { saveAi } from "../actions";
 import { FormMessage, PageTitle, SubmitButton } from "@/components/admin/ui";
 import type { AiConfig } from "@/lib/ai/config";
+import { BiField, TranslateButton } from "@/components/admin/bilingual";
+import { useAdminT } from "@/components/admin/i18n";
 
 type P = { id: string; label: string; note: string; defaultModel: string; configured: boolean };
 
@@ -19,97 +21,102 @@ function Card({ title, hint, children }: { title: string; hint?: React.ReactNode
 
 export function AiForm({ config, providers, tenantName, sources }: { config: AiConfig; providers: P[]; tenantName: string; sources: { projects: number; faqs: number; notes: number } }) {
   const [state, action] = useActionState(saveAi, null);
+  const { t, locale } = useAdminT();
+  const a = t.ai;
   const [provider, setProvider] = useState<string>(config.provider ?? "auto");
-  // Live copy of what the greeting preview shows.
-  const [name, setName] = useState(config.assistantName ?? `${tenantName} Concierge`);
+  // Live copy of what the greeting preview shows, in both languages.
+  const [name, setName] = useState(config.assistantName ?? a.defaultName(tenantName));
+  const [nameAr, setNameAr] = useState(config.assistantName_ar ?? "");
   const [greeting, setGreeting] = useState(config.greeting ?? "");
+  const [greetingAr, setGreetingAr] = useState(config.greeting_ar ?? "");
   const [chips, setChips] = useState((config.suggestions ?? []).join("\n"));
+  const [chipsAr, setChipsAr] = useState((config.suggestions_ar ?? []).join("\n"));
   const [enabled, setEnabled] = useState(config.enabled !== false);
   const current = providers.find((p) => p.id === provider);
-  const chipList = chips.split("\n").map((s) => s.trim()).filter(Boolean).slice(0, 8);
-  const providerLabel = provider === "auto" ? "Automatic, with fallback" : current?.label ?? provider;
+  const toList = (s: string) => s.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 8);
+  const chipList = toList(locale === "ar" && chipsAr.trim() ? chipsAr : chips);
+  const providerLabel = provider === "auto" ? a.automaticFallback : current?.label ?? provider;
 
   return (
     <form action={action}>
-      <PageTitle title="AI concierge" subtitle="Your 24/7 assistant answers from your projects, FAQs and knowledge notes, and captures leads.">
-        <div className="flex items-center gap-3"><FormMessage state={state} /><SubmitButton>Save changes</SubmitButton></div>
+      <PageTitle title={a.title} subtitle={a.subtitle}>
+        <div className="flex flex-wrap items-center gap-3"><FormMessage state={state} /><TranslateButton /><SubmitButton>{t.ui.saveChanges}</SubmitButton></div>
       </PageTitle>
 
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[1.4_1_440px] flex-col gap-6">
           <section className="a-card !py-4">
             <label className="flex min-h-12 cursor-pointer items-center justify-between gap-5">
-              <span><span className="block font-semibold">{enabled ? "Concierge is on" : "Concierge is off"}</span><span className="a-muted text-sm">Buyers see the question box and the chat on every page.</span></span>
+              <span><span className="block font-semibold">{enabled ? a.on : a.off}</span><span className="a-muted text-sm">{a.onHint}</span></span>
               <input type="checkbox" name="enabled" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="h-[22px] w-[22px] shrink-0" />
             </label>
           </section>
 
-          <Card title="How it greets buyers">
-            <label className="field"><span>Assistant name</span><input name="assistantName" value={name} onChange={(e) => setName(e.target.value)} className="max-w-[360px]" /></label>
-            <label className="field"><span>Greeting</span><textarea name="greeting" rows={3} value={greeting} onChange={(e) => setGreeting(e.target.value)} placeholder="Welcome! How can I help you find the right property?" /></label>
-            <label className="field"><span>Quick questions</span>
-              <textarea name="suggestions" rows={6} value={chips} onChange={(e) => setChips(e.target.value)} placeholder={"Dubai market overview\nBest areas to invest\nBuying costs & fees"} />
-              <small>One per line, up to 8. Shown under the chat so visitors can start with a tap. You have {chipList.length}.</small>
-            </label>
+          <Card title={a.greets}>
+            <BiField name="assistantName" label={a.name} value={name} valueAr={nameAr} onChange={setName} onChangeAr={setNameAr} maxLength={60} />
+            <BiField name="greeting" label={a.greeting} multiline value={greeting} valueAr={greetingAr} onChange={setGreeting} onChangeAr={setGreetingAr} placeholder={a.greetingPh} maxLength={600} />
+            <BiField name="suggestions" label={a.chips} multiline rows={6} value={chips} valueAr={chipsAr} onChange={setChips} onChangeAr={setChipsAr}
+              placeholder={a.chipsPh} hint={a.chipsHint(toList(chips).length)} />
           </Card>
 
-          <Card title="How it should behave" hint={<>Facts about projects come from your Projects. Put general business information in <Link href="/admin/knowledge" className="a-link">FAQ &amp; knowledge</Link>.</>}>
-            <label className="field"><span>Instructions for the assistant</span>
-              <textarea name="instructions" rows={7} defaultValue={config.instructions ?? ""} placeholder="Tone of voice, what to emphasise, what never to say, languages, when to hand over to a human…" />
+          <Card title={a.behave} hint={<>{a.behaveHint1}<Link href="/admin/knowledge" className="a-link">{a.behaveLink}</Link>.</>}>
+            <label className="field"><span>{a.instructions}</span>
+              <textarea name="instructions" rows={7} dir="auto" defaultValue={config.instructions ?? ""} placeholder={a.instructionsPh} />
+              <small>{a.languageNote}</small>
             </label>
-            <label className="field"><span>Creativity</span>
+            <label className="field"><span>{a.creativity}</span>
               <select name="temperature" defaultValue={String(config.temperature ?? 0.4)} className="max-w-[360px]">
-                <option value="0.2">Precise: stays close to your wording</option><option value="0.4">Balanced</option><option value="0.7">Conversational</option>
+                <option value="0.2">{a.precise}</option><option value="0.4">{a.balanced}</option><option value="0.7">{a.conversational}</option>
               </select>
             </label>
           </Card>
 
           <details className="a-card group !py-0">
             <summary className="flex min-h-[64px] cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-              <span><span className="block font-semibold">Model</span><span className="a-muted text-sm">{providerLabel}</span></span>
+              <span><span className="block font-semibold">{a.model}</span><span className="a-muted text-sm">{providerLabel}</span></span>
               <ChevronDown size={20} className="text-ink-2 transition-transform duration-300 group-open:rotate-180" aria-hidden />
             </summary>
             <div className="flex flex-col gap-4 pb-6">
               <div className="grid gap-2 sm:grid-cols-2">
                 <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors has-[:checked]:border-brand has-[:checked]:bg-brand-tint">
                   <input type="radio" name="provider" value="auto" checked={provider === "auto"} onChange={() => setProvider("auto")} className="mt-1" />
-                  <span><span className="text-sm font-medium">Automatic</span><span className="a-muted block text-[0.82rem]">Cheapest available model, with automatic fallback.</span></span>
+                  <span><span className="text-sm font-medium">{a.automatic}</span><span className="a-muted block text-[0.82rem]">{a.automaticHint}</span></span>
                 </label>
                 {providers.map((p) => (
                   <label key={p.id} className={`flex items-start gap-3 rounded-lg border p-3 transition-colors has-[:checked]:border-brand has-[:checked]:bg-brand-tint ${p.configured ? "cursor-pointer" : "opacity-55"}`}>
                     <input type="radio" name="provider" value={p.id} disabled={!p.configured} checked={provider === p.id} onChange={() => setProvider(p.id)} className="mt-1" />
-                    <span><span className="text-sm font-medium">{p.label}</span><span className="a-muted block text-[0.82rem]">{p.note}{!p.configured && " · not configured on server"}</span></span>
+                    <span><span className="text-sm font-medium">{p.label}</span><span className="a-muted block text-[0.82rem]">{p.note}{!p.configured && a.notConfigured}</span></span>
                   </label>
                 ))}
               </div>
               {provider !== "auto" && current && (
-                <label className="field"><span>Model ID (optional)</span><input name="model" defaultValue={config.provider === provider ? config.model : ""} placeholder={current.defaultModel} /></label>
+                <label className="field"><span>{a.modelId}</span><input name="model" dir="ltr" defaultValue={config.provider === provider ? config.model : ""} placeholder={current.defaultModel} /></label>
               )}
-              <p className="a-muted text-[0.82rem]">If the chosen model is rate-limited or down, the concierge falls back to the next configured provider.</p>
+              <p className="a-muted text-[0.82rem]">{a.fallbackHint}</p>
             </div>
           </details>
         </div>
 
         <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-6 lg:sticky lg:top-6">
-          <section aria-label="Greeting preview" className="overflow-hidden rounded-xl border bg-surface">
-            <div className="border-b px-5 py-4"><h2 className="font-semibold">What buyers see first</h2><p className="a-muted text-sm">Updates as you type.</p></div>
+          <section aria-label={a.preview} className="overflow-hidden rounded-xl border bg-surface">
+            <div className="border-b px-5 py-4"><h2 className="font-semibold">{a.firstSeen}</h2><p className="a-muted text-sm">{a.updates}</p></div>
             <div className={`flex flex-col gap-3 bg-subtle p-5 transition-opacity ${enabled ? "" : "opacity-50"}`}>
-              <p className="text-[0.82rem] font-medium text-quiet">{name || "Concierge"}</p>
-              <p className="-mt-1.5 max-w-[92%] self-start whitespace-pre-line rounded-[4px_12px_12px_12px] border bg-surface px-3.5 py-2.5 text-[0.95rem]">{greeting || "Welcome! How can I help you find the right property?"}</p>
+              <p className="text-[0.82rem] font-medium text-quiet">{(locale === "ar" && nameAr) || name || a.concierge}</p>
+              <p className="-mt-1.5 max-w-[92%] self-start whitespace-pre-line rounded-[4px_12px_12px_12px] border bg-surface px-3.5 py-2.5 text-[0.95rem] rtl:rounded-[12px_4px_12px_12px]">{(locale === "ar" && greetingAr) || greeting || a.greetingPh}</p>
               {chipList.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {chipList.map((c) => <span key={c} className="rounded-full border border-line-strong bg-surface px-3 py-1.5 text-[0.85rem] text-ink-2">{c}</span>)}
                 </div>
               )}
-              {!enabled && <p className="text-sm font-medium text-warning">The concierge is off, so buyers won&apos;t see this.</p>}
+              {!enabled && <p className="text-sm font-medium text-warning">{a.offWarning}</p>}
             </div>
           </section>
 
           <section className="rounded-xl border bg-surface px-5 pt-4">
-            <h2 className="font-semibold">What it can answer from</h2>
-            <p className="a-muted text-sm">It never answers from anything else.</p>
+            <h2 className="font-semibold">{a.sources}</h2>
+            <p className="a-muted text-sm">{a.sourcesHint}</p>
             <ul className="mt-2.5 text-[0.95rem]">
-              {([["Published projects", sources.projects, "/admin/projects"], ["FAQs", sources.faqs, "/admin/knowledge"], ["Knowledge notes", sources.notes, "/admin/knowledge"]] as const).map(([label, n, href]) => (
+              {([[a.publishedProjects, sources.projects, "/admin/projects"], [a.faqs, sources.faqs, "/admin/knowledge"], [a.notes, sources.notes, "/admin/knowledge"]] as const).map(([label, n, href]) => (
                 <li key={label} className="border-t"><Link href={href} className="flex min-h-11 items-center justify-between gap-3 hover:text-brand-ink"><span>{label}</span><span className="font-semibold tabular-nums">{n}</span></Link></li>
               ))}
             </ul>

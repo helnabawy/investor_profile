@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import { formatNumber, type Locale } from "@/lib/i18n/locales";
 
 /** Counts a number up from zero once, on mount. Screen readers get the final value straight away. */
-export function CountUp({ value, duration = 900 }: { value: number; duration?: number }) {
+export function CountUp({ value, duration = 900, locale = "en" }: { value: number; duration?: number; locale?: Locale }) {
   const [shown, setShown] = useState(value);
   useEffect(() => {
     if (value <= 0 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -16,5 +17,5 @@ export function CountUp({ value, duration = 900 }: { value: number; duration?: n
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [value, duration]);
-  return <><span aria-hidden>{shown.toLocaleString("en")}</span><span className="sr-only">{value.toLocaleString("en")}</span></>;
+  return <><span aria-hidden>{formatNumber(shown, locale)}</span><span className="sr-only">{formatNumber(value, locale)}</span></>;
 }

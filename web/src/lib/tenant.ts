@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { supabaseAdmin, supabasePublic } from "./supabase/server";
 import type { Faq, Page, Project, Tenant } from "./types";
@@ -9,8 +9,10 @@ import type { ThemeConfig } from "./theme";
 import { PREVIEW_COOKIE, verifyPreviewToken } from "./preview";
 import { isMulti } from "./env";
 import { PLANS, planOf, type Plan } from "./plans";
+import { isLocale, type Locale } from "./i18n/locales";
+import { localize } from "./i18n/content";
 
-const TENANT_COLUMNS = "id,slug,name,tagline,domains,plan,theme,ai_config,contact,nav,published,allowed_origins";
+const TENANT_COLUMNS = "id,slug,name,name_ar,tagline,tagline_ar,default_locale,locales,domains,plan,theme,ai_config,contact,nav,published,allowed_origins";
 
 /** The limits that apply to a site. A self-hosted or managed install (single mode) is never limited. */
 export function tenantPlan(tenant: Pick<Tenant, "plan">): Plan {
@@ -48,10 +50,34 @@ async function previewTheme(tenant: Tenant): Promise<ThemeConfig | null> {
   return (data?.theme as ThemeConfig | undefined) ?? null;
 }
 
+/** The site's languages, normalised: the default is always one of them. */
+export function siteLocales(tenant: Pick<Tenant, "default_locale" | "locales">) {
+  const def: Locale = isLocale(tenant.default_locale) ? tenant.default_locale : "en";
+  const list = (tenant.locales ?? []).filter(isLocale);
+  return { defaultLocale: def, locales: list.includes(def) ? list : [def, ...list] };
+}
+
+/** Language the visitor asked for with a /ar or /en prefix (set by the proxy), or null for plain URLs. */
+export const requestedLocale = cache(async (): Promise<Locale | null> => {
+  const v = (await headers()).get("x-locale");
+  return isLocale(v) ? v : null;
+});
+
+/** Language of the current site page: the prefix's, when the site publishes it, else the site default. */
+export const siteLocale = cache(async (): Promise<Locale> => {
+  const site = (await headers()).get("x-site");
+  const tenant = site ? await getTenantBySite(site) : null;
+  const asked = await requestedLocale();
+  if (!tenant) return asked ?? "en";
+  const { defaultLocale, locales } = siteLocales(tenant);
+  return asked && locales.includes(asked) ? asked : defaultLocale;
+});
+
+/** The site's tenant with its content in the page's language (for site pages, not the admin). */
 export async function requireTenant(site: string) {
   const t = await getTenantBySite(site);
   if (!t) notFound();
-  return t;
+  return localize(t, await siteLocale());
 }
 
 export const getPage = cache(async (tenantId: string, slug: string) => {
@@ -62,7 +88,7 @@ export const getPage = cache(async (tenantId: string, slug: string) => {
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();
-  return data as Page | null;
+  return data ? localize(data as Page, await siteLocale()) : null;
 });
 
 // Primitive arguments on purpose: React cache() compares arguments by identity, so an options
@@ -78,7 +104,7 @@ export const getProjects = cache(async (tenantId: string, featuredOnly = false, 
   if (featuredOnly) q = q.eq("featured", true);
   if (limit) q = q.limit(limit);
   const { data } = await q;
-  return (data ?? []) as Project[];
+  return localize((data ?? []) as Project[], await siteLocale());
 });
 
 export const getProject = cache(async (tenantId: string, id: string) => {
@@ -90,7 +116,7 @@ export const getProject = cache(async (tenantId: string, id: string) => {
     .eq("id", id)
     .eq("published", true)
     .maybeSingle();
-  return data as Project | null;
+  return data ? localize(data as Project, await siteLocale()) : null;
 });
 
 export const getFaqs = cache(async (tenantId: string) => {
@@ -100,5 +126,5 @@ export const getFaqs = cache(async (tenantId: string) => {
     .eq("tenant_id", tenantId)
     .eq("published", true)
     .order("sort");
-  return (data ?? []) as Faq[];
+  return localize((data ?? []) as Faq[], await siteLocale());
 });

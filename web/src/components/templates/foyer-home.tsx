@@ -1,5 +1,6 @@
 "use client";
-import Link from "@/components/site/link";
+import Link, { useSiteT } from "@/components/site/link";
+import { LangSwitch } from "@/components/site/lang-switch";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import type { Contact, Faq, NavItem, Project } from "@/lib/types";
@@ -29,13 +30,15 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
   chat: boolean;
   poweredBy: boolean;
 }) {
-  const wa = whatsappLink(contact.whatsapp, `Hi ${name}, I'd like to know more.`);
+  const { t, locale } = useSiteT();
+  const c = t.common;
+  const wa = whatsappLink(contact.whatsapp, c.waHello(name));
   const channels = [
-    wa && { label: "WhatsApp", value: "Usually the fastest reply", href: wa },
-    contact.phone && { label: "Call", value: contact.phone, href: `tel:${contact.phone.replace(/\s/g, "")}` },
-    contact.email && { label: "Email", value: contact.email, href: `mailto:${contact.email}` },
-  ].filter(Boolean) as { label: string; value: string; href: string }[];
-  const tabs = ([["projects", "Projects", projects.length > 0], ["questions", "Questions", faqs.length > 0], ["contact", "Contact", channels.length > 0 || !!contact.address]] as [Tab, string, boolean][]).filter(([, , has]) => has);
+    wa && { label: c.whatsapp, value: c.fastestReply, href: wa },
+    contact.phone && { label: c.call, value: contact.phone, href: `tel:${contact.phone.replace(/\s/g, "")}`, ltr: true },
+    contact.email && { label: c.email, value: contact.email, href: `mailto:${contact.email}`, ltr: true },
+  ].filter(Boolean) as { label: string; value: string; href: string; ltr?: boolean }[];
+  const tabs = ([["projects", t.foyer.projects, projects.length > 0], ["questions", t.foyer.questions, faqs.length > 0], ["contact", t.foyer.contact, channels.length > 0 || !!contact.address]] as [Tab, string, boolean][]).filter(([, , has]) => has);
   const [tab, setTab] = useState<Tab>(tabs[0]?.[0] ?? "contact");
   // Extra pages the agent added (About, a visa guide…) stay reachable from the brand block.
   const more = nav.filter((n) => !["/", "/projects", "/contact"].includes(n.href));
@@ -48,11 +51,14 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
             <span className="font-heading text-[1.25rem] font-bold tracking-[-0.02em]">{name}</span>
             {tagline && <span className="text-[0.82rem] text-muted-foreground">{tagline}</span>}
           </Link>
-          {more.length > 0 && (
-            <nav aria-label="More pages" className="flex flex-wrap gap-x-6">
-              {more.map((n) => <Link key={n.href} href={n.href} className="t-nav py-3 text-[0.95rem]">{n.label}</Link>)}
-            </nav>
-          )}
+          <div className="flex flex-wrap items-center gap-x-6">
+            {more.length > 0 && (
+              <nav aria-label={t.foyer.morePages} className="flex flex-wrap gap-x-6">
+                {more.map((n) => <Link key={n.href} href={n.href} className="t-nav py-3 text-[0.95rem]">{n.label}</Link>)}
+              </nav>
+            )}
+            <LangSwitch className="t-nav text-[0.95rem]" />
+          </div>
         </div>
 
         <div className="flex flex-col gap-5">
@@ -60,14 +66,14 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
           {subtitle && <p className="line-clamp-3 max-w-[44ch] text-[1.08rem] text-muted-foreground">{subtitle}</p>}
           <div className="mt-1 max-w-[520px]">
             {chat
-              ? <TemplateAsk shape="field" id="foyer-ask" label={askLabel} placeholder={askPlaceholder} note={`Answers come only from ${name}'s own portfolio and notes.`} />
-              : <div className="flex flex-wrap gap-3"><Link href="/projects" className="btn btn-primary">Browse projects</Link><Link href="/contact" className="btn btn-light">Contact us</Link></div>}
+              ? <TemplateAsk shape="field" id="foyer-ask" label={askLabel} placeholder={askPlaceholder} note={c.answersNoteShort(name)} />
+              : <div className="flex flex-wrap gap-3"><Link href="/projects" className="btn btn-primary">{c.browseProjects}</Link><Link href="/contact" className="btn btn-light">{c.contactUs}</Link></div>}
           </div>
         </div>
 
         <p className="text-[0.85rem] text-muted-foreground">
           © {new Date().getFullYear()} {name}
-          {poweredBy && <> · Powered by <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateInvestor</a></>}
+          {poweredBy && <> · {c.poweredBy} <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateInvestor</a></>}
         </p>
       </div>
 
@@ -76,8 +82,8 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
           // eslint-disable-next-line @next/next/no-img-element
           <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" />
         )}
-        <section aria-label="Explore" className="relative w-full max-w-[540px] rounded-2xl bg-card px-5 pb-5 pt-2.5 shadow-[0_30px_60px_-30px_rgb(0_0_0/0.6)]">
-          <div role="tablist" aria-label="Sections" className="flex gap-1 pb-2 pt-1">
+        <section aria-label={c.explore} className="relative w-full max-w-[540px] rounded-2xl bg-card px-5 pb-5 pt-2.5 shadow-[0_30px_60px_-30px_rgb(0_0_0/0.6)]">
+          <div role="tablist" aria-label={t.foyer.sections} className="flex gap-1 pb-2 pt-1">
             {tabs.map(([id, label]) => (
               <button key={id} type="button" role="tab" id={`foyer-tab-${id}`} aria-selected={tab === id} aria-controls="foyer-panel" onClick={() => setTab(id)}
                 className={`min-h-11 rounded-full px-4 text-[0.97rem] font-semibold transition-colors ${tab === id ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
@@ -97,12 +103,12 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
                       : <span className="h-[58px] w-[76px] shrink-0 rounded-lg bg-muted" />}
                     <span className="flex min-w-0 flex-1 flex-col leading-snug">
                       <span className="truncate text-[1.05rem] font-bold group-hover:underline group-hover:underline-offset-4">{p.title}</span>
-                      <span className="truncate text-[0.88rem] text-muted-foreground">{[p.area, statusLabel(p.status), p.for_sale && "For sale", p.status === "ready" ? null : p.handover].filter(Boolean).join(" · ")}</span>
+                      <span className="truncate text-[0.88rem] text-muted-foreground">{[p.area, statusLabel(p.status, locale), p.for_sale && t.card.forSale, p.status === "ready" ? null : p.handover].filter(Boolean).join(" · ")}</span>
                     </span>
-                    <span className="shrink-0 whitespace-nowrap font-bold tabular-nums">{formatPrice(p.price_from, p.currency)}</span>
+                    <span className="shrink-0 whitespace-nowrap font-bold tabular-nums">{formatPrice(p.price_from, p.currency, locale)}</span>
                   </Link>
                 ))}
-                <Link href="/projects" className="t-link mt-auto flex min-h-11 items-center gap-2 border-t pt-3 font-semibold">See all projects <ArrowRight size={17} aria-hidden /></Link>
+                <Link href="/projects" className="t-link mt-auto flex min-h-11 items-center gap-2 border-t pt-3 font-semibold">{c.seeAllProjects} <ArrowRight size={17} className="rtl:-scale-x-100" aria-hidden /></Link>
               </>
             )}
             {tab === "questions" && (
@@ -115,21 +121,21 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
                     </div>
                   ))}
                 </dl>
-                <p className="mt-auto border-t pt-3.5 text-[0.95rem] text-muted-foreground">{chat ? "Something else? Ask in the box on this page." : "Something else? Get in touch."}</p>
+                <p className="mt-auto border-t pt-3.5 text-[0.95rem] text-muted-foreground">{chat ? t.foyer.somethingElseAsk : t.foyer.somethingElseContact}</p>
               </>
             )}
             {tab === "contact" && (
               <>
-                {channels.map((c) => (
-                  <a key={c.label} href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="group flex min-h-[68px] items-center gap-3 border-t py-2">
+                {channels.map((ch) => (
+                  <a key={ch.label} href={ch.href} target={ch.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="group flex min-h-[68px] items-center gap-3 border-t py-2">
                     <span className="flex min-w-0 flex-1 flex-col leading-snug">
-                      <span className="text-[1.05rem] font-bold group-hover:underline group-hover:underline-offset-4">{c.label}</span>
-                      <span className="truncate text-[0.88rem] tabular-nums text-muted-foreground">{c.value}</span>
+                      <span className="text-[1.05rem] font-bold group-hover:underline group-hover:underline-offset-4">{ch.label}</span>
+                      <span className="truncate text-[0.88rem] tabular-nums text-muted-foreground">{ch.ltr ? <bdi dir="ltr">{ch.value}</bdi> : ch.value}</span>
                     </span>
-                    <ArrowRight size={18} aria-hidden />
+                    <ArrowRight size={18} className="rtl:-scale-x-100" aria-hidden />
                   </a>
                 ))}
-                <p className="mt-auto border-t pt-3.5 text-[0.95rem] text-muted-foreground">{[contact.address, contact.hours].filter(Boolean).join(" · ") || "We reply within working hours."}</p>
+                <p className="mt-auto border-t pt-3.5 text-[0.95rem] text-muted-foreground">{[contact.address, contact.hours].filter(Boolean).join(" · ") || t.foyer.replyHours}</p>
               </>
             )}
           </div>

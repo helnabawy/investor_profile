@@ -1,6 +1,9 @@
 // Block-based page builder. Each section type declares its editable fields;
 // the admin builds forms from `fields`, the site renders via components/sections.
 
+import type { Locale } from "../i18n/locales";
+import { localize } from "../i18n/content";
+
 export type FieldType = "text" | "textarea" | "image" | "url" | "number" | "select" | "list" | "images";
 
 export type Field = {
@@ -38,7 +41,7 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "subtitle", label: "Subtitle", type: "textarea" },
       { name: "image", label: "Background image (optional — defaults to site backdrop)", type: "image" },
     ],
-    defaults: { title: "Page title", subtitle: "" },
+    defaults: { title: "Page title", title_ar: "عنوان الصفحة", subtitle: "" },
   },
   {
     type: "story",
@@ -51,7 +54,7 @@ export const SECTION_DEFS: SectionDef[] = [
         { name: "image", label: "Photo", type: "image" },
       ] },
     ],
-    defaults: { items: [{ title: "Chapter title", body: "" }] },
+    defaults: { items: [{ title: "Chapter title", title_ar: "عنوان الفصل", body: "" }] },
   },
   {
     type: "hero-split",
@@ -64,7 +67,10 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "image", label: "Photo", type: "image" },
       { name: "askPlaceholder", label: "Question box placeholder", type: "text", placeholder: "e.g. What can I buy for AED 1.5M with a payment plan?" },
     ],
-    defaults: { title: "Invest with clear numbers and one advisor you can reach", subtitle: "", askPlaceholder: "Ask about projects, prices or payment plans" },
+    defaults: {
+      title: "Invest with clear numbers and one advisor you can reach", title_ar: "استثمر بأرقام واضحة ومستشار واحد يمكنك الوصول إليه",
+      subtitle: "", askPlaceholder: "Ask about projects, prices or payment plans", askPlaceholder_ar: "اسأل عن المشاريع أو الأسعار أو خطط الدفع",
+    },
   },
   {
     type: "quick-links",
@@ -79,9 +85,9 @@ export const SECTION_DEFS: SectionDef[] = [
       ] },
     ],
     defaults: { items: [
-      { title: "Browse projects", body: "Filter by area, status and budget", href: "/projects", icon: "building" },
-      { title: "Ask the concierge", body: "Prices, payment plans and fees, answered now", href: "#chat", icon: "chat" },
-      { title: "Speak to an advisor", body: "Call, WhatsApp or book a consultation", href: "/contact", icon: "person" },
+      { title: "Browse projects", title_ar: "تصفّح المشاريع", body: "Filter by area, status and budget", body_ar: "صنّف حسب المنطقة والحالة والميزانية", href: "/projects", icon: "building" },
+      { title: "Ask the concierge", title_ar: "اسأل المساعد", body: "Prices, payment plans and fees, answered now", body_ar: "الأسعار وخطط الدفع والرسوم، بإجابة فورية", href: "#chat", icon: "chat" },
+      { title: "Speak to an advisor", title_ar: "تحدّث إلى مستشار", body: "Call, WhatsApp or book a consultation", body_ar: "اتصال أو واتساب أو احجز استشارة", href: "/contact", icon: "person" },
     ] },
   },
   {
@@ -97,10 +103,10 @@ export const SECTION_DEFS: SectionDef[] = [
         { name: "body", label: "Text", type: "textarea" },
       ] },
     ],
-    defaults: { title: "From first shortlist to handover", items: [
-      { title: "Tell us your goals", body: "Capital growth, rental yield or a home for the family. Share your budget and timeline." },
-      { title: "Get a shortlist with honest numbers", body: "Each project comes with a full cost sheet: price, fees, payment plan and expected yield." },
-      { title: "View, reserve and hand over", body: "We arrange viewings, guide you through reservation, and help with leasing or resale." },
+    defaults: { title: "From first shortlist to handover", title_ar: "من القائمة الأولى حتى التسليم", items: [
+      { title: "Tell us your goals", title_ar: "أخبرنا بأهدافك", body: "Capital growth, rental yield or a home for the family. Share your budget and timeline.", body_ar: "نمو رأس المال أو العائد الإيجاري أو منزل للعائلة. شاركنا ميزانيتك وإطارك الزمني." },
+      { title: "Get a shortlist with honest numbers", title_ar: "احصل على قائمة مختصرة بأرقام صادقة", body: "Each project comes with a full cost sheet: price, fees, payment plan and expected yield.", body_ar: "يأتي كل مشروع ببيان تكاليف كامل: السعر والرسوم وخطة الدفع والعائد المتوقع." },
+      { title: "View, reserve and hand over", title_ar: "المعاينة والحجز والتسليم", body: "We arrange viewings, guide you through reservation, and help with leasing or resale.", body_ar: "ننظّم المعاينات، ونرشدك خلال الحجز، ونساعدك في التأجير أو إعادة البيع." },
     ] },
   },
   {
@@ -116,7 +122,7 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "secondaryLabel", label: "Secondary button label", type: "text" },
       { name: "secondaryHref", label: "Secondary button link", type: "url" },
     ],
-    defaults: { title: "Your headline", subtitle: "", ctaLabel: "Explore", ctaHref: "/projects" },
+    defaults: { title: "Your headline", title_ar: "عنوانك الرئيسي", subtitle: "", ctaLabel: "Explore", ctaLabel_ar: "استكشف", ctaHref: "/projects" },
   },
   {
     type: "stats",
@@ -128,7 +134,7 @@ export const SECTION_DEFS: SectionDef[] = [
         { name: "label", label: "Label", type: "text" },
       ] },
     ],
-    defaults: { items: [{ value: "100+", label: "Happy clients" }] },
+    defaults: { items: [{ value: "100+", label: "Happy clients", label_ar: "عميل سعيد" }] },
   },
   {
     type: "about",
@@ -140,7 +146,7 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "image", label: "Image", type: "image" },
       { name: "bullets", label: "Bullet points", type: "list", itemFields: [{ name: "text", label: "Text", type: "text" }] },
     ],
-    defaults: { title: "About us", body: "" },
+    defaults: { title: "About us", title_ar: "من نحن", body: "" },
   },
   {
     type: "featured-projects",
@@ -151,7 +157,7 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "subtitle", label: "Subtitle", type: "text" },
       { name: "limit", label: "How many", type: "number" },
     ],
-    defaults: { title: "Featured projects", limit: 3 },
+    defaults: { title: "Featured projects", title_ar: "مشاريع مميّزة", limit: 3 },
   },
   {
     type: "project-grid",
@@ -161,7 +167,7 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "title", label: "Title", type: "text" },
       { name: "subtitle", label: "Subtitle", type: "text" },
     ],
-    defaults: { title: "Our portfolio" },
+    defaults: { title: "Our portfolio", title_ar: "محفظة مشاريعنا" },
   },
   {
     type: "features",
@@ -174,7 +180,7 @@ export const SECTION_DEFS: SectionDef[] = [
         { name: "body", label: "Text", type: "textarea" },
       ] },
     ],
-    defaults: { title: "Why work with us", items: [] },
+    defaults: { title: "Why work with us", title_ar: "لماذا تعمل معنا", items: [] },
   },
   {
     type: "testimonials",
@@ -188,7 +194,7 @@ export const SECTION_DEFS: SectionDef[] = [
         { name: "role", label: "Role / location", type: "text" },
       ] },
     ],
-    defaults: { title: "What clients say", items: [] },
+    defaults: { title: "What clients say", title_ar: "آراء عملائنا", items: [] },
   },
   {
     type: "gallery",
@@ -198,14 +204,14 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "title", label: "Title", type: "text" },
       { name: "images", label: "Images", type: "images" },
     ],
-    defaults: { title: "Gallery", images: [] },
+    defaults: { title: "Gallery", title_ar: "معرض الصور", images: [] },
   },
   {
     type: "cta",
     label: "Call to action",
     description: "Highlighted banner with a button",
     fields: [{ name: "title", label: "Title", type: "text" }, { name: "body", label: "Text", type: "textarea" }, ...cta()],
-    defaults: { title: "Ready to invest?", ctaLabel: "Contact us", ctaHref: "/contact" },
+    defaults: { title: "Ready to invest?", title_ar: "مستعد للاستثمار؟", ctaLabel: "Contact us", ctaLabel_ar: "تواصل معنا", ctaHref: "/contact" },
   },
   {
     type: "chat-cta",
@@ -216,21 +222,21 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "body", label: "Text", type: "textarea" },
       { name: "buttonLabel", label: "Button label", type: "text" },
     ],
-    defaults: { title: "Questions?", body: "Ask our AI concierge.", buttonLabel: "Start chatting" },
+    defaults: { title: "Questions?", title_ar: "لديك أسئلة؟", body: "Ask our AI concierge.", body_ar: "اسأل مساعدنا الذكي.", buttonLabel: "Start chatting", buttonLabel_ar: "ابدأ المحادثة" },
   },
   {
     type: "faq",
     label: "FAQ",
     description: "Shows your published FAQs",
     fields: [{ name: "title", label: "Title", type: "text" }],
-    defaults: { title: "Frequently asked questions" },
+    defaults: { title: "Frequently asked questions", title_ar: "الأسئلة الشائعة" },
   },
   {
     type: "contact",
     label: "Contact form",
     description: "Lead form plus your contact details",
     fields: [{ name: "title", label: "Title", type: "text" }, { name: "subtitle", label: "Subtitle", type: "textarea" }],
-    defaults: { title: "Get in touch" },
+    defaults: { title: "Get in touch", title_ar: "تواصل معنا" },
   },
   {
     type: "map",
@@ -240,13 +246,21 @@ export const SECTION_DEFS: SectionDef[] = [
       { name: "title", label: "Title", type: "text" },
       { name: "query", label: "Address or place to show", type: "text" },
     ],
-    defaults: { title: "Find us", query: "" },
+    defaults: { title: "Find us", title_ar: "موقعنا", query: "" },
   },
 ];
 
 export const SECTION_MAP = Object.fromEntries(SECTION_DEFS.map((d) => [d.type, d]));
 
-export function newSection(type: string): Section {
+/**
+ * A section with its default text in both languages (`title` and `title_ar`, see src/lib/i18n/content.ts).
+ * With a locale, the defaults are resolved to that language, for sections the site renders on its own.
+ */
+export function newSection(type: string, locale?: Locale): Section {
   const def = SECTION_MAP[type];
-  return { id: Math.random().toString(36).slice(2, 10), type, props: structuredClone(def?.defaults ?? {}) };
+  const props = structuredClone(def?.defaults ?? {});
+  return { id: Math.random().toString(36).slice(2, 10), type, props: locale ? localize(props, locale) : props };
 }
+
+/** Field types whose text is the agent's words, so each gets an Arabic twin in the page builder. */
+export const TRANSLATABLE: FieldType[] = ["text", "textarea"];

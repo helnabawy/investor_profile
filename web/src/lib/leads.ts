@@ -2,6 +2,7 @@ import "server-only";
 import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Tenant } from "./types";
+import type { Locale } from "./i18n/locales";
 
 export type LeadInput = {
   name?: string;
@@ -13,6 +14,8 @@ export type LeadInput = {
   source: "form" | "chat";
   sessionId?: string;
   clientHash?: string;
+  /** Language of the page the visitor wrote from, so the agent can reply in it. */
+  locale?: Locale;
 };
 
 const clip = (v: string | undefined, n = 500) => (v ? v.trim().slice(0, n) || null : null);
@@ -29,6 +32,7 @@ export async function saveLead(db: SupabaseClient, tenant: Tenant, input: LeadIn
     source: input.source,
     session_id: input.sessionId ?? null,
     client_hash: input.clientHash ?? null,
+    locale: input.locale ?? null,
   };
   const { data, error } = await db.from("leads").insert(row).select("id").single();
   if (error) throw error;
@@ -41,7 +45,7 @@ async function notifyAgent(tenant: Tenant, lead: Record<string, unknown>) {
   const key = process.env.RESEND_API_KEY;
   const lines = Object.entries(lead)
     .filter(([k, v]) => v && !["tenant_id", "session_id", "client_hash"].includes(k))
-    .map(([k, v]) => `${k}: ${v}`);
+    .map(([k, v]) => (k === "locale" ? `language: ${v === "ar" ? "Arabic" : "English"}` : `${k}: ${v}`));
   if (!key || !to) {
     console.log(`[leads] new ${lead.source} lead for ${tenant.slug}:\n  ${lines.join("\n  ")}`);
     return;
@@ -49,7 +53,7 @@ async function notifyAgent(tenant: Tenant, lead: Record<string, unknown>) {
   await new Resend(key).emails.send({
     from: process.env.LEADS_FROM_EMAIL ?? "EstateInvestor <leads@resend.dev>",
     to,
-    subject: `New ${lead.source} lead — ${lead.name ?? "website visitor"}`,
+    subject: `New ${lead.source} lead — ${lead.name ?? "website visitor"}${lead.locale === "ar" ? " (Arabic)" : ""}`,
     text: `You have a new lead from your website.\n\n${lines.join("\n")}`,
   });
 }

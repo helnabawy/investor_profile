@@ -1,6 +1,7 @@
 "use client";
 import Link from "@/components/site/link";
-import { useSitePathname } from "@/components/site/link";
+import { useSitePathname, useSiteT } from "@/components/site/link";
+import { LangSwitch } from "@/components/site/lang-switch";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import type { NavItem } from "@/lib/types";
@@ -27,6 +28,7 @@ type Props = {
 export function TemplateHeader({ kind, name, tagline, logoUrl, nav, phone, cta, hideOnHome }: Props) {
   const [open, setOpen] = useState(false);
   const path = useSitePathname();
+  const { t } = useSiteT();
   if (hideOnHome && path === "/") return null;
   const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
   const twoLine = (kind === "ledger" || kind === "foyer") && tagline;
@@ -55,19 +57,21 @@ export function TemplateHeader({ kind, name, tagline, logoUrl, nav, phone, cta, 
             </>
           )}
         </Link>
-        <nav aria-label="Main" className="hidden items-center gap-x-7 lg:flex">{nav.map((n) => link(n))}</nav>
+        <nav aria-label={t.common.mainNav} className="hidden items-center gap-x-7 lg:flex">{nav.map((n) => link(n))}</nav>
         <div className="hidden items-center gap-x-5 lg:flex">
-          {kind === "ledger" && phone && <a href={`tel:${phone.replace(/\s/g, "")}`} className="t-nav py-3 text-[0.95rem] tabular-nums">{phone}</a>}
+          <LangSwitch className="t-nav text-[0.95rem]" />
+          {kind === "ledger" && phone && <a href={`tel:${phone.replace(/\s/g, "")}`} className="t-nav py-3 text-[0.95rem] tabular-nums"><bdi dir="ltr">{phone}</bdi></a>}
           {button}
         </div>
-        <button className="flex h-11 w-11 items-center justify-center lg:hidden" aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>
+        <button className="flex h-11 w-11 items-center justify-center lg:hidden" aria-expanded={open} aria-label={open ? t.common.closeMenu : t.common.openMenu} onClick={() => setOpen(!open)}>
           {open ? <X /> : <Menu />}
         </button>
       </div>
       {open && (
-        <nav aria-label="Main" className="flex flex-col gap-1 border-t px-5 pb-5 pt-2 lg:hidden">
+        <nav aria-label={t.common.mainNav} className="flex flex-col gap-1 border-t px-5 pb-5 pt-2 lg:hidden">
           {nav.map((n) => link(n, true))}
-          {phone && <a href={`tel:${phone.replace(/\s/g, "")}`} className="t-nav flex min-h-12 items-center text-base tabular-nums">{phone}</a>}
+          {phone && <a href={`tel:${phone.replace(/\s/g, "")}`} className="t-nav flex min-h-12 items-center text-base tabular-nums"><bdi dir="ltr">{phone}</bdi></a>}
+          <LangSwitch className="t-nav self-start text-base" />
           <div className="mt-2">{button}</div>
         </nav>
       )}

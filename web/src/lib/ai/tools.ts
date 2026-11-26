@@ -7,8 +7,10 @@ import { PROJECT_COLUMNS } from "../types";
 import { projectSummary, toTsQuery } from "./knowledge";
 import { saveLead } from "../leads";
 import { whatsappLink } from "../format";
+import type { Locale } from "../i18n/locales";
+import { SITE } from "../i18n/site";
 
-export function chatTools(db: SupabaseClient, tenant: Tenant, sessionId: string) {
+export function chatTools(db: SupabaseClient, tenant: Tenant, sessionId: string, locale: Locale = "en") {
   return {
     searchProjects: tool({
       description: "Search this business's published property inventory with optional filters.",
@@ -45,10 +47,10 @@ export function chatTools(db: SupabaseClient, tenant: Tenant, sessionId: string)
       }),
       execute: async ({ name, phone, email, interest, budget, notes }) => {
         if (!phone && !email) return { saved: false, reason: "Ask for a phone number or email first." };
-        await saveLead(db, tenant, { name, phone, email, interest, budget, message: notes, source: "chat", sessionId });
+        await saveLead(db, tenant, { name, phone, email, interest, budget, message: notes, source: "chat", sessionId, locale });
         return {
           saved: true,
-          whatsapp: whatsappLink(tenant.contact?.whatsapp, `Hi, I'm ${name}. I just chatted on your website about ${interest ?? "a property"}.`),
+          whatsapp: whatsappLink(tenant.contact?.whatsapp, SITE[locale].api.waAfterChat(name, interest)),
         };
       },
     }),

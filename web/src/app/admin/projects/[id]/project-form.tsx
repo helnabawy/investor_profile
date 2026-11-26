@@ -6,9 +6,10 @@ import { deleteProject, saveProject } from "../../actions";
 import { FormMessage, SubmitButton } from "@/components/admin/ui";
 import { UploadButton } from "@/components/admin/image-upload";
 import type { Project } from "@/lib/types";
+import { formatFullPrice } from "@/lib/format";
 import { PriceGrowthEditor } from "./price-growth-editor";
-
-const STATUS_LABEL = { "off-plan": "Off-plan", ready: "Ready", "sold-out": "Sold out" } as const;
+import { BiInput, TranslateButton } from "@/components/admin/bilingual";
+import { useAdminT } from "@/components/admin/i18n";
 
 function Card({ title, hint, children, className = "" }: { title: string; hint?: string; children: React.ReactNode; className?: string }) {
   return (
@@ -21,6 +22,9 @@ function Card({ title, hint, children, className = "" }: { title: string; hint?:
 
 export function ProjectForm({ tenantId, project }: { tenantId: string; project?: Project }) {
   const [state, action] = useActionState(saveProject, null);
+  const { t: d, locale } = useAdminT();
+  const tp = d.project;
+  const STATUS_LABEL = { "off-plan": tp.statusOffPlan, ready: tp.statusReady, "sold-out": tp.statusSoldOut } as const;
   const p = project;
   const [images, setImages] = useState<string[]>(p?.images ?? []);
   const [brochure, setBrochure] = useState(p?.brochure_url ?? "");
@@ -35,13 +39,15 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
     const t = e.target as HTMLInputElement;
     if (t.name in v) setV((x) => ({ ...x, [t.name]: t.value }));
   };
-  const text = (name: keyof Project, label: string, placeholder?: string, hint?: string) => (
-    <label className="field min-w-0 flex-[1_1_220px]"><span>{label}</span><input name={name} defaultValue={(p?.[name] as string) ?? ""} placeholder={placeholder} />{hint && <small>{hint}</small>}</label>
+  // Each text field with its Arabic twin (`developer` / `developer_ar`).
+  const text = (name: keyof Project & string, label: string, placeholder?: string, hint?: string) => (
+    <BiInput className="basis-full" name={name} label={label} placeholder={placeholder} hint={hint}
+      defaultValue={(p?.[name] as string) ?? ""} defaultValueAr={(p?.[`${name}_ar` as keyof Project] as string) ?? ""} />
   );
   const price = Number(v.price_from.replace(/[^\d.]/g, ""));
   const checks: [string, boolean][] = [
-    ["Starting price", price > 0], ["Payment plan", !!v.payment_plan.trim()], ["Handover date", !!v.handover.trim()],
-    ["Expected yield", !!v.roi.trim()], ["At least two photos", images.length >= 2], ["Brochure", !!brochure.trim()],
+    [tp.checkPrice, price > 0], [tp.checkPlan, !!v.payment_plan.trim()], [tp.checkHandover, !!v.handover.trim()],
+    [tp.checkYield, !!v.roi.trim()], [tp.checkPhotos, images.length >= 2], [tp.checkBrochure, !!brochure.trim()],
   ];
   const done = checks.filter(([, ok]) => ok).length;
 
@@ -50,76 +56,77 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
       <form id="project" action={action} onChange={track} className="contents">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/admin/projects" aria-label="Back to projects" className="a-btn a-btn-ghost !w-11 !px-0"><ArrowLeft size={18} aria-hidden /></Link>
+            <Link href="/admin/projects" aria-label={tp.backToProjects} className="a-btn a-btn-ghost !w-11 !px-0"><ArrowLeft size={18} className="rtl:-scale-x-100" aria-hidden /></Link>
             <div className="min-w-0">
-              <p className="a-muted text-sm">Projects</p>
-              <h1 className="truncate text-[1.4rem] font-semibold leading-tight tracking-[-0.02em]">{v.title || (p ? "Untitled project" : "New project")}</h1>
+              <p className="a-muted text-sm">{tp.projects}</p>
+              <h1 className="truncate text-[1.4rem] font-semibold leading-tight tracking-[-0.02em]">{v.title || (p ? tp.untitled : tp.newProject)}</h1>
             </div>
           </div>
-          <div className="flex items-center gap-3"><FormMessage state={state} /><SubmitButton>{p ? "Save project" : "Create project"}</SubmitButton></div>
+          <div className="flex flex-wrap items-center gap-3"><FormMessage state={state} /><TranslateButton /><SubmitButton>{p ? tp.save : tp.create}</SubmitButton></div>
         </div>
         {p && <input type="hidden" name="id" value={p.id} />}
         <input type="hidden" name="images" value={images.join("\n")} />
 
         <div className="flex flex-wrap items-start gap-6">
           <div className="flex min-w-0 flex-[2_1_520px] flex-col gap-6">
-            <Card title="Basics">
+            <Card title={tp.basics}>
               <div className="flex flex-wrap gap-4">
-                <label className="field basis-full"><span>Title</span><input name="title" required defaultValue={p?.title} /></label>
-                {text("developer", "Developer")}
-                {text("property_type", "Property type", "Apartment, Villa, Townhouse…")}
-                {text("area", "Area / community", "Dubai Marina")}
-                {text("city", "City", "Dubai")}
-                <label className="field min-w-0 flex-[1_1_220px]"><span>Status</span>
-                  <select name="status" defaultValue={p?.status ?? "off-plan"}><option value="off-plan">Off-plan</option><option value="ready">Ready</option><option value="sold-out">Sold out</option></select>
+                <BiInput className="basis-full" name="title" label={tp.title} required defaultValue={p?.title} defaultValueAr={p?.title_ar} />
+                {text("developer", tp.developer)}
+                {text("property_type", tp.propertyType, tp.propertyTypePh)}
+                {text("area", tp.area, "Dubai Marina")}
+                {text("city", tp.city, "Dubai")}
+                <label className="field min-w-0 flex-[1_1_220px]"><span>{tp.status}</span>
+                  <select name="status" defaultValue={p?.status ?? "off-plan"}><option value="off-plan">{tp.statusOffPlan}</option><option value="ready">{tp.statusReady}</option><option value="sold-out">{tp.statusSoldOut}</option></select>
                 </label>
-                {text("bedrooms", "Bedrooms", "Studio, 1, 2, 3", "Separate with commas.")}
+                {text("bedrooms", tp.bedrooms, "Studio, 1, 2, 3", tp.bedroomsHint)}
               </div>
             </Card>
 
-            <Card title="The numbers buyers ask for" hint="These appear on the project card, and the concierge quotes them word for word.">
+            <Card title={tp.numbers} hint={tp.numbersHint}>
               <div className="flex flex-wrap gap-4">
-                <div className="field min-w-0 flex-[1_1_220px]"><span>Starting price</span>
-                  <div className="flex gap-2">
-                    <input name="currency" aria-label="Currency" defaultValue={p?.currency ?? "AED"} className="!w-20 shrink-0" />
-                    <input name="price_from" aria-label="Starting price" inputMode="numeric" defaultValue={p?.price_from ?? ""} placeholder="1450000" className="tabular-nums" />
+                <div className="field min-w-0 flex-[1_1_220px]"><span>{tp.startingPrice}</span>
+                  <div className="flex gap-2" dir="ltr">
+                    <input name="currency" aria-label={tp.currency} defaultValue={p?.currency ?? "AED"} className="!w-20 shrink-0" />
+                    <input name="price_from" aria-label={tp.startingPrice} inputMode="numeric" defaultValue={p?.price_from ?? ""} placeholder="1450000" className="tabular-nums" />
                   </div>
                 </div>
-                {text("handover", "Handover", "Q4 2027")}
-                {text("payment_plan", "Payment plan", "60/40")}
-                {text("roi", "Expected yield", "6–7% gross", "Write it as an expectation, not a promise.")}
+                {text("handover", tp.handover, "Q4 2027")}
+                {text("payment_plan", tp.paymentPlan, "60/40")}
+                {text("roi", tp.expectedYield, tp.yieldPh, tp.yieldHint)}
               </div>
             </Card>
 
-            <Card title="Price growth" hint="Show buyers how much the project has risen since launch. Your project page turns these figures into charts.">
+            <Card title={tp.growth} hint={tp.growthHint}>
               <PriceGrowthEditor value={p?.price_growth ?? null} currency={v.currency} />
             </Card>
 
-            <Card title="Description and amenities">
-              <label className="field"><span>Description</span><textarea name="description" rows={5} defaultValue={p?.description ?? ""} /></label>
-              <label className="field"><span>Amenities</span><textarea name="amenities" rows={4} defaultValue={p?.amenities.join("\n")} /><small>One per line.</small></label>
+            <Card title={tp.descAmenities}>
+              <BiInput name="description" label={tp.description} multiline rows={5} defaultValue={p?.description} defaultValueAr={p?.description_ar} />
+              <BiInput name="amenities" label={tp.amenities} multiline rows={4} hint={tp.onePerLine}
+                defaultValue={p?.amenities.join("\n")} defaultValueAr={p?.amenities_ar?.join("\n")} />
             </Card>
 
-            <Card title="Photos" hint="The first photo is the cover.">
+            <Card title={tp.photos} hint={tp.photosHint}>
               <div className="flex flex-wrap gap-3">
                 {images.map((src, i) => (
                   <div key={src + i} className="group relative h-[108px] w-[148px] overflow-hidden rounded-lg border">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="h-full w-full object-cover" />
-                    {i === 0 && <span className="absolute left-1.5 top-1.5 rounded-full bg-inverse px-2 py-px text-xs font-medium text-white">Cover</span>}
+                    {i === 0 && <span className="absolute start-1.5 top-1.5 rounded-full bg-inverse px-2 py-px text-xs font-medium text-white">{tp.cover}</span>}
                     <div className="absolute inset-x-1.5 bottom-1.5 flex justify-end gap-1">
-                      {i > 0 && <button type="button" className="rounded-md bg-surface/95 px-2 py-1 text-xs font-medium shadow" onClick={() => setImages([src, ...images.filter((_, j) => j !== i)])}>Make cover</button>}
-                      <button type="button" className="rounded-md bg-surface/95 p-1 shadow" onClick={() => setImages(images.filter((_, j) => j !== i))} aria-label="Remove photo"><X size={14} aria-hidden /></button>
+                      {i > 0 && <button type="button" className="rounded-md bg-surface/95 px-2 py-1 text-xs font-medium shadow" onClick={() => setImages([src, ...images.filter((_, j) => j !== i)])}>{tp.makeCover}</button>}
+                      <button type="button" className="rounded-md bg-surface/95 p-1 shadow" onClick={() => setImages(images.filter((_, j) => j !== i))} aria-label={tp.removePhoto}><X size={14} aria-hidden /></button>
                     </div>
                   </div>
                 ))}
                 <div className="flex min-h-[108px] flex-[1_1_200px] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-line-bold bg-subtle p-3 text-center">
-                  <UploadButton tenantId={tenantId} multiple label="Upload photos" onUploaded={(u) => setImages([...images, ...u])} />
-                  <span className="a-muted text-[0.82rem]">JPG or PNG, up to 8 MB each.</span>
+                  <UploadButton tenantId={tenantId} multiple label={tp.uploadPhotos} onUploaded={(u) => setImages([...images, ...u])} />
+                  <span className="a-muted text-[0.82rem]">{tp.photoTypes}</span>
                 </div>
               </div>
-              <label className="field"><span>Or paste an image link</span>
-                <input type="url" placeholder="https://… then press Enter" onKeyDown={(e) => {
+              <label className="field"><span>{tp.pasteLink}</span>
+                <input type="url" dir="ltr" placeholder={tp.pasteLinkPh} onKeyDown={(e) => {
                   if (e.key !== "Enter") return;
                   e.preventDefault();
                   const url = e.currentTarget.value.trim();
@@ -128,12 +135,12 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
               </label>
             </Card>
 
-            <Card title="Brochure">
-              {!brochure && <p className="rounded-lg border border-warning-line bg-warning-soft px-4 py-3 text-sm text-warning-strong">Buyers often ask the concierge for a brochure. Add a PDF and it can share the link.</p>}
-              <div className="field"><span>Brochure (PDF)</span>
+            <Card title={tp.brochure}>
+              {!brochure && <p className="rounded-lg border border-warning-line bg-warning-soft px-4 py-3 text-sm text-warning-strong">{tp.brochureNudge}</p>}
+              <div className="field"><span>{tp.brochurePdf}</span>
                 <div className="flex flex-wrap gap-2">
-                  <input name="brochure_url" className="a-input min-w-0 flex-1" value={brochure} onChange={(e) => setBrochure(e.target.value)} placeholder="https://…" />
-                  <UploadButton tenantId={tenantId} accept="application/pdf" label="Upload PDF" onUploaded={(u) => setBrochure(u[0])} />
+                  <input name="brochure_url" dir="ltr" className="a-input min-w-0 flex-1" value={brochure} onChange={(e) => setBrochure(e.target.value)} placeholder="https://…" />
+                  <UploadButton tenantId={tenantId} accept="application/pdf" label={tp.uploadPdf} onUploaded={(u) => setBrochure(u[0])} />
                 </div>
               </div>
             </Card>
@@ -141,57 +148,57 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
 
           <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-6 lg:sticky lg:top-6">
             <section className="a-card flex flex-col gap-3.5 !p-5">
-              <h2 className="font-semibold">How buyers see it</h2>
+              <h2 className="font-semibold">{tp.howBuyersSee}</h2>
               <div className="overflow-hidden rounded border border-[#dad6ca] bg-white">
                 <div className="relative h-[170px] bg-wash">
                   {images[0]
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={images[0]} alt="" className="h-full w-full object-cover" />
-                    : <span className="a-muted flex h-full items-center justify-center text-sm">No cover photo yet</span>}
-                  <span className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-                    <span className="rounded-sm bg-surface px-2.5 py-1 text-xs font-semibold">{STATUS_LABEL[v.status as keyof typeof STATUS_LABEL] ?? "Off-plan"}</span>
-                    {forSale && <span className="rounded-sm bg-inverse px-2.5 py-1 text-xs font-semibold text-white">Available for sale</span>}
+                    : <span className="a-muted flex h-full items-center justify-center text-sm">{tp.noCover}</span>}
+                  <span className="absolute start-3 top-3 flex flex-wrap gap-1.5">
+                    <span className="rounded-sm bg-surface px-2.5 py-1 text-xs font-semibold">{STATUS_LABEL[v.status as keyof typeof STATUS_LABEL] ?? tp.statusOffPlan}</span>
+                    {forSale && <span className="rounded-sm bg-inverse px-2.5 py-1 text-xs font-semibold text-white">{tp.forSaleTag}</span>}
                   </span>
                 </div>
                 <div className="flex flex-col gap-2.5 px-4 pb-4 pt-3.5">
                   <div>
-                    <p className="font-[Georgia,serif] text-[1.25rem] leading-tight">{v.title || "Project title"}</p>
-                    <p className="a-muted text-sm">{[v.area, v.bedrooms && `${v.bedrooms} bedrooms`].filter(Boolean).join(" · ") || "Area · bedrooms"}</p>
+                    <p className="font-[Georgia,serif] text-[1.25rem] leading-tight">{v.title || tp.titlePh}</p>
+                    <p className="a-muted text-sm">{[v.area, v.bedrooms && tp.bedroomsShort(v.bedrooms)].filter(Boolean).join(" · ") || tp.areaBedroomsPh}</p>
                   </div>
                   <p className="border-t pt-2.5 text-sm text-[#4c5952]">
-                    From <strong className="font-semibold tabular-nums text-[#0f1728]">{price ? `${v.currency} ${price.toLocaleString("en-US")}` : "price on request"}</strong>
-                    <br />{[v.handover && `Handover ${v.handover}`, v.payment_plan.split(/\s/)[0]].filter(Boolean).join(" · ")}
+                    {tp.from} <strong className="font-semibold tabular-nums text-[#0f1728]">{price ? formatFullPrice(price, v.currency, locale) : tp.onRequest}</strong>
+                    <br />{[v.handover && tp.handoverOn(v.handover), v.payment_plan.split(/\s/)[0]].filter(Boolean).join(" · ")}
                   </p>
                 </div>
               </div>
             </section>
 
             <section className="a-card !p-5 !pb-2">
-              <h2 className="font-semibold">Ready for the concierge</h2>
-              <p className="a-muted text-sm">{done} of {checks.length} details filled in.</p>
+              <h2 className="font-semibold">{tp.readyForConcierge}</h2>
+              <p className="a-muted text-sm">{tp.filledOf(done, checks.length)}</p>
               <ul className="mt-2">
                 {checks.map(([label, ok]) => (
                   <li key={label} className={`flex items-center gap-2.5 border-t border-line-soft py-2.5 text-[0.95rem] ${ok ? "" : "text-warning"}`}>
                     {ok ? <Check size={18} strokeWidth={2.2} className="text-success" aria-hidden /> : <CircleAlert size={18} className="text-warning-fill" aria-hidden />}
-                    {label}{!ok && <span className="sr-only"> (missing)</span>}
+                    {label}{!ok && <span className="sr-only">{tp.missing}</span>}
                   </li>
                 ))}
               </ul>
             </section>
 
             <section className="a-card flex flex-col gap-4 !p-5">
-              <h2 className="font-semibold">Visibility</h2>
-              <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="for_sale" checked={forSale} onChange={(e) => setForSale(e.target.checked)} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">Available for sale</span><span className="a-muted block text-sm">Shows an &ldquo;Available for sale&rdquo; tag on the project card and page.</span></span></label>
-              <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="published" defaultChecked={p?.published ?? true} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">Published</span><span className="a-muted block text-sm">Shown on your site and known to the concierge.</span></span></label>
-              <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="featured" defaultChecked={p?.featured} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">Featured on the home page</span><span className="a-muted block text-sm">Featured projects lead your home page.</span></span></label>
-              <label className="field"><span>Position in lists</span><input name="sort" type="number" min={0} defaultValue={p?.sort ?? 0} className="!w-28" /><small>Lower numbers come first.</small></label>
+              <h2 className="font-semibold">{tp.visibility}</h2>
+              <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="for_sale" checked={forSale} onChange={(e) => setForSale(e.target.checked)} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">{tp.forSaleTag}</span><span className="a-muted block text-sm">{tp.forSaleHint}</span></span></label>
+              <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="published" defaultChecked={p?.published ?? true} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">{d.ui.published}</span><span className="a-muted block text-sm">{tp.publishedHint}</span></span></label>
+              <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="featured" defaultChecked={p?.featured} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">{tp.featured}</span><span className="a-muted block text-sm">{tp.featuredHint}</span></span></label>
+              <label className="field"><span>{tp.position}</span><input name="sort" type="number" min={0} defaultValue={p?.sort ?? 0} className="!w-28" /><small>{tp.positionHint}</small></label>
             </section>
           </div>
         </div>
       </form>
       {p && (
-        <form action={deleteProject.bind(null, p.id)} onSubmit={(e) => { if (!window.confirm("Delete this project? This cannot be undone.")) e.preventDefault(); }}>
-          <button className="a-btn a-btn-danger"><Trash2 size={15} aria-hidden /> Delete project</button>
+        <form action={deleteProject.bind(null, p.id)} onSubmit={(e) => { if (!window.confirm(tp.confirmDelete)) e.preventDefault(); }}>
+          <button className="a-btn a-btn-danger"><Trash2 size={15} aria-hidden /> {tp.deleteProject}</button>
         </form>
       )}
     </div>

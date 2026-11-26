@@ -7,13 +7,26 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, type ComponentProps } from "react";
 
-const SiteBase = createContext("");
+import type { Locale } from "@/lib/i18n/locales";
+import { SITE } from "@/lib/i18n/site";
 
-export function SiteBaseProvider({ base, children }: { base: string; children: React.ReactNode }) {
-  return <SiteBase.Provider value={base}>{children}</SiteBase.Provider>;
+// Arabic pages add a language prefix to the base: "/ar/projects", "/s/demo/ar/projects". The prefix
+// is left out for the site's default language, so `base` already carries it and links keep it.
+type SiteCtx = { base: string; root: string; locale: Locale; defaultLocale: Locale; locales: Locale[] };
+const SiteBase = createContext<SiteCtx>({ base: "", root: "", locale: "en", defaultLocale: "en", locales: ["en"] });
+
+export function SiteBaseProvider({ children, ...value }: SiteCtx & { children: React.ReactNode }) {
+  return <SiteBase.Provider value={value}>{children}</SiteBase.Provider>;
 }
 
-export const useSiteBase = () => useContext(SiteBase);
+export const useSiteBase = () => useContext(SiteBase).base;
+/** Language of the page, with the site's language settings. */
+export const useSiteLocale = () => useContext(SiteBase);
+
+/** Base path of the site in another language: "" / "/ar" on its own host, "/s/demo" / "/s/demo/ar" under a path. */
+export function localeBase(ctx: Pick<SiteCtx, "root" | "defaultLocale">, locale: Locale) {
+  return ctx.root + (locale === ctx.defaultLocale ? "" : `/${locale}`);
+}
 
 /** "/projects" → "/s/demo/projects" under a base path; external, hash and mailto links are unchanged. */
 export function siteHref(base: string, href: string) {
@@ -34,4 +47,10 @@ export function useSitePathname() {
   const path = usePathname() ?? "/";
   if (!base || (path !== base && !path.startsWith(base + "/"))) return path;
   return path.slice(base.length) || "/";
+}
+
+/** The site's words in the page's language (client components). */
+export function useSiteT() {
+  const { locale } = useContext(SiteBase);
+  return { t: SITE[locale], locale };
 }

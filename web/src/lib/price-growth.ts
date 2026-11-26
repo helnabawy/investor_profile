@@ -1,9 +1,13 @@
 import { z } from "zod";
+import { formatNumber, type Locale } from "./i18n/locales";
+import { SITE } from "./i18n/site";
 
 /** One unit type's launch price against today's price. Amounts are in the project's currency. */
 export type GrowthUnit = {
   unit: string;          // "Studio", "1 BR", "2 BR + maid"
+  unit_ar?: string | null;
   size?: string | null;  // free text, "37–44 m²"
+  size_ar?: string | null;
   before: number;        // launch price
   now: number;           // today's price
   psfBefore?: number | null;
@@ -17,6 +21,11 @@ export type PriceGrowth = {
   beforeLabel?: string | null; // "Launch"
   nowLabel?: string | null;    // "Today"
   note?: string | null;        // source or date of the figures
+  // Arabic twins, shown on the Arabic site (src/lib/i18n/content.ts)
+  label_ar?: string | null;
+  beforeLabel_ar?: string | null;
+  nowLabel_ar?: string | null;
+  note_ar?: string | null;
   units: GrowthUnit[];
 };
 
@@ -30,12 +39,18 @@ const schema = z.object({
   beforeLabel: optText(40),
   nowLabel: optText(40),
   note: optText(400),
+  label_ar: optText(80),
+  beforeLabel_ar: optText(40),
+  nowLabel_ar: optText(40),
+  note_ar: optText(400),
   units: z.array(z.unknown()).max(20).catch([]),
 });
 
 const unitSchema = z.object({
   unit: z.string().trim().min(1).max(40),
+  unit_ar: optText(40),
   size: optText(40),
+  size_ar: optText(40),
   before: amount,
   now: amount,
   psfBefore: optAmount,
@@ -77,9 +92,9 @@ export function parseCount(input: string): number | null {
 }
 
 /** "4 available" / "Sold out" / null when the agent has not said. */
-export function availabilityLabel(n: number | null | undefined) {
+export function availabilityLabel(n: number | null | undefined, locale: Locale = "en") {
   if (n == null) return null;
-  return n === 0 ? "Sold out" : `${n.toLocaleString("en-US")} available`;
+  return n === 0 ? SITE[locale].card.soldOut : SITE[locale].growth.available(formatNumber(n, locale));
 }
 
 export type GrowthRow = GrowthUnit & {

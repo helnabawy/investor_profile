@@ -19,6 +19,10 @@ export type AiConfig = {
   enabled?: boolean;
   /** Quick-question chips shown under the chat (lounge home, widget). */
   suggestions?: string[];
+  // Arabic twins, shown on the Arabic site (src/lib/i18n/content.ts)
+  assistantName_ar?: string;
+  greeting_ar?: string;
+  suggestions_ar?: string[];
 };
 
 export type ProviderId = "google" | "groq" | "openrouter" | "anthropic";

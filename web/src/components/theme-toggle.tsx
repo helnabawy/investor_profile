@@ -52,22 +52,25 @@ const isDark = () =>
  * `icon`: one button that flips to the other theme (landing app bar). Its icon is chosen in CSS, so the
  * server render is right in either theme. `segmented`: System / Light / Dark (admin sidebar).
  */
-export function ThemeToggle({ variant = "icon", className = "" }: { variant?: "icon" | "segmented"; className?: string }) {
+type Labels = { theme: string; themeSystem: string; themeLight: string; themeDark: string; themeSwitch: string; themeTitle: string };
+const EN_LABELS: Labels = { theme: "Theme", themeSystem: "System", themeLight: "Light", themeDark: "Dark", themeSwitch: "Switch between light and dark theme", themeTitle: "Light or dark" };
+
+export function ThemeToggle({ variant = "icon", className = "", labels = EN_LABELS }: { variant?: "icon" | "segmented"; className?: string; labels?: Labels }) {
   // The stored choice, kept in step with other toggles on the page; "system" on the server.
   const choice = useSyncExternalStore(subscribe, read, () => "system" as ThemeChoice);
 
   if (variant === "icon") {
     return (
-      <button type="button" onClick={() => apply(isDark() ? "light" : "dark")} aria-label="Switch between light and dark theme" title="Light or dark" className={`theme-icon-btn ${className}`}>
+      <button type="button" onClick={() => apply(isDark() ? "light" : "dark")} aria-label={labels.themeSwitch} title={labels.themeTitle} className={`theme-icon-btn ${className}`}>
         <Moon size={19} strokeWidth={1.75} aria-hidden data-show="light" />
         <Sun size={19} strokeWidth={1.75} aria-hidden data-show="dark" />
       </button>
     );
   }
 
-  const opts: [ThemeChoice, string, typeof Sun][] = [["system", "System", Monitor], ["light", "Light", Sun], ["dark", "Dark", Moon]];
+  const opts: [ThemeChoice, string, typeof Sun][] = [["system", labels.themeSystem, Monitor], ["light", labels.themeLight, Sun], ["dark", labels.themeDark, Moon]];
   return (
-    <div role="radiogroup" aria-label="Theme" className={`theme-seg ${className}`}>
+    <div role="radiogroup" aria-label={labels.theme} className={`theme-seg ${className}`}>
       {opts.map(([id, label, Icon]) => (
         <button key={id} type="button" role="radio" aria-checked={choice === id} title={label}
           onClick={() => apply(id)}>

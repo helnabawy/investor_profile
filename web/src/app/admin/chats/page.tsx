@@ -3,12 +3,15 @@ import { getAdmin } from "@/lib/admin/context";
 import { PageTitle } from "@/components/admin/ui";
 import { timeAgo } from "@/lib/admin/time";
 import { Transcript } from "./transcript";
+import { adminT } from "@/lib/i18n/admin-server";
 
 type Msg = { content: string; role: string; created_at: string };
 
 export default async function ChatsPage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const { db, tenant } = await getAdmin();
   const { id } = await searchParams;
+  const { t, locale } = await adminT();
+  const tc = t.chats;
   const { data } = await db.from("chat_sessions")
     .select("id,created_at,updated_at,chat_messages(content,role,created_at)")
     .eq("tenant_id", tenant.id).order("updated_at", { ascending: false }).limit(100);
@@ -22,19 +25,19 @@ export default async function ChatsPage({ searchParams }: { searchParams: Promis
 
   return (
     <div>
-      <PageTitle title="Conversations" subtitle="Every chat with your AI concierge. Use them to spot what visitors ask about." />
+      <PageTitle title={tc.title} subtitle={tc.subtitle} />
       {!sessions.length ? (
-        <p className="a-card a-muted text-center">No conversations yet. They appear here as soon as a visitor talks to the concierge.</p>
+        <p className="a-card a-muted text-center">{tc.none}</p>
       ) : (
         <div className="flex flex-wrap items-start gap-6">
-          <nav aria-label="Conversations" className="stagger min-w-0 flex-[1_1_320px] overflow-hidden rounded-xl border bg-surface">
-            <p className="a-muted px-4 py-3.5 text-sm"><span className="font-semibold text-ink">{sessions.length}</span> latest conversations</p>
+          <nav aria-label={tc.navAria} className="stagger min-w-0 flex-[1_1_320px] overflow-hidden rounded-xl border bg-surface">
+            <p className="a-muted px-4 py-3.5 text-sm">{tc.latest(sessions.length)}</p>
             {sessions.map((s) => {
               const lead = leadFor.get(s.id);
               return (
                 <Link key={s.id} href={`?id=${s.id}`} scroll={false} aria-current={s.id === cur.id ? "true" : undefined} className="a-row flex min-h-[72px] flex-col gap-1 border-t px-4 py-3">
-                  <span className="flex items-baseline justify-between gap-3"><span className="truncate font-medium">{first(s)}</span><span className="a-muted shrink-0 text-[0.82rem]">{timeAgo(s.updated_at)}</span></span>
-                  <span className="a-muted flex flex-wrap items-center gap-2 text-[0.85rem]">{s.chat_messages.length} messages{lead && <span className="a-pill a-pill-green">Became a lead</span>}</span>
+                  <span className="flex items-baseline justify-between gap-3"><span dir="auto" className="truncate font-medium">{first(s)}</span><span className="a-muted shrink-0 text-[0.82rem]">{timeAgo(s.updated_at, locale)}</span></span>
+                  <span className="a-muted flex flex-wrap items-center gap-2 text-[0.85rem]">{tc.messages(s.chat_messages.length)}{lead && <span className="a-pill a-pill-green">{tc.becameLead}</span>}</span>
                 </Link>
               );
             })}
@@ -43,8 +46,8 @@ export default async function ChatsPage({ searchParams }: { searchParams: Promis
             key={cur.id}
             className="p-pop flex-[1.7_1_440px]"
             title={first(cur)}
-            meta={`${timeAgo(cur.updated_at)} · ${cur.chat_messages.length} messages`}
-            assistant={tenant.ai_config?.assistantName || `${tenant.name} concierge`}
+            meta={`${timeAgo(cur.updated_at, locale)} · ${tc.messages(cur.chat_messages.length)}`}
+            assistant={tenant.ai_config?.assistantName || tc.assistant(tenant.name)}
             messages={cur.chat_messages}
             lead={leadFor.get(cur.id)}
           />

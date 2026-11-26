@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { LayoutGroup, MotionConfig, motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { ArrowUp, Loader2, RotateCcw } from "lucide-react";
 import { ChatError, MessageView, Status, useConciergeChat } from "@/components/site/chat";
-import { cn } from "@/lib/format";
+import { useSiteT } from "@/components/site/link";
+import { cn, initials as initialsOf } from "@/lib/format";
 import { Backdrop } from "./backdrop";
 
 type Props = {
@@ -24,7 +25,7 @@ function splitName(name: string) {
 }
 
 function Avatar({ src, name, size }: { src?: string; name: string; size: "lg" | "sm" }) {
-  const initials = name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
+  const initials = initialsOf(name);
   return (
     <motion.span
       layoutId="lounge-avatar"
@@ -49,6 +50,7 @@ function Avatar({ src, name, size }: { src?: string; name: string; size: "lg" | 
 
 export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, storageKey, suggestions }: Props) {
   const { messages, status, error, busy, send, reset } = useConciergeChat(storageKey);
+  const { t } = useSiteT();
   const [input, setInput] = useState("");
   const threadRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -88,8 +90,8 @@ export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, stora
               <motion.p layoutId="lounge-title" transition={{ duration: 0.6, ease: EASE }} className="font-heading text-lg leading-tight">
                 {first} <span className="text-[var(--lounge-accent)]">{last}</span>
               </motion.p>
-              <button onClick={reset} className="font-ui ml-auto flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-[var(--lounge-muted)] transition hover:bg-white/10 hover:text-[var(--lounge-text)]">
-                <RotateCcw size={13} /> New conversation
+              <button onClick={reset} className="font-ui ms-auto flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-[var(--lounge-muted)] transition hover:bg-white/10 hover:text-[var(--lounge-text)]">
+                <RotateCcw size={13} /> {t.chat.newConversation}
               </button>
             </motion.header>
           ) : (
@@ -128,7 +130,7 @@ export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, stora
                   <MessageView m={m} />
                 </motion.div>
               ))}
-              {status === "submitted" && <div className="muted"><Status>Thinking…</Status></div>}
+              {status === "submitted" && <div className="muted"><Status>{t.chat.thinking}</Status></div>}
               {error && <ChatError error={error} />}
             </div>
           </div>
@@ -142,7 +144,7 @@ export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, stora
               animate="show"
               variants={{ show: { transition: { staggerChildren: 0.04, delayChildren: 0.25 } } }}
               className="mb-4 flex flex-wrap justify-center gap-2"
-              aria-label="Suggested questions"
+              aria-label={t.chat.suggested}
             >
               {suggestions.map((s) => (
                 <motion.li key={s} variants={{ hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE } } }}>
@@ -162,15 +164,15 @@ export function LoungeChatHome({ name, subtitle, portraitUrl, backdropUrl, stora
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(input); } }}
               rows={2}
               maxLength={2000}
-              placeholder={talking ? "Reply…" : "Ask about projects, prices…"}
-              aria-label="Message"
+              placeholder={talking ? t.chat.reply : t.chat.askShort}
+              aria-label={t.chat.message}
               className="max-h-40 min-h-[3.25rem] flex-1 resize-none px-2.5 py-2 text-[0.98rem] leading-relaxed outline-none"
             />
-            <button type="submit" disabled={busy || !input.trim()} aria-label="Send message" className="lounge-send flex h-10 w-10 items-center justify-center">
+            <button type="submit" disabled={busy || !input.trim()} aria-label={t.chat.sendMessage} className="lounge-send flex h-10 w-10 items-center justify-center">
               {busy ? <Loader2 size={17} className="animate-spin" /> : <ArrowUp size={18} strokeWidth={2} />}
             </button>
           </form>
-          <p className="muted font-ui mt-2.5 hidden text-center text-[0.72rem] sm:block">Enter to send · Shift + Enter for a new line · Answers come from this advisor&apos;s own portfolio</p>
+          <p className="muted font-ui mt-2.5 hidden text-center text-[0.72rem] sm:block">{t.chat.keyHint}</p>
         </div>
       </section>
     </LayoutGroup>

@@ -5,19 +5,21 @@ import { starterPages, starterTheme, STARTER_NAV } from "@/lib/admin/starter";
 import { isMulti } from "@/lib/env";
 import { PRESETS } from "@/lib/theme";
 import { TEMPLATES, templateFor } from "@/lib/templates";
+import { adminT } from "@/lib/i18n/admin-server";
 
 const RESERVED = new Set(["www", "app", "admin", "api", "mail", "help", "support", "blog", "docs", "status", "s"]);
 
 export async function createSite(_: { error?: string } | null, f: FormData): Promise<{ error?: string }> {
-  if (!isMulti) return { error: "Sign-up is disabled on this installation." };
+  const a = (await adminT()).t.auth;
+  if (!isMulti) return { error: a.signupDisabled };
   const user = (await (await supabaseServer()).auth.getUser()).data.user;
-  if (!user) return { error: "Please sign in first." };
+  if (!user) return { error: a.signInFirst };
 
   const name = String(f.get("name") ?? "").trim().slice(0, 80);
   const slug = String(f.get("slug") ?? "").trim().toLowerCase();
-  if (!name) return { error: "Business name is required." };
+  if (!name) return { error: a.nameRequired };
   if (!/^[a-z0-9](-?[a-z0-9])*$/.test(slug) || slug.length < 2 || slug.length > 40 || RESERVED.has(slug)) {
-    return { error: "Choose a web address of 2–40 lowercase letters, numbers or dashes." };
+    return { error: a.badAddress };
   }
 
   // "look" is "<template>:<preset>" from the sign-up form, e.g. "classic:calm-green".
@@ -33,7 +35,7 @@ export async function createSite(_: { error?: string } | null, f: FormData): Pro
     contact: { email: user.email },
     nav: STARTER_NAV,
   }).select("id").single();
-  if (error) return { error: error.code === "23505" ? "That web address is taken — try another." : error.message };
+  if (error) return { error: error.code === "23505" ? a.addressTaken : error.message };
 
   await admin.from("tenant_members").insert({ tenant_id: tenant.id, user_id: user.id, role: "owner" });
   await admin.from("pages").insert(starterPages(name).map((p) => ({ ...p, tenant_id: tenant.id })));

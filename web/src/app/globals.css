@@ -255,7 +255,7 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 .pg-chart[data-phase="in"] :is(.pg-moving, .pg-link, .pg-stack) { transition-duration: 0.9s; transition-delay: calc(var(--i, 0) * 90ms + 150ms); }
 .pg-details summary { list-style: none; display: inline-flex; min-height: 2.75rem; align-items: center; }
 .pg-details summary::-webkit-details-marker { display: none; }
-.pg-details summary::after { content: "+"; margin-left: 0.5rem; }
+.pg-details summary::after { content: "+"; margin-inline-start: 0.5rem; }
 .pg-details[open] summary::after { content: "−"; }
 @media (prefers-reduced-motion: reduce) { .pg-chart :is(.pg-moving, .pg-link, .pg-stack) { transition: none; } }
 
@@ -283,13 +283,13 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 
 .prose-chat a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
 .prose-chat p + p { margin-top: 0.5rem; }
-.prose-chat ul { list-style: disc; padding-left: 1.1rem; margin: 0.35rem 0; }
+.prose-chat ul { list-style: disc; padding-inline-start: 1.1rem; margin: 0.35rem 0; }
 .prose-chat strong { font-weight: 600; }
 
 /* ───────── Admin dashboard (fixed design, independent of tenant themes) ───────── */
 /* Calm, high-contrast UI: one blue accent, 44px touch targets, white cards on a soft grey ground. */
 /* Shared by the landing page, sign-in and the admin: Geist, one blue, slate ink, 8px controls, 12px panels. */
-.admin, .platform { font-family: var(--font-platform), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--c-ink); font-size: 15px; line-height: 1.5; }
+.admin, .platform { font-family: var(--font-platform), var(--font-platform-ar, ui-sans-serif), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--c-ink); font-size: 15px; line-height: 1.5; }
 .admin ::selection, .platform ::selection { background: var(--c-brand); color: var(--c-on-brand); }
 .admin :is(h1, h2, h3, h4), .platform :is(h1, h2, h3, h4) { font-family: inherit; }
 .admin :is(h1, h2, h3) { letter-spacing: -0.015em; }
@@ -445,7 +445,7 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 .lounge-nav-item:hover { background: color-mix(in srgb, var(--sidebar-fg) 6%, transparent); color: var(--sidebar-fg); }
 .lounge-nav-item.is-active { background: color-mix(in srgb, var(--sidebar-fg) 9%, transparent); color: var(--sidebar-fg); font-weight: 500; }
 .lounge-nav-item.is-active svg { color: var(--sidebar-mark); }
-.lounge-nav-marker { position: absolute; left: -0.25rem; top: 0.6rem; bottom: 0.6rem; width: 3px; border-radius: 3px; background: var(--primary); }
+.lounge-nav-marker { position: absolute; inset-inline-start: -0.25rem; top: 0.6rem; bottom: 0.6rem; width: 3px; border-radius: 3px; background: var(--primary); }
 .lounge-nav-item:focus-visible, .lounge-cta:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .lounge-cta { background: var(--sidebar-fg); color: var(--sidebar); box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.5); transition: transform 0.2s, box-shadow 0.2s; }
 .lounge-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.6); }
@@ -550,12 +550,12 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 .lounge-room { position: relative; isolation: isolate; overflow: hidden; background: var(--lounge-ink); }
 @media (min-width: 1024px) {
   /* Reach back under the sidebar; --room-pad is the room's own left padding, kept clear of the sidebar. */
-  .lounge-room { margin-left: -16rem; padding-left: calc(16rem + var(--room-pad, 0px)); }
+  .lounge-room { margin-inline-start: -16rem; padding-inline-start: calc(16rem + var(--room-pad, 0px)); }
 }
 /* Consecutive chapters share one night ground, divided by a hairline. */
 .lounge-rooms { background: var(--lounge-ink); }
 .lounge-rooms .lounge-room { border-top: 1px solid var(--lounge-glass-line); }
-@media (min-width: 1024px) { .lounge-rooms { margin-left: -16rem; } .lounge-rooms .lounge-room { margin-left: 0; } }
+@media (min-width: 1024px) { .lounge-rooms { margin-inline-start: -16rem; } .lounge-rooms .lounge-room { margin-inline-start: 0; } }
 
 /* Story photographs come in from the right, behind the chapter text. */
 @property --story-reveal { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
@@ -563,6 +563,7 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
   --mask: linear-gradient(90deg, transparent calc(18% + var(--story-reveal)), #000 calc(62% + var(--story-reveal)));
   mask-image: var(--mask); -webkit-mask-image: var(--mask);
 }
+[dir="rtl"] .lounge-story-img { --mask: linear-gradient(270deg, transparent calc(18% + var(--story-reveal)), #000 calc(62% + var(--story-reveal))); }
 @media (max-width: 767px) { .lounge-story-img { mask-image: none; -webkit-mask-image: none; } }
 .lounge .card-ui { font-family: var(--font-ui); font-variant-numeric: lining-nums tabular-nums; }
 .lounge-ghost {
@@ -598,7 +599,7 @@ a.a-card:focus-visible { outline: 2px solid var(--c-brand); outline-offset: 2px;
 /* Header links: an underline that draws in on hover and stays on the current page. */
 .nav-link { position: relative; }
 .nav-link::after {
-  content: ""; position: absolute; left: 0.875rem; right: 0.875rem; bottom: 0.45rem; height: 2px; border-radius: 2px;
+  content: ""; position: absolute; inset-inline: 0.875rem; bottom: 0.45rem; height: 2px; border-radius: 2px;
   background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .nav-link:hover::after, .nav-link[aria-current="page"]::after { transform: scaleX(1); }
@@ -702,3 +703,10 @@ details.faq-item[open]::details-content { block-size: auto; }
   .js-reveal .sky-edge:not(.is-in) .roof-line { clip-path: inset(0); }
   .p-typing { display: none; }
 }
+
+/* ───────── Right-to-left (Arabic) ───────── */
+/* Arabic letters join, so tracking would pull words apart; uppercase does nothing to them either. */
+[dir="rtl"] * { letter-spacing: normal !important; }
+[dir="rtl"] .nav-link::after { transform-origin: right; }
+[dir="rtl"] .chat-pop { transform-origin: bottom left; }
+[dir="rtl"] .grow-x { transform-origin: right; }

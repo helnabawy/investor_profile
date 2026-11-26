@@ -1,11 +1,13 @@
 import { getAdmin } from "@/lib/admin/context";
-import { availableProviders, PROVIDERS } from "@/lib/ai/config";
+import { availableProviders, PROVIDERS, type ProviderId } from "@/lib/ai/config";
+import { adminT } from "@/lib/i18n/admin-server";
 import { AiForm } from "./ai-form";
 
 export default async function AiPage() {
   const { db, tenant } = await getAdmin();
   const available = availableProviders();
-  const providers = Object.entries(PROVIDERS).map(([id, p]) => ({ id, label: p.label, note: p.note, defaultModel: p.defaultModel, configured: available.includes(id as never) }));
+  const { t } = await adminT();
+  const providers = Object.entries(PROVIDERS).map(([id, p]) => ({ id, label: p.label, note: t.providers[id as ProviderId] ?? p.note, defaultModel: p.defaultModel, configured: available.includes(id as never) }));
   const count = { count: "exact", head: true } as const;
   const [projects, faqs, notes] = await Promise.all([
     db.from("projects").select("id", count).eq("tenant_id", tenant.id).eq("published", true),

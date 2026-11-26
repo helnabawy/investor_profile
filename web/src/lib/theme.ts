@@ -31,6 +31,9 @@ export type ThemeConfig = Partial<ThemeTokens> & {
   backdropUrl?: string;
   /** Lounge: sidebar call-to-action. */
   ctaLabel?: string;
+  ctaLabel_ar?: string;
+  /** Typeface for Arabic text on the Arabic site; Latin text keeps the heading and body fonts. */
+  fontArabic?: ArabicFont;
   ctaHref?: string;
 };
 
@@ -185,13 +188,39 @@ function sanitizeCssValue(v: string) {
   return v.replace(/[<>{};"\\]/g, "").slice(0, 80);
 }
 
-export function themeCss(t: ThemeTokens) {
-  return `:root{--background:${t.background};--foreground:${t.foreground};--card:${t.card};--muted:${t.muted};--muted-foreground:${t.mutedForeground};--border:${t.border};--primary:${t.primary};--primary-foreground:${t.primaryForeground};--accent:${t.accent};--radius:${t.radius};--font-heading:"${t.headingFont}",Georgia,serif;--font-body:"${t.bodyFont}",system-ui,sans-serif;}`;
+/** Arabic typefaces on Google Fonts, with the weights each one ships. */
+export const ARABIC_FONTS = {
+  "IBM Plex Sans Arabic": ":wght@400;500;600;700",
+  "Noto Kufi Arabic": ":wght@400;500;600;700",
+  "Readex Pro": ":wght@400;500;600;700",
+  Cairo: ":wght@400;500;600;700",
+  Tajawal: ":wght@400;500;700",
+  "Noto Naskh Arabic": ":wght@400;500;600;700",
+  Amiri: ":wght@400;700",
+} as const;
+export type ArabicFont = keyof typeof ARABIC_FONTS;
+export const DEFAULT_ARABIC_FONT: ArabicFont = "IBM Plex Sans Arabic";
+
+export function arabicFont(config: ThemeConfig | null | undefined): ArabicFont {
+  const f = config?.fontArabic;
+  return f && Object.hasOwn(ARABIC_FONTS, f) ? f : DEFAULT_ARABIC_FONT;
 }
 
-export function googleFontsHref(t: ThemeTokens) {
+/**
+ * CSS variables for the theme. On the Arabic site the Arabic face follows each Latin one: the Latin
+ * fonts are loaded with Latin glyphs only, so English words keep the brand fonts and Arabic falls
+ * through to the Arabic face.
+ */
+export function themeCss(t: ThemeTokens, locale: "en" | "ar" = "en", arabic: ArabicFont = DEFAULT_ARABIC_FONT) {
+  const ar = locale === "ar" ? `"${arabic}",` : "";
+  const ui = locale === "ar" ? `.lounge{--font-ui:"Hanken Grotesk",${ar}ui-sans-serif,system-ui,sans-serif;}` : "";
+  return `:root{--background:${t.background};--foreground:${t.foreground};--card:${t.card};--muted:${t.muted};--muted-foreground:${t.mutedForeground};--border:${t.border};--primary:${t.primary};--primary-foreground:${t.primaryForeground};--accent:${t.accent};--radius:${t.radius};--font-heading:"${t.headingFont}",${ar}Georgia,serif;--font-body:"${t.bodyFont}",${ar}system-ui,sans-serif;}${ui}`;
+}
+
+export function googleFontsHref(t: ThemeTokens, locale: "en" | "ar" = "en", arabic: ArabicFont = DEFAULT_ARABIC_FONT) {
   const fams = Array.from(new Set([t.headingFont, t.bodyFont]))
     .filter((f) => (FONTS as readonly string[]).includes(f))
     .map((f) => `family=${f.replace(/ /g, "+")}${FONT_WEIGHTS[f] ?? ":wght@400;500;600;700"}`);
+  if (locale === "ar" && ![t.headingFont, t.bodyFont].includes(arabic)) fams.push(`family=${arabic.replace(/ /g, "+")}${ARABIC_FONTS[arabic]}`);
   return fams.length ? `https://fonts.googleapis.com/css2?${fams.join("&")}&display=swap` : null;
 }

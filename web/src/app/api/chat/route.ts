@@ -17,6 +17,9 @@ import { buildInstructions, loadCatalogue, retrieveSnippets } from "@/lib/ai/kno
 import { chatTools } from "@/lib/ai/tools";
 import { clientHash, LIMITS, minutesAgo } from "@/lib/rate-limit";
 import { corsFor, preflight } from "@/lib/cors";
+import { isLocale, type Locale } from "@/lib/i18n/locales";
+import { SITE } from "@/lib/i18n/site";
+import { siteLocales } from "@/lib/tenant";
 
 // Leaves room for the model timeouts below, so a slow or rate-limited provider ends in a readable
 // error instead of the platform cutting the stream off with the visitor still waiting.
@@ -36,19 +39,22 @@ export async function OPTIONS(req: Request) {
 export async function POST(req: Request) {
   const h = await headers();
   const site = h.get("x-site");
-  if (!site) return json(400, "Unknown site");
-  const tenant = await getTenantBySite(site);
-  if (!tenant || tenant.ai_config?.enabled === false) return json(404, "Chat is not available");
-  const cors = corsFor(req, tenant);
-  if (!cors) return json(403, "This site is not allowed to use the concierge");
-
   // Only the visitor's newest message is taken from the request. Earlier turns come from our own
   // chat_messages table, so a client cannot inflate the prompt or forge assistant replies.
-  const body = (await req.json().catch(() => null)) as { messages?: UIMessage[]; sessionId?: string } | null;
+  const body = (await req.json().catch(() => null)) as { messages?: UIMessage[]; sessionId?: string; locale?: string } | null;
+  const tenant = site ? await getTenantBySite(site) : null;
+  // The language of the page the visitor is on; the concierge answers and errors in it.
+  const locale: Locale = isLocale(body?.locale) ? body.locale : tenant ? siteLocales(tenant).defaultLocale : "en";
+  const m = SITE[locale].api;
+  if (!site) return json(400, m.unknownSite);
+  if (!tenant || tenant.ai_config?.enabled === false) return json(404, m.chatUnavailable);
+  const cors = corsFor(req, tenant);
+  if (!cors) return json(403, m.chatNotAllowed);
+
   const last = body?.messages?.at(-1);
   const lastText = last?.parts?.map((p) => (p.type === "text" ? p.text : "")).join("").trim() ?? "";
-  if (!last || last.role !== "user" || !lastText) return json(400, "No message", cors);
-  if (lastText.length > MAX_INPUT_CHARS) return json(413, "Message too long", cors);
+  if (!last || last.role !== "user" || !lastText) return json(400, m.noMessage, cors);
+  if (lastText.length > MAX_INPUT_CHARS) return json(413, m.tooLong, cors);
 
   const db = supabaseAdmin();
   const client = clientHash(h);
@@ -59,20 +65,20 @@ export async function POST(req: Request) {
     db.from("chat_messages").select("id", { count: "exact", head: true }).eq("client_hash", client).eq("role", "user").gte("created_at", minutesAgo(24 * 60)),
   ]);
   if ((recent ?? 0) >= LIMITS.chatPer10Min || (today ?? 0) >= LIMITS.chatPerDay) {
-    return json(429, "You've sent a lot of messages. Please use the contact form and an advisor will reply.", cors);
+    return json(429, m.tooMany, cors);
   }
 
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const { count: daily } = await db.from("chat_messages").select("id", { count: "exact", head: true })
     .eq("tenant_id", tenant.id).eq("role", "user").gte("created_at", since);
   if ((daily ?? 0) >= tenantPlan(tenant).dailyChat) {
-    return json(429, "The concierge is busy right now. Please use the contact form and we'll reply shortly.", cors);
+    return json(429, m.busy, cors);
   }
 
   const sessionId = await ensureSession(db, tenant.id, body?.sessionId);
   const { count: burst } = await db.from("chat_messages").select("id", { count: "exact", head: true })
     .eq("session_id", sessionId).eq("role", "user").gte("created_at", new Date(Date.now() - 60_000).toISOString());
-  if ((burst ?? 0) >= 8) return json(429, "You're sending messages quickly — please wait a moment.", cors);
+  if ((burst ?? 0) >= 8) return json(429, m.slowDown, cors);
 
   const models = resolveModels(tenant.ai_config ?? {});
   if (!models.length) return json(503, "No AI provider configured. Set GOOGLE_GENERATIVE_AI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY or ANTHROPIC_API_KEY.", cors);
@@ -90,9 +96,9 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: fallbackModel(models.map((m) => m.model as LanguageModelV4)),
-    instructions: buildInstructions(tenant, catalogue, snippets),
+    instructions: buildInstructions(tenant, catalogue, snippets, locale),
     messages: history,
-    tools: chatTools(db, tenant, sessionId),
+    tools: chatTools(db, tenant, sessionId, locale),
     stopWhen: isStepCount(4),
     // With a fallback, an overloaded model is skipped rather than retried (a retry of a 503 "high demand"
     // can take ~10s and usually fails again). A single model gets one retry.
@@ -114,7 +120,7 @@ export async function POST(req: Request) {
       stream: result.stream,
       onError: (error) => {
         console.error("[chat] failed", error);
-        return visitorError(error);
+        return visitorError(error, locale);
       },
     }).pipeThrough(
       // A timeout ends the stream as an "abort", which the chat would show as a silent stop.
@@ -122,7 +128,7 @@ export async function POST(req: Request) {
         transform(chunk, out) {
           if (chunk.type === "abort") {
             console.error("[chat] timed out", chunk);
-            out.enqueue({ type: "error", errorText: TIMEOUT_MESSAGE });
+            out.enqueue({ type: "error", errorText: m.timeout });
           } else out.enqueue(chunk);
         },
       }),
@@ -131,23 +137,16 @@ export async function POST(req: Request) {
   });
 }
 
-const TIMEOUT_MESSAGE = "The concierge is taking too long to answer. Please try again, or use the contact form.";
-
 /** What the visitor sees when the model fails: the cause in plain words, never the provider's raw error. */
-function visitorError(error: unknown) {
+function visitorError(error: unknown, locale: Locale) {
+  const m = SITE[locale].api;
   const e = error as { name?: string; message?: string; statusCode?: number } | undefined;
   const text = `${e?.name ?? ""} ${e?.message ?? ""}`;
-  if (e?.statusCode === 429 || /429|quota|rate.?limit|resource.?exhausted/i.test(text)) {
-    return "The concierge has reached its usage limit for now. Please try again later, or use the contact form and an advisor will reply.";
-  }
-  if (e?.statusCode === 503 || /overload|unavailable|503|high demand|try again later/i.test(text)) {
-    return "The concierge is very busy right now. Please try again in a minute, or use the contact form.";
-  }
-  if (/timeout|timed out|abort|no output within/i.test(text)) return TIMEOUT_MESSAGE;
-  if (e?.statusCode === 400 || e?.statusCode === 401 || e?.statusCode === 403 || /api key|permission|not found/i.test(text)) {
-    return "The concierge isn't available right now. Please use the contact form and an advisor will reply.";
-  }
-  return "The concierge couldn't answer just now. Please try again, or use the contact form.";
+  if (e?.statusCode === 429 || /429|quota|rate.?limit|resource.?exhausted/i.test(text)) return m.usageLimit;
+  if (e?.statusCode === 503 || /overload|unavailable|503|high demand|try again later/i.test(text)) return m.veryBusy;
+  if (/timeout|timed out|abort|no output within/i.test(text)) return m.timeout;
+  if (e?.statusCode === 400 || e?.statusCode === 401 || e?.statusCode === 403 || /api key|permission|not found/i.test(text)) return m.notAvailable;
+  return m.couldNotAnswer;
 }
 
 // The widget generates the session id (kept in localStorage) so it can resume conversations.

@@ -16,7 +16,7 @@ export const getAdmin = cache(async () => {
 
   const { data: memberships } = await db
     .from("tenant_members")
-    .select("role, tenant:tenants(id,slug,name,tagline,domains,plan,theme,ai_config,contact,nav,published)")
+    .select("role, tenant:tenants(id,slug,name,name_ar,tagline,tagline_ar,default_locale,locales,domains,plan,theme,ai_config,contact,nav,published)")
     .eq("user_id", user.id);
   const sites = (memberships ?? [])
     .map((m) => ({ role: m.role as string, tenant: m.tenant as unknown as Tenant }))

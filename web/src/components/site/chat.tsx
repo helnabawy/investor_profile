@@ -1,13 +1,12 @@
 "use client";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { useSitePathname } from "@/components/site/link";
+import { useSitePathname, useSiteT } from "@/components/site/link";
 import Link from "@/components/site/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MessageCircle, Send, X, Sparkles, Loader2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/format";
 import { apiUrl } from "@/lib/api-base";
-import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";
 
 type ChatProps = { assistantName: string; greeting: string; storageKey: string; suggestions?: string[] };
 
@@ -22,6 +21,7 @@ export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: 
   const [question, setQuestion] = useState("");
   const clearQuestion = useCallback(() => setQuestion(""), []);
   const pathname = useSitePathname();
+  const { t } = useSiteT();
   useEffect(() => {
     // An "open-chat" CustomEvent may carry { question } to send straight away (e.g. the hero ask box).
     const onOpen = (e: Event) => {
@@ -44,14 +44,14 @@ export function ChatWidget({ hideOnHome, ...props }: ChatProps & { hideOnHome?: 
   return (
     <>
       {open && (
-        <div className="chat-pop fixed inset-x-3 bottom-3 top-20 z-50 flex flex-col overflow-hidden rounded-[calc(var(--radius)+6px)] border bg-background shadow-2xl sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[620px] sm:max-h-[calc(100vh-8rem)] sm:w-[400px]">
+        <div className="chat-pop fixed inset-x-3 bottom-3 top-20 z-50 flex flex-col overflow-hidden rounded-[calc(var(--radius)+6px)] border bg-background shadow-2xl sm:inset-auto sm:bottom-24 sm:end-6 sm:h-[620px] sm:max-h-[calc(100vh-8rem)] sm:w-[400px]">
           <ChatPanel {...props} initialQuestion={question} onQuestionSent={clearQuestion} onClose={() => setOpen(false)} />
         </div>
       )}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label={open ? "Close chat" : `Chat with ${props.assistantName}`}
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition hover:scale-105 sm:bottom-6 sm:right-6"
+        aria-label={open ? t.chat.close : t.common.chatWith(props.assistantName)}
+        className="fixed bottom-5 end-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition hover:scale-105 sm:bottom-6 sm:end-6"
       >
         {open ? <X /> : <MessageCircle />}
       </button>
@@ -65,7 +65,9 @@ export function useConciergeChat(storageKey: string) {
   const msgsKey = `chat:${storageKey}:messages`;
   // Start empty on the server and first client render (hydration-safe), then restore from localStorage.
   const [sessionId, setSessionId] = useState("");
-  const transport = useMemo(() => new DefaultChatTransport({ api: apiUrl("/api/chat"), body: () => ({ sessionId }) }), [sessionId]);
+  const { locale } = useSiteT();
+  // The page's language goes with every message, so the concierge answers in it.
+  const transport = useMemo(() => new DefaultChatTransport({ api: apiUrl("/api/chat"), body: () => ({ sessionId, locale }) }), [sessionId, locale]);
   const { messages, sendMessage, status, error, setMessages, clearError } = useChat({ transport });
   const busy = status === "submitted" || status === "streaming";
 
@@ -103,6 +105,7 @@ export function useConciergeChat(storageKey: string) {
 
 /** Renders one message's parts (text, tool progress, lead confirmation). */
 export function MessageView({ m }: { m: UIMessage }) {
+  const { t } = useSiteT();
   return (
     <>
       {m.parts.map((part, i) => {
@@ -110,15 +113,15 @@ export function MessageView({ m }: { m: UIMessage }) {
           return <Bubble key={i} role={m.role}>{m.role === "assistant" ? renderMarkdown(part.text) : part.text}</Bubble>;
         }
         if (part.type === "tool-searchProjects" && part.state !== "output-available" && part.state !== "output-error") {
-          return <Status key={i}>Searching the portfolio…</Status>;
+          return <Status key={i}>{t.chat.searching}</Status>;
         }
         if (part.type === "tool-captureLead" && part.state === "output-available") {
           const out = part.output as { saved?: boolean; whatsapp?: string | null };
           if (!out?.saved) return null;
           return (
             <div key={i} className="rounded-[var(--radius)] border border-primary/40 bg-primary/10 p-3 text-sm">
-              Your details are with an advisor — expect a reply shortly.
-              {out.whatsapp && <a href={out.whatsapp} target="_blank" rel="noreferrer" className="btn btn-primary mt-2 w-full !py-2">Continue on WhatsApp</a>}
+              {t.chat.leadSaved}
+              {out.whatsapp && <a href={out.whatsapp} target="_blank" rel="noreferrer" className="btn btn-primary mt-2 w-full !py-2">{t.chat.continueWhatsapp}</a>}
             </div>
           );
         }
@@ -129,13 +132,16 @@ export function MessageView({ m }: { m: UIMessage }) {
 }
 
 export function ChatError({ error }: { error: Error }) {
-  return <div role="alert" className="rounded-[var(--radius)] border border-red-500/40 bg-red-500/10 p-3 text-sm">{errorText(error)}</div>;
+  const { t } = useSiteT();
+  return <div role="alert" className="rounded-[var(--radius)] border border-red-500/40 bg-red-500/10 p-3 text-sm">{errorText(error, t.chat.error)}</div>;
 }
 
-export function ChatPanel({ assistantName, greeting, storageKey, suggestions = DEFAULT_SUGGESTIONS, onClose, initialQuestion, onQuestionSent }: ChatProps & {
+export function ChatPanel({ assistantName, greeting, storageKey, suggestions, onClose, initialQuestion, onQuestionSent }: ChatProps & {
   onClose?: () => void; initialQuestion?: string; onQuestionSent?: () => void;
 }) {
   const { messages, status, error, busy, send, reset, ready } = useConciergeChat(storageKey);
+  const { t } = useSiteT();
+  const chips = suggestions?.length ? suggestions : t.chat.suggestions;
   // A question handed over by the hero box is sent once the session is ready and the concierge is
   // not mid-reply; while busy it waits, and `send` changing when the reply ends retries it once.
   useEffect(() => {
@@ -154,14 +160,14 @@ export function ChatPanel({ assistantName, greeting, storageKey, suggestions = D
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground"><Sparkles size={16} /></span>
           <div>
             <p className="font-heading leading-tight">{assistantName}</p>
-            <p className="text-xs text-muted-foreground">AI concierge · replies instantly</p>
+            <p className="text-xs text-muted-foreground">{t.chat.repliesInstantly}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
           {messages.length > 0 && (
-            <button onClick={reset} className="rounded p-2 text-muted-foreground hover:text-foreground" aria-label="New conversation" title="New conversation"><RotateCcw size={16} /></button>
+            <button onClick={reset} className="rounded p-2 text-muted-foreground hover:text-foreground" aria-label={t.chat.newConversation} title={t.chat.newConversation}><RotateCcw size={16} /></button>
           )}
-          {onClose && <button onClick={onClose} className="rounded p-2 text-muted-foreground hover:text-foreground" aria-label="Close chat"><X size={18} /></button>}
+          {onClose && <button onClick={onClose} className="rounded p-2 text-muted-foreground hover:text-foreground" aria-label={t.chat.close}><X size={18} /></button>}
         </div>
       </div>
 
@@ -169,13 +175,13 @@ export function ChatPanel({ assistantName, greeting, storageKey, suggestions = D
         <Bubble role="assistant">{renderMarkdown(greeting)}</Bubble>
         {messages.length === 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
-            {suggestions.map((s) => (
+            {chips.map((s) => (
               <button key={s} onClick={() => submit(s)} className="rounded-full border px-3 py-1.5 text-sm text-muted-foreground hover:border-primary hover:text-primary">{s}</button>
             ))}
           </div>
         )}
         {messages.map((m) => <MessageView key={m.id} m={m} />)}
-        {status === "submitted" && <Status>Thinking…</Status>}
+        {status === "submitted" && <Status>{t.chat.thinking}</Status>}
         {error && <ChatError error={error} />}
         <div ref={endRef} />
       </div>
@@ -187,12 +193,12 @@ export function ChatPanel({ assistantName, greeting, storageKey, suggestions = D
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(input); } }}
           rows={1}
           maxLength={2000}
-          placeholder="Ask about projects, prices, payment plans…"
+          placeholder={t.chat.placeholder}
           className="input max-h-32 min-h-[44px] flex-1 resize-none"
-          aria-label="Message"
+          aria-label={t.chat.message}
         />
-        <button type="submit" disabled={busy || !input.trim()} className="btn btn-primary !h-11 !w-11 !p-0" aria-label="Send">
-          {busy ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
+        <button type="submit" disabled={busy || !input.trim()} className="btn btn-primary !h-11 !w-11 !p-0" aria-label={t.chat.send}>
+          {busy ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} className="rtl:-scale-x-100" />}
         </button>
       </form>
     </div>
@@ -221,14 +227,14 @@ export function Status({ children }: { children: ReactNode }) {
  * The server's own words when it sent any: a JSON body for refusals before the stream (rate limits,
  * no provider), or the stream's error text, which the API already writes for visitors.
  */
-function errorText(error: Error) {
+function errorText(error: Error, fallback: string) {
   const msg = error.message?.trim() ?? "";
   try {
     const parsed = JSON.parse(msg);
     if (parsed?.error) return parsed.error as string;
   } catch {}
   if (msg && msg.length <= 240 && !/^(failed to fetch|load failed|networkerror)/i.test(msg) && !msg.includes("{")) return msg;
-  return "Sorry, I couldn't respond just now. Please try again in a moment or use the contact form.";
+  return fallback;
 }
 
 // Minimal, safe markdown: links, **bold**, and "- " bullets. No HTML is ever injected.

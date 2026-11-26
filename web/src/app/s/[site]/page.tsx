@@ -3,23 +3,24 @@ import { RenderSections } from "@/components/sections/render";
 import { newSection } from "@/lib/sections/registry";
 import { siteLayout } from "@/lib/theme";
 import { LoungeChatHome } from "@/components/lounge/chat-home";
-import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";
+import { siteT } from "@/lib/i18n/server";
 import { FoyerHome } from "@/components/templates/foyer-home";
 
 export default async function Home({ params }: { params: Promise<{ site: string }> }) {
   const tenant = await requireTenant((await params).site);
   const ai = tenant.ai_config ?? {};
+  const { t, locale } = await siteT();
 
   // Lounge: the conversation is the homepage.
   if (siteLayout(tenant.theme) === "lounge" && ai.enabled !== false) {
     return (
       <LoungeChatHome
           name={tenant.name}
-          subtitle={tenant.tagline || `Ask ${ai.assistantName || "our concierge"} about projects, prices and payment plans`}
+          subtitle={tenant.tagline || t.common.loungeSubtitle(ai.assistantName)}
           portraitUrl={tenant.theme?.portraitUrl}
           backdropUrl={tenant.theme?.backdropUrl}
           storageKey={tenant.slug}
-          suggestions={ai.suggestions?.length ? ai.suggestions : DEFAULT_SUGGESTIONS}
+          suggestions={ai.suggestions?.length ? ai.suggestions : t.chat.suggestions}
         />
     );
   }
@@ -36,15 +37,15 @@ export default async function Home({ params }: { params: Promise<{ site: string 
       <FoyerHome
         name={tenant.name}
         tagline={tenant.tagline}
-        title={text("title") || `Find your next property with ${tenant.name}`}
+        title={text("title") || t.common.findNext(tenant.name)}
         subtitle={text("subtitle")}
         image={text("image") || tenant.theme?.backdropUrl}
         projects={(projects.length ? projects : await getProjects(tenant.id)).slice(0, 3)}
         faqs={faqs.slice(0, 3)}
         contact={tenant.contact ?? {}}
         nav={tenant.nav ?? []}
-        askLabel={`Ask ${ai.assistantName || "the concierge"}`}
-        askPlaceholder={text("askPlaceholder") || "Ask about projects, prices or payment plans"}
+        askLabel={t.common.askNamed(ai.assistantName)}
+        askPlaceholder={text("askPlaceholder") || t.common.askPlaceholder}
         chat={ai.enabled !== false}
         poweredBy={tenantPlan(tenant).badge}
       />
@@ -52,10 +53,10 @@ export default async function Home({ params }: { params: Promise<{ site: string 
   }
   // A brand-new tenant without a home page still gets something sensible.
   const sections = page?.sections?.length ? page.sections : [
-    { ...newSection("hero-split"), props: { eyebrow: tenant.tagline ?? "", title: `Find your next property with ${tenant.name}`, image: tenant.theme?.backdropUrl ?? "" } },
-    newSection("quick-links"),
-    newSection("featured-projects"),
-    newSection("contact"),
+    { ...newSection("hero-split", locale), props: { eyebrow: tenant.tagline ?? "", title: t.common.findNext(tenant.name), image: tenant.theme?.backdropUrl ?? "" } },
+    newSection("quick-links", locale),
+    newSection("featured-projects", locale),
+    newSection("contact", locale),
   ];
   return <RenderSections sections={sections} tenant={tenant} />;
 }

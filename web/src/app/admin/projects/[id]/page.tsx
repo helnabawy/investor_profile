@@ -4,6 +4,7 @@ import { ProjectForm } from "./project-form";
 import { PROJECT_COLUMNS, type Project } from "@/lib/types";
 import { PageTitle, UpgradeNote } from "@/components/admin/ui";
 import { tenantPlan } from "@/lib/tenant";
+import { adminT } from "@/lib/i18n/admin-server";
 
 export default async function EditProject({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -13,10 +14,11 @@ export default async function EditProject({ params }: { params: Promise<{ id: st
     if (plan.maxProjects !== null) {
       const { count } = await db.from("projects").select("id", { count: "exact", head: true }).eq("tenant_id", tenant.id);
       if ((count ?? 0) >= plan.maxProjects) {
+        const { t } = await adminT();
         return (
           <div>
-            <PageTitle title="New project" />
-            <UpgradeNote>The {plan.name} plan includes up to {plan.maxProjects} projects. Upgrade to add more, or delete one you no longer need.</UpgradeNote>
+            <PageTitle title={t.project.newProject} />
+            <UpgradeNote>{t.projectsList.planFull(plan.name, plan.maxProjects)}</UpgradeNote>
           </div>
         );
       }

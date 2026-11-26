@@ -40,5 +40,17 @@ const prompt = buildInstructions(tenant!, cat, snippets);
 assert(prompt.includes("Aurelia Concierge") && prompt.includes("Marina Vista") && !prompt.includes("Hills Park"), "system prompt has persona + own inventory only");
 assert(other && cat.every((p) => p.tenant_id === tenant!.id), "catalogue is tenant-scoped");
 
+// Arabic: the same inventory and FAQs answer questions asked in Arabic, and the prompt switches language.
+const arTools = chatTools(db, tenant!, sessionId, "ar");
+const r4 = (await arTools.searchProjects.execute!({ query: "مارينا" }, ctx)) as { results: string[] };
+assert(r4.results.some((r) => r.includes("Marina Vista")), `Arabic search 'مارينا' finds Marina Vista (got: ${r4.results.map((r) => r.split(" [")[0]).join(", ") || "none"})`);
+const arSnippets = await retrieveSnippets(db, tenant!.id, "ما هي تكاليف الشراء؟");
+assert(arSnippets.some((s) => s.includes("تكاليف")), `Arabic FAQ retrieval for 'تكاليف' → ${arSnippets.length} snippets`);
+const arPrompt = buildInstructions(tenant!, cat, arSnippets, "ar");
+assert(arPrompt.includes("Reply in Arabic") && arPrompt.includes("مساكن مارينا فيستا"), "Arabic page: prompt asks for Arabic and carries Arabic project names");
+const arLead = (await arTools.captureLead.execute!({ name: "سارة", phone: "+971 50 111 2222" }, ctx)) as { saved: boolean; whatsapp: string };
+const { data: arSaved } = await db.from("leads").select("locale").eq("session_id", sessionId).eq("name", "سارة").single();
+assert(arLead.saved && arSaved?.locale === "ar" && decodeURIComponent(arLead.whatsapp).includes("مرحباً"), "Arabic lead is stored with locale=ar and an Arabic WhatsApp message");
+
 await db.from("chat_sessions").delete().eq("id", sessionId);
 await db.from("leads").delete().eq("session_id", sessionId);

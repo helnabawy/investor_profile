@@ -2,13 +2,15 @@
 import { useFormStatus } from "react-dom";
 import type { ActionResult } from "@/app/admin/actions";
 import { upgradeUrl } from "@/lib/plans";
+import { useAdminT } from "./i18n";
 
 /** One line telling an agent that something needs a higher plan, with the way to get it. */
 export function UpgradeNote({ children }: { children: React.ReactNode }) {
+  const { t } = useAdminT();
   return (
     <p className="rounded-lg bg-warning-soft px-4 py-3 text-sm text-warning-strong">
       {children}{" "}
-      {upgradeUrl ? <a href={upgradeUrl} className="font-semibold underline">See plans</a> : "Contact us to upgrade."}
+      {upgradeUrl ? <a href={upgradeUrl} className="font-semibold underline">{t.ui.seePlans}</a> : t.ui.contactToUpgrade}
     </p>
   );
 }
@@ -25,14 +27,16 @@ export function PageTitle({ title, subtitle, children }: { title: string; subtit
   );
 }
 
-export function SubmitButton({ children, className = "a-btn a-btn-primary", pendingLabel = "Saving…" }: { children: React.ReactNode; className?: string; pendingLabel?: string }) {
+export function SubmitButton({ children, className = "a-btn a-btn-primary", pendingLabel }: { children: React.ReactNode; className?: string; pendingLabel?: string }) {
   const { pending } = useFormStatus();
-  return <button className={className} disabled={pending}>{pending ? pendingLabel : children}</button>;
+  const { t } = useAdminT();
+  return <button className={className} disabled={pending}>{pending ? pendingLabel ?? t.ui.saving : children}</button>;
 }
 
 export function FormMessage({ state }: { state: ActionResult | null }) {
+  const { t } = useAdminT();
   if (!state) return null;
   return state.ok
-    ? <p role="status" className="rise text-sm font-medium text-success">Saved ✓</p>
+    ? <p role="status" className="rise text-sm font-medium text-success">{t.ui.saved}</p>
     : <p role="alert" className="rise text-sm font-medium text-danger">{state.error}</p>;
 }
