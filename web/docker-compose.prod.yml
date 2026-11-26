@@ -64,7 +64,7 @@ services:
       GOTRUE_SMTP_USER: ${SMTP_USER:-}
       GOTRUE_SMTP_PASS: ${SMTP_PASS:-}
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_FROM_EMAIL:-}
-      GOTRUE_SMTP_SENDER_NAME: ${SMTP_FROM_NAME:-EstateProfile}
+      GOTRUE_SMTP_SENDER_NAME: ${SMTP_FROM_NAME:-EstateInvestor}
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:9999/health"]
       interval: 5s

@@ -67,7 +67,7 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
 
         <p className="text-[0.85rem] text-muted-foreground">
           © {new Date().getFullYear()} {name}
-          {poweredBy && <> · Powered by <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateProfile</a></>}
+          {poweredBy && <> · Powered by <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateInvestor</a></>}
         </p>
       </div>
 

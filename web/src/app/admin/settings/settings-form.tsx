@@ -67,7 +67,7 @@ export function SettingsForm({ tenant, multi, rootDomain, planName, customDomain
         <Group title="Domains" hint="Where buyers find your site.">
           <div className="overflow-hidden rounded-xl border bg-surface">
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3.5">
-              <span className="min-w-0"><span className="block font-medium [overflow-wrap:anywhere]">{tenant.slug}.{rootDomain}</span><span className="a-muted text-sm">Your free EstateProfile address. Always works.</span></span>
+              <span className="min-w-0"><span className="block font-medium [overflow-wrap:anywhere]">{tenant.slug}.{rootDomain}</span><span className="a-muted text-sm">Your free EstateInvestor address. Always works.</span></span>
               <span className={`a-pill ${tenant.published === false ? "a-pill-amber" : "a-pill-green"}`}>{tenant.published === false ? "Not published" : "Live"}</span>
             </div>
             {customDomains && tenant.domains.map((d) => (

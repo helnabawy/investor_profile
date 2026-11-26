@@ -1,4 +1,4 @@
-# EstateProfile
+# EstateInvestor
 
 Portfolio websites with an AI concierge for real-estate agents and brokers. One codebase runs two ways:
 

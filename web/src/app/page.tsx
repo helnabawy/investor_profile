@@ -25,7 +25,7 @@ const STEPS = [
 const perDay = (n: number) => `${n.toLocaleString("en")} concierge messages a day`;
 const PLANS = [
   { name: LIMITS.free.name, price: "Free", per: "", desc: "Try it with your listings", cta: "Start free", href: "/signup",
-    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "All templates", "EstateProfile badge in the footer"] },
+    items: ["Your site on our subdomain", `Up to ${LIMITS.free.maxProjects} projects`, perDay(LIMITS.free.dailyChat), "All templates", "EstateInvestor badge in the footer"] },
   { name: LIMITS.solo.name, price: "AED 199", per: " a month", desc: "For independent agents", cta: "Start free, upgrade later", href: "/signup", highlight: true,
     items: ["Your own domain", "Unlimited projects", perDay(LIMITS.solo.dailyChat), "All templates", "No badge"] },
   { name: LIMITS.team.name, price: "Contact us", per: "", desc: "For brokerages", cta: "Start free, upgrade later", href: "/signup",
@@ -236,7 +236,7 @@ export default function Landing() {
 
       <footer className="border-t border-line bg-surface">
         <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4 text-[0.95rem] text-ink-3">
-          <span>© {new Date().getFullYear()} EstateProfile</span>
+          <span>© {new Date().getFullYear()} EstateInvestor</span>
           <Link href="/login" className="a-link inline-flex min-h-11 items-center">Sign in</Link>
         </div>
       </footer>

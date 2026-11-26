@@ -1,4 +1,4 @@
-# Deploying EstateProfile (Vercel + Supabase)
+# Deploying EstateInvestor (Vercel + Supabase)
 
 This guide takes the SaaS setup (`DEPLOY_MODE=multi`) from nothing to a live site, with two environments:
 

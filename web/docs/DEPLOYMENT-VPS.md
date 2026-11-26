@@ -1,4 +1,4 @@
-# Deploying EstateProfile on a VPS behind Cloudflare
+# Deploying EstateInvestor on a VPS behind Cloudflare
 
 This guide runs the whole platform on one server you rent, with Cloudflare in front:
 

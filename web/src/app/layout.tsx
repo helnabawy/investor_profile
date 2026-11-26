@@ -3,7 +3,7 @@ import "./globals.css";
 import { THEME_SCRIPT } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
-  title: "EstateProfile — websites & AI concierge for real-estate agents",
+  title: "EstateInvestor — websites & AI concierge for real-estate agents",
   description: "Launch a beautiful property portfolio site with an AI concierge that captures leads 24/7.",
 };
 

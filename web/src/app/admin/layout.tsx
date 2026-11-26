@@ -8,7 +8,7 @@ import { platformFont } from "@/lib/fonts";
 import { tenantPlan } from "@/lib/tenant";
 import { templateFor } from "@/lib/templates";
 
-export const metadata = { title: "Dashboard · EstateProfile", icons: { icon: "/logo-mark.svg" } };
+export const metadata = { title: "Dashboard · EstateInvestor", icons: { icon: "/logo-mark.svg" } };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { db, user, sites, tenant } = await getAdmin();

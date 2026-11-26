@@ -22,7 +22,7 @@ export function TemplateFooter({ name, tagline, contact, nav, poweredBy }: { nam
       </div>
       <div className="border-t px-5 py-5 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} {name}
-        {poweredBy && <> · Powered by <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateProfile</a></>}
+        {poweredBy && <> · Powered by <a href={process.env.NEXT_PUBLIC_PLATFORM_URL ?? "#"} className="underline">EstateInvestor</a></>}
       </div>
     </footer>
   );
