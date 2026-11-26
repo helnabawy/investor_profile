@@ -1,7 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
-import { starterPages, starterTheme, STARTER_NAV } from "@/lib/admin/starter";
+import { starterAssistant, starterPages, starterTheme, STARTER_NAV } from "@/lib/admin/starter";
 import { isMulti } from "@/lib/env";
 import { PRESETS } from "@/lib/theme";
 import { TEMPLATES, templateFor } from "@/lib/templates";
@@ -31,7 +31,7 @@ export async function createSite(_: { error?: string } | null, f: FormData): Pro
   const { data: tenant, error } = await admin.from("tenants").insert({
     slug, name,
     theme: starterTheme(template, preset),
-    ai_config: { provider: "auto", assistantName: `${name} Concierge` },
+    ai_config: { provider: "auto", ...starterAssistant(name) },
     contact: { email: user.email },
     nav: STARTER_NAV,
   }).select("id").single();
