@@ -42,10 +42,10 @@ export function starterPages(name: string): { slug: string; title: string; sort:
 }
 
 export const STARTER_NAV = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Projects", href: "/projects" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", label_ar: "الرئيسية", href: "/" },
+  { label: "About", label_ar: "من نحن", href: "/about" },
+  { label: "Projects", label_ar: "المشاريع", href: "/projects" },
+  { label: "Contact", label_ar: "تواصل معنا", href: "/contact" },
 ];
 
 /** New sites start on the template picked at sign-up, with a neutral architectural backdrop the agent can replace. */
@@ -55,6 +55,7 @@ export function starterTheme(template: string, preset: string) {
     layout: siteLayout({ layout: template as SiteLayout }),
     backdropUrl: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=2400&q=80",
     ctaLabel: "Book a consultation",
+    ctaLabel_ar: "احجز استشارة",
     ctaHref: "/contact",
   };
 }

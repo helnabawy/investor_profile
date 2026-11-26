@@ -11,6 +11,7 @@ import { isMulti } from "./env";
 import { PLANS, planOf, type Plan } from "./plans";
 import { isLocale, type Locale } from "./i18n/locales";
 import { localize } from "./i18n/content";
+import { withStockArabic } from "./i18n/stock-labels";
 
 const TENANT_COLUMNS = "id,slug,name,name_ar,tagline,tagline_ar,default_locale,locales,domains,plan,theme,ai_config,contact,nav,published,allowed_origins";
 
@@ -77,7 +78,7 @@ export const siteLocale = cache(async (): Promise<Locale> => {
 export async function requireTenant(site: string) {
   const t = await getTenantBySite(site);
   if (!t) notFound();
-  return localize(t, await siteLocale());
+  return localize(withStockArabic(t), await siteLocale());
 }
 
 export const getPage = cache(async (tenantId: string, slug: string) => {
