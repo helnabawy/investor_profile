@@ -211,6 +211,54 @@ body:has(main [data-hero]) .site-header:not(.is-solid) {
 .c-badge { display: inline-flex; align-items: center; border-radius: 0.375rem; padding: 0.3rem 0.6rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
 .c-label { font-size: 0.78rem; color: var(--muted-foreground); }
 .c-figure { font-family: var(--font-heading); font-weight: 700; font-variant-numeric: lining-nums tabular-nums; }
+/* Price growth charts (project page). One hue, two steps: the launch value is a light step of
+   --primary, today's is --primary itself. Text stays in text colours; marks carry the hue. */
+.pg-before, .pg-paid { background: color-mix(in srgb, var(--primary) 32%, var(--card)); }
+.pg-now { background: var(--primary); }
+.pg-key { width: 0.75rem; height: 0.75rem; border-radius: 3px; }
+.pg-toggle { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--muted); }
+.pg-toggle button { min-height: 2.25rem; padding: 0 0.9rem; border-radius: 999px; font-size: 0.875rem; font-weight: 500; color: var(--muted-foreground); transition: background-color 0.2s, color 0.2s; }
+.pg-toggle button[aria-checked="true"] { background: var(--card); color: var(--foreground); box-shadow: 0 1px 3px rgb(0 0 0 / 0.12); }
+.pg-toggle button:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.pg-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label value" "track track";
+  column-gap: 1rem; align-items: center; padding: 0.55rem 0.5rem; margin: 0 -0.5rem; border-radius: var(--radius); outline: none;
+}
+@media (min-width: 640px) { .pg-row { grid-template-columns: 7.5rem minmax(0, 1fr) 6.5rem; grid-template-areas: "label track value"; } }
+.pg-row:not(.pg-axis):hover, .pg-row:focus-visible { background: color-mix(in srgb, var(--primary) 6%, transparent); }
+.pg-row:focus-visible { box-shadow: inset 0 0 0 2px var(--primary); }
+.pg-label { grid-area: label; line-height: 1.25; }
+.pg-value { grid-area: value; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
+.pg-track { grid-area: track; position: relative; height: 1.75rem; margin: 0 0.5rem; }
+.pg-grid { position: absolute; top: -0.55rem; bottom: -0.55rem; width: 1px; background: var(--border); }
+.pg-axis { padding-top: 0; }
+.pg-axis .pg-track { height: 1rem; }
+@media (max-width: 639.98px) { .pg-axis .pg-value { display: none; } }
+.pg-tick { position: absolute; transform: translateX(-50%); font-size: 0.75rem; color: var(--muted-foreground); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pg-link { position: absolute; top: 50%; height: 2px; margin-top: -1px; background: color-mix(in srgb, var(--primary) 55%, var(--card)); transform-origin: left; }
+.pg-dot { position: absolute; top: 50%; width: 0.875rem; height: 0.875rem; margin: -0.4375rem 0 0 -0.4375rem; border-radius: 999px; box-shadow: 0 0 0 2px var(--card); }
+.pg-stack { position: absolute; top: 50%; height: 0.875rem; margin-top: -0.4375rem; display: flex; gap: 2px; transform-origin: left; }
+.pg-stack > span { min-width: 2px; }
+.pg-stack > span:first-child { border-radius: 2px 0 0 2px; }
+.pg-stack > span:last-child { border-radius: 0 4px 4px 0; }
+.pg-tip {
+  position: absolute; bottom: calc(100% + 0.25rem); z-index: 5; transform: translateX(-50%); display: flex; flex-direction: column; gap: 1px;
+  min-width: 10rem; padding: 0.55rem 0.75rem; border-radius: var(--radius); background: var(--card); border: 1px solid var(--border);
+  box-shadow: 0 10px 28px -12px rgb(0 0 0 / 0.35); font-size: 0.8rem; line-height: 1.35; color: var(--foreground); white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.15s;
+}
+.pg-row:hover .pg-tip, .pg-row:focus-visible .pg-tip { opacity: 1; }
+/* Entrance: today's dot travels out from the launch dot and the bars grow from the baseline. */
+.pg-chart .pg-moving, .pg-chart .pg-link, .pg-chart .pg-stack { transition: left 0.5s cubic-bezier(.2,.7,.2,1), width 0.5s cubic-bezier(.2,.7,.2,1), transform 0.5s cubic-bezier(.2,.7,.2,1); }
+.pg-chart[data-phase="armed"] .pg-moving { left: var(--from) !important; }
+.pg-chart[data-phase="armed"] .pg-link, .pg-chart[data-phase="armed"] .pg-stack { transform: scaleX(0); }
+.pg-chart[data-phase="in"] :is(.pg-moving, .pg-link, .pg-stack) { transition-duration: 0.9s; transition-delay: calc(var(--i, 0) * 90ms + 150ms); }
+.pg-details summary { list-style: none; display: inline-flex; min-height: 2.75rem; align-items: center; }
+.pg-details summary::-webkit-details-marker { display: none; }
+.pg-details summary::after { content: "+"; margin-left: 0.5rem; }
+.pg-details[open] summary::after { content: "−"; }
+@media (prefers-reduced-motion: reduce) { .pg-chart :is(.pg-moving, .pg-link, .pg-stack) { transition: none; } }
+
 /* Always a dark band with white text, whatever the preset (light or dark): built from a fixed
    near-black tinted by the brand colour, not from --foreground. */
 .c-dark { --c-dark-bg: color-mix(in srgb, #0b0f0e 84%, var(--primary)); background: var(--c-dark-bg); color: #fff; }

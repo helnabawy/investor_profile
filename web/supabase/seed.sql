@@ -73,6 +73,19 @@ insert into public.projects (tenant_id, title, developer, area, city, property_t
  'Corner villa backing onto the park, renovated kitchen, private garden.', '{"Garden","Park view","Maid room"}',
  '{"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=80"}', true, 0);
 
+-- Price growth since launch on one demo project, charted on its project page.
+update public.projects set
+  bedrooms = 'Studio, 1, 2, 3',
+  price_from = 750000,
+  for_sale = true,
+  price_growth = '{"label":"Granada (4)","beforeLabel":"Launch","nowLabel":"Today","note":null,"units":[
+    {"unit":"Studio","size":"37–44","before":591000,"now":750000,"psfBefore":1484,"psfNow":1884,"paid":236400},
+    {"unit":"1 BR","size":"60–77","before":909000,"now":1150000,"psfBefore":1409,"psfNow":1782,"paid":363600},
+    {"unit":"2 BR","size":"105","before":1360000,"now":1720000,"psfBefore":1203,"psfNow":1523,"paid":544000},
+    {"unit":"2 BR + maid","size":"135","before":1670000,"now":2000000,"psfBefore":1150,"psfNow":1380,"paid":668000},
+    {"unit":"3 BR","size":"175","before":1959000,"now":2300000,"psfBefore":1040,"psfNow":1221,"paid":783000}]}'
+where tenant_id = '11111111-1111-1111-1111-111111111111' and title = 'Marina Vista Residences';
+
 insert into public.faqs (tenant_id, question, answer, sort) values
 ('11111111-1111-1111-1111-111111111111', 'Can foreigners buy property in Dubai?', 'Yes. Non-residents can buy freehold property in designated areas such as Dubai Marina, Downtown, Palm Jumeirah and Business Bay.', 0),
 ('11111111-1111-1111-1111-111111111111', 'What are the buying costs?', 'Budget roughly 4% Dubai Land Department fee, plus registration and agency fees. We provide a full cost sheet for each unit.', 1),

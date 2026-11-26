@@ -1,6 +1,7 @@
 import type { ThemeConfig } from "./theme";
 import type { AiConfig } from "./ai/config";
 import type { Section } from "./sections/registry";
+import type { PriceGrowth } from "./price-growth";
 
 export type Contact = {
   email?: string;
@@ -59,6 +60,10 @@ export type Project = {
   amenities: string[];
   images: string[];
   brochure_url: string | null;
+  /** Launch-vs-today prices per unit type, charted on the project page. */
+  price_growth: PriceGrowth | null;
+  /** Shown to visitors as an "Available for sale" tag. */
+  for_sale: boolean;
   featured: boolean;
   published: boolean;
   sort: number;
@@ -82,4 +87,4 @@ export type Lead = {
 };
 
 export const PROJECT_COLUMNS =
-  "id,tenant_id,title,developer,area,city,property_type,status,bedrooms,price_from,currency,handover,payment_plan,roi,description,amenities,images,brochure_url,featured,published,sort";
+  "id,tenant_id,title,developer,area,city,property_type,status,bedrooms,price_from,currency,handover,payment_plan,roi,description,amenities,images,brochure_url,price_growth,for_sale,featured,published,sort";

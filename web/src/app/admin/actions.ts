@@ -9,6 +9,7 @@ import type { Section } from "@/lib/sections/registry";
 import type { ThemeConfig } from "@/lib/theme";
 import { addDomainToHosting, removeDomainFromHosting } from "@/lib/domains";
 import { tenantPlan } from "@/lib/tenant";
+import { cleanPriceGrowth } from "@/lib/price-growth";
 
 export type ActionResult = { ok: boolean; error?: string; id?: string };
 
@@ -175,6 +176,11 @@ export async function deletePage(id: string) {
 // ───────────── projects ─────────────
 const list = (v: string) => v.split("\n").map((s) => s.trim()).filter(Boolean);
 
+function readGrowth(json: string) {
+  if (!json) return null;
+  try { return cleanPriceGrowth(JSON.parse(json)); } catch { return null; }
+}
+
 export async function saveProject(_: ActionResult | null, f: FormData): Promise<ActionResult> {
   const { db, tenant } = await getAdmin();
   const id = fd(f, "id");
@@ -200,6 +206,8 @@ export async function saveProject(_: ActionResult | null, f: FormData): Promise<
     amenities: list(fd(f, "amenities")),
     images: list(fd(f, "images")),
     brochure_url: orNull(fd(f, "brochure_url")),
+    price_growth: readGrowth(fd(f, "price_growth")),
+    for_sale: f.get("for_sale") === "on",
     featured: f.get("featured") === "on",
     published: f.get("published") === "on",
     sort: Number(fd(f, "sort")) || 0,

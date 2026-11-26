@@ -26,7 +26,7 @@ const H2 = "text-balance font-heading text-[clamp(1.75rem,3vw,2.5rem)] leading-[
 /** The short plan label for tight spaces: "60/40 — 60% during construction…" → "60/40". */
 const planShort = (plan: string | null) => plan?.match(/^\s*\d{1,2}\s*\/\s*\d{1,2}/)?.[0].replace(/\s/g, "") ?? plan?.split(/[;—–-]/)[0].trim() ?? "";
 const handover = (p: Project) => (p.status === "ready" ? "Ready" : p.handover ?? "");
-const facts = (p: Project) => [p.area, statusLabel(p.status)].filter(Boolean).join(" · ");
+const facts = (p: Project) => [p.area, statusLabel(p.status), p.for_sale && "Available for sale"].filter(Boolean).join(" · ");
 
 function Img({ src, alt = "", className }: { src: string; alt?: string; className: string }) {
   // eslint-disable-next-line @next/next/no-img-element
@@ -86,7 +86,10 @@ function HorizonProjects({ projects, p }: { projects: Project[]; p: P }) {
             <Link href={`/projects/${pr.id}`} className="group flex flex-col gap-4">
               <div className="relative h-[250px] overflow-hidden rounded-2xl bg-muted">
                 {pr.images[0] && <Img src={pr.images[0]} alt={pr.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />}
-                <span className={`absolute left-3.5 top-3.5 rounded-full px-3 py-1 text-[0.8rem] font-semibold ${pr.status === "ready" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`}>{statusLabel(pr.status)}</span>
+                <span className="absolute left-3.5 right-3.5 top-3.5 flex flex-wrap gap-1.5">
+                  <span className={`rounded-full px-3 py-1 text-[0.8rem] font-semibold ${pr.status === "ready" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`}>{statusLabel(pr.status)}</span>
+                  {pr.for_sale && <span className="rounded-full bg-primary px-3 py-1 text-[0.8rem] font-semibold text-primary-foreground">Available for sale</span>}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <h3 className="text-[1.25rem] font-bold leading-snug transition-colors group-hover:text-primary">{pr.title}</h3>
@@ -134,7 +137,7 @@ function LedgerProjects({ projects, p }: { projects: Project[]; p: P }) {
             <Link key={pr.id} href={`/projects/${pr.id}`} className={`t-row grid ${LEDGER_COLS} items-center gap-5 border-t px-6 py-3.5`}>
               <span className="flex min-w-0 items-center gap-4">
                 {pr.images[0] ? <Img src={pr.images[0]} className="h-[60px] w-[84px] shrink-0 rounded-md object-cover" /> : <span className="h-[60px] w-[84px] shrink-0 rounded-md bg-muted" />}
-                <span className="flex min-w-0 flex-col leading-snug"><span className="truncate text-[1.05rem] font-bold">{pr.title}</span><span className="truncate text-[0.88rem] text-muted-foreground">{[statusLabel(pr.status), pr.bedrooms && `${pr.bedrooms} BR`].filter(Boolean).join(" · ")}</span></span>
+                <span className="flex min-w-0 flex-col leading-snug"><span className="truncate text-[1.05rem] font-bold">{pr.title}</span><span className="truncate text-[0.88rem] text-muted-foreground">{[statusLabel(pr.status), pr.for_sale && "For sale", pr.bedrooms && `${pr.bedrooms} BR`].filter(Boolean).join(" · ")}</span></span>
               </span>
               <span className="truncate text-[0.97rem]">{pr.area ?? "—"}</span>
               <span className="font-bold tabular-nums">{formatFullPrice(pr.price_from, pr.currency)}</span>

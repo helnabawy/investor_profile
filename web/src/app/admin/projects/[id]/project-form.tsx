@@ -6,6 +6,7 @@ import { deleteProject, saveProject } from "../../actions";
 import { FormMessage, SubmitButton } from "@/components/admin/ui";
 import { UploadButton } from "@/components/admin/image-upload";
 import type { Project } from "@/lib/types";
+import { PriceGrowthEditor } from "./price-growth-editor";
 
 const STATUS_LABEL = { "off-plan": "Off-plan", ready: "Ready", "sold-out": "Sold out" } as const;
 
@@ -23,6 +24,7 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
   const p = project;
   const [images, setImages] = useState<string[]>(p?.images ?? []);
   const [brochure, setBrochure] = useState(p?.brochure_url ?? "");
+  const [forSale, setForSale] = useState(p?.for_sale ?? false);
   // Mirrors the fields the buyer card and checklist read, so both update as the agent types.
   const [v, setV] = useState({
     title: p?.title ?? "", area: p?.area ?? "", bedrooms: p?.bedrooms ?? "", status: p?.status ?? "off-plan",
@@ -89,6 +91,10 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
               </div>
             </Card>
 
+            <Card title="Price growth" hint="Show buyers how much the project has risen since launch. Your project page turns these figures into charts.">
+              <PriceGrowthEditor value={p?.price_growth ?? null} currency={v.currency} />
+            </Card>
+
             <Card title="Description and amenities">
               <label className="field"><span>Description</span><textarea name="description" rows={5} defaultValue={p?.description ?? ""} /></label>
               <label className="field"><span>Amenities</span><textarea name="amenities" rows={4} defaultValue={p?.amenities.join("\n")} /><small>One per line.</small></label>
@@ -142,7 +148,10 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={images[0]} alt="" className="h-full w-full object-cover" />
                     : <span className="a-muted flex h-full items-center justify-center text-sm">No cover photo yet</span>}
-                  <span className="absolute left-3 top-3 rounded-sm bg-surface px-2.5 py-1 text-xs font-semibold">{STATUS_LABEL[v.status as keyof typeof STATUS_LABEL] ?? "Off-plan"}</span>
+                  <span className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+                    <span className="rounded-sm bg-surface px-2.5 py-1 text-xs font-semibold">{STATUS_LABEL[v.status as keyof typeof STATUS_LABEL] ?? "Off-plan"}</span>
+                    {forSale && <span className="rounded-sm bg-inverse px-2.5 py-1 text-xs font-semibold text-white">Available for sale</span>}
+                  </span>
                 </div>
                 <div className="flex flex-col gap-2.5 px-4 pb-4 pt-3.5">
                   <div>
@@ -172,6 +181,7 @@ export function ProjectForm({ tenantId, project }: { tenantId: string; project?:
 
             <section className="a-card flex flex-col gap-4 !p-5">
               <h2 className="font-semibold">Visibility</h2>
+              <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="for_sale" checked={forSale} onChange={(e) => setForSale(e.target.checked)} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">Available for sale</span><span className="a-muted block text-sm">Shows an &ldquo;Available for sale&rdquo; tag on the project card and page.</span></span></label>
               <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="published" defaultChecked={p?.published ?? true} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">Published</span><span className="a-muted block text-sm">Shown on your site and known to the concierge.</span></span></label>
               <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="featured" defaultChecked={p?.featured} className="mt-0.5 h-5 w-5" /><span><span className="font-medium">Featured on the home page</span><span className="a-muted block text-sm">Featured projects lead your home page.</span></span></label>
               <label className="field"><span>Position in lists</span><input name="sort" type="number" min={0} defaultValue={p?.sort ?? 0} className="!w-28" /><small>Lower numbers come first.</small></label>

@@ -3,8 +3,9 @@ import Link from "@/components/site/link";
 import { notFound } from "next/navigation";
 import { requireTenant, getProject } from "@/lib/tenant";
 import { formatFullPrice, whatsappLink } from "@/lib/format";
-import { statusLabel, yieldFigure } from "@/components/site/project-card";
+import { ForSaleTag, statusLabel, yieldFigure } from "@/components/site/project-card";
 import { ContactForm, OpenChatButton } from "@/components/sections/client";
+import { PriceGrowthSection } from "@/components/site/price-growth";
 import { ArrowLeft, Check, FileDown, MapPin } from "lucide-react";
 
 type Props = { params: Promise<{ site: string; id: string }> };
@@ -48,7 +49,10 @@ export default async function ProjectPage({ params }: Props) {
 
       <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
         <div className="flex min-w-0 flex-col gap-2.5">
-          <span className="c-badge c-tile self-start">{statusLabel(p.status)}</span>
+          <span className="flex flex-wrap gap-2">
+            <span className="c-badge c-tile">{statusLabel(p.status)}</span>
+            {p.for_sale && <ForSaleTag />}
+          </span>
           <h1 className="text-balance text-[clamp(1.9rem,3.4vw,2.75rem)] font-bold leading-[1.1]">{p.title}</h1>
           <p className="flex items-center gap-2 text-[1.06rem] text-muted-foreground">
             <MapPin size={18} aria-hidden /> {[[p.area, p.city].filter(Boolean).join(", "), p.developer && `by ${p.developer}`].filter(Boolean).join(" · ")}
@@ -88,6 +92,8 @@ export default async function ProjectPage({ params }: Props) {
               <p className="whitespace-pre-line text-[1.06rem] leading-relaxed text-muted-foreground">{p.description}</p>
             </section>
           )}
+
+          {p.price_growth && <PriceGrowthSection growth={p.price_growth} currency={p.currency} />}
 
           {p.payment_plan && (
             <section className="c-card flex flex-col gap-4 p-7">

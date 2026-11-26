@@ -110,10 +110,16 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
       (type === "all" || p.property_type === type) &&
       (budget === "all" || (p.price_from != null && price >= lo && price < hi));
   });
-  const counts = { all: base.length, "off-plan": base.filter((p) => p.status === "off-plan").length, ready: base.filter((p) => p.status === "ready").length };
+  const counts = {
+    all: base.length, "off-plan": base.filter((p) => p.status === "off-plan").length, ready: base.filter((p) => p.status === "ready").length,
+    "for-sale": base.filter((p) => p.for_sale).length,
+  };
+  // "For sale" is the agent's own flag, so the chip only appears once a project carries it.
+  const chips: ["all" | "off-plan" | "ready" | "for-sale", string][] = [["all", "All"], ["off-plan", "Off-plan"], ["ready", "Ready"]];
+  if (projects.some((p) => p.for_sale)) chips.push(["for-sale", "For sale"]);
   const byPrice = (a: Project, b: Project) => (a.price_from ?? Infinity) - (b.price_from ?? Infinity);
   const shown = base
-    .filter((p) => status === "all" || p.status === status)
+    .filter((p) => status === "all" || (status === "for-sale" ? p.for_sale : p.status === status))
     .sort(sort === "price-asc" ? byPrice : sort === "price-desc" ? (a, b) => byPrice(b, a) : sort === "featured" ? (a, b) => Number(b.featured) - Number(a.featured) : () => 0);
   const currency = projects[0]?.currency ?? "AED";
 
@@ -131,7 +137,7 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="group" aria-label="Status" className="flex flex-wrap gap-2">
-          {([["all", "All"], ["off-plan", "Off-plan"], ["ready", "Ready"]] as const).map(([v, l]) => (
+          {chips.map(([v, l]) => (
             <button key={v} type="button" aria-pressed={status === v} onClick={() => setStatus(v)}
               className={`min-h-11 rounded-full border px-4 text-[0.94rem] ${status === v ? "border-primary bg-primary font-semibold text-primary-foreground" : "bg-card font-medium hover:border-primary"}`}>
               {l} · {counts[v]}

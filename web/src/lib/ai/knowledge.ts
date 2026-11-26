@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Faq, Project, Tenant } from "../types";
 import { PROJECT_COLUMNS } from "../types";
+import { growthSummary } from "../price-growth";
 import { formatPrice } from "../format";
 
 // Retrieval uses Postgres full-text search (no embeddings), so it works with every
@@ -32,6 +33,8 @@ export function projectSummary(p: Project) {
     p.handover && `handover: ${p.handover}`,
     p.payment_plan && `payment plan: ${p.payment_plan}`,
     p.roi && `yield: ${p.roi}`,
+    p.for_sale && "available for sale now",
+    growthSummary(p.price_growth, p.currency),
   ]
     .filter(Boolean)
     .join(" | ");

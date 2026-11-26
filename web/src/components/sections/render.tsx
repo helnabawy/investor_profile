@@ -124,7 +124,7 @@ async function SectionView({ s, tenant, layout, index, next }: { s: Section; ten
             {featured && (
               <Link href={`/projects/${featured.id}`} className="absolute inset-x-4 bottom-4 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 rounded-[calc(var(--radius)+2px)] bg-card px-5 py-4 shadow-[0_10px_28px_rgb(0_0_0/0.18)] transition hover:-translate-y-0.5 sm:inset-x-5 sm:bottom-5">
                 <span className="flex min-w-0 flex-col">
-                  <span className="text-xs font-semibold uppercase tracking-[0.06em] text-primary">Featured · {statusLabel(featured.status)}</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.06em] text-primary">Featured · {statusLabel(featured.status)}{featured.for_sale && " · Available for sale"}</span>
                   <span className="font-heading font-bold">{featured.title}</span>
                   <span className="text-sm text-muted-foreground">{[featured.area, yld && `${yld} expected gross yield`].filter(Boolean).join(" · ")}</span>
                 </span>

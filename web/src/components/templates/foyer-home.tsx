@@ -97,7 +97,7 @@ export function FoyerHome({ name, tagline, title, subtitle, image, projects, faq
                       : <span className="h-[58px] w-[76px] shrink-0 rounded-lg bg-muted" />}
                     <span className="flex min-w-0 flex-1 flex-col leading-snug">
                       <span className="truncate text-[1.05rem] font-bold group-hover:underline group-hover:underline-offset-4">{p.title}</span>
-                      <span className="truncate text-[0.88rem] text-muted-foreground">{[p.area, statusLabel(p.status), p.status === "ready" ? null : p.handover].filter(Boolean).join(" · ")}</span>
+                      <span className="truncate text-[0.88rem] text-muted-foreground">{[p.area, statusLabel(p.status), p.for_sale && "For sale", p.status === "ready" ? null : p.handover].filter(Boolean).join(" · ")}</span>
                     </span>
                     <span className="shrink-0 whitespace-nowrap font-bold tabular-nums">{formatPrice(p.price_from, p.currency)}</span>
                   </Link>
