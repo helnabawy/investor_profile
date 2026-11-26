@@ -63,6 +63,7 @@ async function TenantShell({ children, params }: Props) {
         <LoungeSidebar
           name={tenant.name}
           logoUrl={tenant.theme?.logoUrl}
+          portraitUrl={tenant.theme?.portraitUrl}
           nav={tenant.nav ?? []}
           cta={{ label: tenant.theme?.ctaLabel || "Book a consultation", href: tenant.theme?.ctaHref || "/contact" }}
         />

@@ -110,7 +110,7 @@ export function ThemeEditor({ tenantId, initial, name, hasDraft, justPublished }
           {current.id === "lounge" && (
             <section className="a-card grid gap-4">
               <h2 className="text-[1.05rem] font-semibold">Lounge photos</h2>
-              <ImageField tenantId={tenantId} label="Your portrait (round avatar above the chat)" value={cfg.portraitUrl ?? ""} onChange={(v) => set({ portraitUrl: v })} />
+              <ImageField tenantId={tenantId} label="Your portrait (round avatar above the chat and in the sidebar)" value={cfg.portraitUrl ?? ""} onChange={(v) => set({ portraitUrl: v })} />
               <ImageField tenantId={tenantId} label="Backdrop photo (blurred and toned behind the chat and page headers)" value={cfg.backdropUrl ?? ""} onChange={(v) => set({ backdropUrl: v })} />
               <p className="a-muted text-sm">Portraits work best as a square head-and-shoulders crop. Quick-question buttons are set under AI concierge.</p>
             </section>

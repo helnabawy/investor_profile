@@ -30,16 +30,18 @@ function Avatar({ src, name, size }: { src?: string; name: string; size: "lg" | 
       layoutId="lounge-avatar"
       transition={{ duration: 0.6, ease: EASE }}
       className={cn(
-        "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-[var(--lounge-glass-line)]",
-        size === "lg" ? "h-24 w-24 shadow-[0_18px_40px_-12px_rgb(0_0_0/0.8)]" : "h-10 w-10",
+        "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+        size === "lg"
+          ? "h-32 w-32 shadow-[0_24px_56px_-14px_rgb(0_0_0/0.85)] ring-2 ring-[color-mix(in_srgb,var(--lounge-accent)_45%,transparent)] ring-offset-4 ring-offset-transparent sm:h-40 sm:w-40 lg:h-44 lg:w-44"
+          : "h-11 w-11 ring-1 ring-[var(--lounge-glass-line)]",
       )}
       style={{ background: "color-mix(in srgb, var(--primary) 30%, #0b0a08)" }}
     >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" className="h-full w-full object-cover" />
+        <img src={src} alt="" className="h-full w-full object-cover object-[50%_30%]" />
       ) : (
-        <span className={cn("font-heading text-[var(--lounge-accent)]", size === "lg" ? "text-3xl" : "text-sm")}>{initials}</span>
+        <span className={cn("font-heading text-[var(--lounge-accent)]", size === "lg" ? "text-5xl" : "text-sm")}>{initials}</span>
       )}
     </motion.span>
   );

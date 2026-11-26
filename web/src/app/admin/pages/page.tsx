@@ -15,7 +15,7 @@ export default async function PagesList() {
       <div className="stagger overflow-hidden rounded-xl border bg-surface">
         {pages.map((p, i) => (
           <Link key={p.id} href={`/admin/pages/${p.id}`} className={`a-row flex min-h-[68px] items-center gap-4 px-5 py-3 ${i ? "border-t" : ""}`}>
-            <span className="flex min-w-0 flex-1 flex-col"><span className="font-semibold">{p.title}</span><span className="a-muted text-[0.85rem]">/{p.slug} · {p.sections.length} sections</span></span>
+            <span className="flex min-w-0 flex-1 flex-col"><span className="font-semibold">{p.title}</span><span className="a-muted text-[0.85rem]">/{p.slug} · {p.sections.length} {p.sections.length === 1 ? "section" : "sections"}</span></span>
             <span className={`a-pill ${p.published ? "a-pill-green" : "a-pill-grey"}`}>{p.published ? "Published" : "Draft"}</span>
             <ChevronRight size={18} className="text-faint" aria-hidden />
           </Link>

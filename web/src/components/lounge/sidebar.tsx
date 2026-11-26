@@ -16,19 +16,27 @@ const ICONS: [RegExp, typeof House][] = [
 ];
 const iconFor = (href: string) => ICONS.find(([re]) => re.test(href))?.[1] ?? FileText;
 
-type Props = { name: string; logoUrl?: string; nav: NavItem[]; cta: { label: string; href: string } };
+type Props = { name: string; logoUrl?: string; portraitUrl?: string; nav: NavItem[]; cta: { label: string; href: string } };
 
-function Monogram({ name }: { name: string }) {
+/** The advisor's portrait when there is one (the same photo as the home avatar), else their initials. */
+function Monogram({ name, portraitUrl }: { name: string; portraitUrl?: string }) {
   const letters = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
   return (
-    <div className="flex flex-col items-center gap-3 text-center">
-      <span className="font-heading text-[2.6rem] leading-none tracking-tight text-[var(--sidebar-mark)]">{letters}</span>
+    <div className="flex flex-col items-center gap-4 text-center">
+      {portraitUrl ? (
+        <span className="h-28 w-28 overflow-hidden rounded-full shadow-[0_14px_32px_-12px_rgb(0_0_0/0.7)] ring-2 ring-[color-mix(in_srgb,var(--sidebar-mark)_55%,transparent)] ring-offset-4 ring-offset-[var(--sidebar)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={portraitUrl} alt="" className="h-full w-full object-cover object-[50%_30%]" />
+        </span>
+      ) : (
+        <span className="font-heading text-[2.6rem] leading-none tracking-tight text-[var(--sidebar-mark)]">{letters}</span>
+      )}
       <span className="font-heading text-[0.95rem] uppercase tracking-[0.22em]">{name}</span>
     </div>
   );
 }
 
-function Panel({ name, logoUrl, nav, cta, onNavigate }: Props & { onNavigate?: () => void }) {
+function Panel({ name, logoUrl, portraitUrl, nav, cta, onNavigate }: Props & { onNavigate?: () => void }) {
   const path = useSitePathname() ?? "/";
   const items = nav.some((n) => n.href === "/") ? nav : [{ label: "Home", href: "/" }, ...nav];
   const active = (href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(href + "/"));
@@ -40,7 +48,7 @@ function Panel({ name, logoUrl, nav, cta, onNavigate }: Props & { onNavigate?: (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={logoUrl} alt={name} className="max-h-24 w-auto max-w-[80%] object-contain" />
         ) : (
-          <Monogram name={name} />
+          <Monogram name={name} portraitUrl={portraitUrl} />
         )}
       </Link>
       <nav aria-label="Main" className="border-t border-[var(--sidebar-line)] px-3 py-3">
